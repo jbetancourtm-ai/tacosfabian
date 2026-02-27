@@ -65,6 +65,20 @@
 </header>
 
 <main>
+  <div class="card" id="studentInfoCard">
+    <div class="row" style="flex-wrap:wrap; gap:10px;">
+      <div>
+        <label>Nombre del cadete:<br><input type="text" id="inputName"></label>
+      </div>
+      <div>
+        <label>Arma:<br><input type="text" id="inputArma"></label>
+      </div>
+      <div>
+        <label>Servicio:<br><input type="text" id="inputServicio"></label>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="row">
       <div>
@@ -76,6 +90,11 @@
     <div style="margin-top:10px">
       <textarea id="exportArea" placeholder="Aquí aparecerá el JSON de resultados..."></textarea>
     </div>
+  </div>
+
+  <div id="feedback" class="card" style="display:none;">
+    <div class="qtitle">Retroalimentación</div>
+    <div id="feedbackText" class="small"></div>
   </div>
 
   <div id="quiz"></div>

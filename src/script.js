@@ -75,15 +75,37 @@ function updateProgress(){
 function grade(){
   const answeredInputs = quizEl.querySelectorAll('input[type=radio]:checked');
   let score = 0;
+  const wrongSections = {};
   answeredInputs.forEach(inp=>{
     const idx = parseInt(inp.name.slice(1),10);
-    if(inp.value === QUESTIONS[idx].answer) score++;
+    if(inp.value === QUESTIONS[idx].answer) {
+      score++;
+    } else {
+      const sec = QUESTIONS[idx].section;
+      wrongSections[sec] = (wrongSections[sec]||0)+1;
+    }
   });
   const elapsed = Math.floor((new Date() - startTime)/1000);
-  document.getElementById('pillScore').textContent = `Puntaje: ${score}`;
+  const percent = Math.round((score/QUESTIONS.length)*100);
+  document.getElementById('pillScore').textContent = `Puntaje: ${score} (${percent}%)`;
   document.getElementById('pillTime').textContent = `Tiempo: ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
   document.getElementById('pillStatus').textContent = 'Calificado';
   document.getElementById('btnExport').disabled = false;
+
+  // feedback
+  const feedbackEl = document.getElementById('feedback');
+  const feedbackText = document.getElementById('feedbackText');
+  if(score === QUESTIONS.length){
+    feedbackText.textContent = '¡Felicitaciones! Contestaste todas las preguntas correctamente.';
+  } else {
+    const sections = Object.keys(wrongSections);
+    if(sections.length) {
+      feedbackText.textContent = 'Debes reforzar los temas: ' + sections.join(', ') + '.';
+    } else {
+      feedbackText.textContent = 'Hubo algunas respuestas incorrectas. Repasa el examen.';
+    }
+  }
+  feedbackEl.style.display = 'block';
 }
 
 function reset(){
@@ -111,7 +133,13 @@ function exportJSON(){
     const idx = parseInt(inp.name.slice(1),10);
     return {id: QUESTIONS[idx].id, answer: inp.value};
   });
-  const data = {answers: answersArr, timestamp: new Date().toISOString()};
+  const data = {
+    name: document.getElementById('inputName').value,
+    arma: document.getElementById('inputArma').value,
+    servicio: document.getElementById('inputServicio').value,
+    answers: answersArr,
+    timestamp: new Date().toISOString()
+  };
   document.getElementById('exportArea').value = JSON.stringify(data,null,2);
 }
 
@@ -122,6 +150,9 @@ window.addEventListener('DOMContentLoaded', ()=>{
   if(title){ title.textContent = `Examen LSP – ${QUESTIONS.length} reactivos (Opción múltiple)`; }
   const build = document.getElementById('buildInfo');
   if(build){ build.textContent = 'Build: 2026-02-27'; }
+  // optional: focus name input
+  const nameInp = document.getElementById('inputName');
+  if(nameInp) nameInp.focus();
 });
 
 const btnShuffle = document.getElementById('btnShuffle');
