@@ -1,69 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Cuestionario Militar - Cadetes</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Examen LSP - opción múltiple</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    body { margin: 0; background:#0b1020; color:#e8ecff; }
+    header { padding: 20px; background:#111a33; position: sticky; top:0; border-bottom:1px solid #22305e; }
+    h1 { margin:0 0 6px 0; font-size: 18px; }
+    .sub { opacity:.85; font-size: 13px; }
+    main { max-width: 980px; margin: 0 auto; padding: 18px; }
+    .card { background:#111a33; border:1px solid #22305e; border-radius: 14px; padding: 14px; margin: 12px 0; }
+    .qtitle { font-weight:700; margin-bottom: 8px; }
+    .meta { font-size: 12px; opacity:.8; margin-bottom: 10px; }
+    .opts { display: grid; gap: 8px; }
+    label.opt { display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius: 12px;
+      border:1px solid #22305e; background:#0e1630; cursor:pointer; }
+    input[type="radio"] { margin-top: 2px; }
+    .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
+    .btn { border:1px solid #2c3d79; background:#16224b; color:#e8ecff; padding:10px 12px; border-radius: 12px; cursor:pointer; }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .pill { padding:6px 10px; border:1px solid #22305e; border-radius: 999px; background:#0e1630; font-size: 12px; }
+    .ok { border-color:#2b7a3d !important; background:#0f2a18 !important; }
+    .bad { border-color:#8b2f2f !important; background:#2a1212 !important; }
+    .small { font-size: 12px; opacity:.85; }
+    footer { padding: 20px; text-align:center; opacity:.75; }
+    .topbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
+    .progress { height:10px; background:#0e1630; border:1px solid #22305e; border-radius:999px; overflow:hidden; }
+    .bar { height:100%; width:0%; background:#3f60ff; }
+    .grid2 { display:grid; grid-template-columns: 1fr; gap:10px; }
+    @media (min-width: 800px){ .grid2 { grid-template-columns: 1fr 1fr; } }
+    textarea { width:100%; min-height: 130px; background:#0e1630; color:#e8ecff; border:1px solid #22305e; border-radius:12px; padding:10px; }
+    code { color:#c9d4ff; }
+  </style>
 </head>
-
 <body>
-  <div class="container">
-    <header>
-      <h1>Cuestionario para Cadetes</h1>
-      <p class="subtitle">Preguntas de deberes y responsabilidades (Ejército y Fuerza Aérea Mexicanos)</p>
-    </header>
+<header>
+  <div class="topbar">
+    <div>
+      <h1 id="examTitle">Examen LSP &#8211; reactivos dinámicos (Opción múltiple)</h1>
+      <div class="sub">CNPP  Ley General de Víctimas  IPH  Primer Respondiente  Cadena de Custodia  Inteligencia Criminal  Datos Personales  Transparencia</div>
+    </div>
+    <div class="row">
+      <span class="pill" id="pillStatus">Sin calificar</span>
+      <span class="pill" id="buildInfo">Build: --</span>
+      <button class="btn" id="btnShuffle">Mezclar preguntas</button>
+      <button class="btn" id="btnGrade">Calificar</button>
+      <button class="btn" id="btnReset">Reiniciar</button>
+    </div>
+  </div>
+  <div style="margin-top:12px" class="row">
+    <div style="flex:1; min-width:260px;">
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="small" id="progressText" style="margin-top:8px;">0/0 contestadas</div>
+    </div>
+    <div class="row" style="gap:8px;">
+      <span class="pill" id="pillAnswered">Contestadas: 0</span>
+      <span class="pill" id="pillScore">Puntaje: </span>
+      <span class="pill" id="pillTime">Tiempo: 00:00</span>
+    </div>
+  </div>
+</header>
 
-    <section id="intro">
-      <form id="cadet-form">
-        <label>Nombre del cadete
-          <input type="text" id="name" required placeholder="Nombre completo">
-        </label>
-
-        <label>Año
-          <select id="year">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-        </label>
-
-        <label>Arma o servicio
-          <input type="text" id="branch" placeholder="Ej. Infantería, Fuerza Aérea, Sanidad">
-        </label>
-
-        <p class="note">Se mostrarán 20 preguntas una por una. Responde y haz clic en "Siguiente".</p>
-
-        <button type="submit" id="start-btn">Comenzar cuestionario</button>
-      </form>
-    </section>
-
-    <section id="quiz" class="hidden">
-      <div id="progress">Pregunta <span id="current">1</span> / 20</div>
-      <div id="card">
-        <h2 id="question"></h2>
-        <div id="options"></div>
+<main>
+  <div class="card">
+    <div class="row">
+      <div>
+        <div class="qtitle">Exportar resultados</div>
+        <div class="small">Al calificar, se genera unJSON con respuestas del alumno (útil para guardar en backend o repo).</div>
       </div>
-      <div class="controls">
-        <button id="next-btn" disabled>Siguiente</button>
-      </div>
-    </section>
-
-    <section id="result" class="hidden">
-      <div id="result-card">
-        <h2 id="result-emoji"></h2>
-        <p id="result-text"></p>
-        <p id="score-text"></p>
-        <p id="advice"></p>
-        <button id="restart">Volver a empezar</button>
-      </div>
-    </section>
+      <button class="btn" id="btnExport" disabled>Generar JSON</button>
+    </div>
+    <div style="margin-top:10px">
+      <textarea id="exportArea" placeholder="Aquí aparecerá el JSON de resultados..."></textarea>
+    </div>
   </div>
 
-  <script src="script.js" defer></script>
-</body>
+  <div id="quiz"></div>
+</main>
 
+<footer>
+  Hecho para ejecución directa en HTML/JS. Fuente de contenidos: manual cargado. 
+</footer>
+
+<!-- el código de la aplicación se carga desde script.js -->
+<script src="script.js"></script>
+</body>
 </html>
