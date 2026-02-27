@@ -218,6 +218,12 @@ function updateButtonState(){
   } else {
     btnGrade.disabled = true;
   }
+  // hide student card when both name and year provided
+  const yearEl = document.getElementById('inputYear');
+  if(inputName && yearEl && inputName.value.trim() !== '' && yearEl.value.trim() !== ''){
+    const card = document.getElementById('studentInfoCard');
+    if(card) card.style.display = 'none';
+  }
 }
 
 function attachEnterClose(element){
