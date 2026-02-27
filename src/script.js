@@ -2,9 +2,9 @@
 // Generado a partir de bank.sql (38 reactivos actualmente)
 
 const QUESTIONS = [
-  {id:1,section:'CNPP',q:`El proceso penal en México es:`,options:{A:`Inquisitivo y escrito`,B:`Acusatorio y oral`,C:`Mixto y reservado`,D:`Administrativo y documental`},answer:'B'},
-  {id:2,section:'CNPP',q:`Son principios rectores del proceso penal, excepto:`,options:{A:`Publicidad`,B:`Contradicción`,C:`Secrecía absoluta`,D:`Inmediación`},answer:'C'},
-  {id:3,section:'CNPP',q:`El principio de publicidad implica que:`,options:{A:`Solo las partes pueden asistir`,B:`Las audiencias son privadas`,C:`El público puede acceder salvo excepciones`,D:`Solo el juez puede presenciar`},answer:'C'},
+  {id:1,section:'CNPP',q:`El proceso penal en México es:`,options:{A:`Inquisitivo y escrito`,B:`Acusatorio y oral`,C:`Mixto y reservado`,D:`Administrativo y documental`},answer:'B', explanation:'Porque el sistema penal es acusatorio y oral.'},
+  {id:2,section:'CNPP',q:`Son principios rectores del proceso penal, excepto:`,options:{A:`Publicidad`,B:`Contradicción`,C:`Secrecía absoluta`,D:`Inmediación`},answer:'C', explanation:'El principio no es la secrecía absoluta, todo lo contrario, se busca publicidad.'},
+  {id:3,section:'CNPP',q:`El principio de publicidad implica que:`,options:{A:`Solo las partes pueden asistir`,B:`Las audiencias son privadas`,C:`El público puede acceder salvo excepciones`,D:`Solo el juez puede presenciar`},answer:'C', explanation:'La publicidad es la regla, con excepciones justificadas.'},
   {id:4,section:'CNPP',q:`El principio de contradicción permite:`,options:{A:`Oponerse a resoluciones firmes`,B:`Conocer y controvertir pruebas`,C:`Suspender audiencias`,D:`Delegar funciones`},answer:'B'},
   {id:5,section:'CNPP',q:`El principio de continuidad significa que las audiencias serán:`,options:{A:`Esporádicas`,B:`Secretas`,C:`Continuas y sucesivas`,D:`Escritas`},answer:'C'},
   {id:6,section:'CNPP',q:`El principio de inmediación exige:`,options:{A:`Delegación en secretarios`,B:`Presencia del órgano jurisdiccional`,C:`Uso exclusivo de medios electrónicos`,D:`Juicios escritos`},answer:'B'},
@@ -56,7 +56,8 @@ function renderQuiz(){
       <div class="meta">${q.q}</div>
       <div class="opts">
         ${['A','B','C','D'].map(l=>`<label class="opt"><input type="radio" name="q${i}" value="${l}"> ${q.options[l]}</label>`).join('')}
-      </div>`;
+      </div>
+      <div class="explanation" style="display:none;"></div>`;
     quizEl.appendChild(card);
   });
   quizEl.querySelectorAll('input[type=radio]').forEach(inp=>{
@@ -106,6 +107,20 @@ function grade(){
     }
   }
   feedbackEl.style.display = 'block';
+
+  // reveal correct answers and explanations
+  const cards = quizEl.querySelectorAll('.card');
+  cards.forEach((card, i)=>{
+    const expl = card.querySelector('.explanation');
+    if(!expl) return;
+    const correct = QUESTIONS[i].answer;
+    const text = `Respuesta correcta: ${correct}. ${QUESTIONS[i].explanation || ''}`;
+    expl.textContent = text;
+    expl.style.display = 'block';
+    const selected = card.querySelector('input[type=radio]:checked');
+    if(selected && selected.value === correct) card.classList.add('ok');
+    else card.classList.add('bad');
+  });
 }
 
 function reset(){
