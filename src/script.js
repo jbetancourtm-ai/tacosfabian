@@ -98,7 +98,8 @@ function grade(){
   document.getElementById('pillScore').textContent = `Puntaje: ${score} (${percent}%)`;
   document.getElementById('pillTime').textContent = `Tiempo: ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
   document.getElementById('pillStatus').textContent = 'Calificado';
-  document.getElementById('btnExport').disabled = false;
+  // fill export area automatically
+  exportJSON();
 
   // feedback
   const feedbackEl = document.getElementById('feedback');
@@ -169,8 +170,6 @@ function shuffle(){
 function exportJSON(){
   const nameVal = inputName ? inputName.value.trim() : '';
   if(nameVal === ''){
-    alert('Ingresa el nombre antes de exportar.');
-    if(inputName) inputName.focus();
     return;
   }
   const answeredInputs = quizEl.querySelectorAll('input[type=radio]:checked');
@@ -178,8 +177,10 @@ function exportJSON(){
     const idx = parseInt(inp.name.slice(1),10);
     return {id: QUESTIONS[idx].id, answer: inp.value};
   });
+  const yearVal = document.getElementById('inputYear') ? document.getElementById('inputYear').value : '';
   const data = {
     name: nameVal,
+    year: yearVal,
     arma: document.getElementById('inputArma').value,
     servicio: document.getElementById('inputServicio').value,
     answers: answersArr,
