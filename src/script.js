@@ -74,6 +74,13 @@ function updateProgress(){
 }
 
 function grade(){
+  // require name
+  const nameVal = inputName ? inputName.value.trim() : '';
+  if(nameVal === ''){
+    alert('Por favor ingresa el nombre del cadete antes de calificar.');
+    if(inputName) inputName.focus();
+    return;
+  }
   const answeredInputs = quizEl.querySelectorAll('input[type=radio]:checked');
   let score = 0;
   const wrongSections = {};
@@ -107,6 +114,10 @@ function grade(){
     }
   }
   feedbackEl.style.display = 'block';
+
+  // show review icon
+  const reviewEl = document.getElementById('reviewIcon');
+  if(reviewEl) reviewEl.style.display = 'block';
 
   // reveal correct answers and explanations
   const cards = quizEl.querySelectorAll('.card');
@@ -143,13 +154,19 @@ function shuffle(){
 }
 
 function exportJSON(){
+  const nameVal = inputName ? inputName.value.trim() : '';
+  if(nameVal === ''){
+    alert('Ingresa el nombre del cadete antes de exportar.');
+    if(inputName) inputName.focus();
+    return;
+  }
   const answeredInputs = quizEl.querySelectorAll('input[type=radio]:checked');
   const answersArr = Array.from(answeredInputs).map(inp=>{
     const idx = parseInt(inp.name.slice(1),10);
     return {id: QUESTIONS[idx].id, answer: inp.value};
   });
   const data = {
-    name: document.getElementById('inputName').value,
+    name: nameVal,
     arma: document.getElementById('inputArma').value,
     servicio: document.getElementById('inputServicio').value,
     answers: answersArr,
@@ -174,8 +191,23 @@ const btnShuffle = document.getElementById('btnShuffle');
 const btnGrade = document.getElementById('btnGrade');
 const btnReset = document.getElementById('btnReset');
 const btnExport = document.getElementById('btnExport');
+const inputName = document.getElementById('inputName');
 
+function updateButtonState(){
+  if(inputName && inputName.value.trim() !== ''){
+    btnGrade.disabled = false;
+  } else {
+    btnGrade.disabled = true;
+  }
+}
+
+if(inputName){
+  inputName.addEventListener('input', updateButtonState);
+}
 if(btnShuffle) btnShuffle.addEventListener('click', shuffle);
 if(btnGrade) btnGrade.addEventListener('click', grade);
 if(btnReset) btnReset.addEventListener('click', reset);
 if(btnExport) btnExport.addEventListener('click', exportJSON);
+
+// initialize button state
+updateButtonState();
