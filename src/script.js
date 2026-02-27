@@ -77,7 +77,7 @@ function grade(){
   // require name
   const nameVal = inputName ? inputName.value.trim() : '';
   if(nameVal === ''){
-    alert('Por favor ingresa el nombre del cadete antes de calificar.');
+    alert('Por favor ingresa el nombre antes de calificar.');
     if(inputName) inputName.focus();
     return;
   }
@@ -127,7 +127,8 @@ function grade(){
     let emoji = '😢';
     if(percent >= 80) emoji = '😃';
     else if(percent >= 50) emoji = '🙂';
-    summaryText.textContent = `Correo: ${inputName.value} - ${score}/${QUESTIONS.length} (${percent}%) ${emoji}`;
+    const yearVal = document.getElementById('inputYear') ? document.getElementById('inputYear').value : '';
+    summaryText.textContent = `Nombre: ${inputName.value} (${yearVal}) - ${score}/${QUESTIONS.length} (${percent}%) ${emoji}`;
     summaryEl.style.display = 'block';
   }
 
@@ -168,7 +169,7 @@ function shuffle(){
 function exportJSON(){
   const nameVal = inputName ? inputName.value.trim() : '';
   if(nameVal === ''){
-    alert('Ingresa el nombre del cadete antes de exportar.');
+    alert('Ingresa el nombre antes de exportar.');
     if(inputName) inputName.focus();
     return;
   }
@@ -198,8 +199,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
   const nameInp = document.getElementById('inputName');
   if(nameInp) {
     nameInp.focus();
-    nameInp.addEventListener('input', handleEmailChange);
     attachEnterClose(nameInp);
+    attachEnterClose(document.getElementById('inputYear'));
     attachEnterClose(document.getElementById('inputArma'));
     attachEnterClose(document.getElementById('inputServicio'));
   }
@@ -216,18 +217,6 @@ function updateButtonState(){
     btnGrade.disabled = false;
   } else {
     btnGrade.disabled = true;
-  }
-}
-
-function handleEmailChange(){
-  const val = inputName.value.trim();
-  const reviewEl = document.getElementById('reviewIcon');
-  if(val && val.includes('@')){
-    if(reviewEl) reviewEl.style.display = 'block';
-    // message about best programmer
-    reviewEl.title = 'Eres el mejor programador del mundo';
-  } else {
-    if(reviewEl) reviewEl.style.display = 'none';
   }
 }
 
