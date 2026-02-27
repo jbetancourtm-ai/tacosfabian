@@ -119,6 +119,18 @@ function grade(){
   const reviewEl = document.getElementById('reviewIcon');
   if(reviewEl) reviewEl.style.display = 'block';
 
+  // display summary card with data, score and emoji
+  const summaryEl = document.getElementById('summaryCard');
+  const summaryText = document.getElementById('summaryText');
+  if(summaryEl && summaryText){
+    const percent = Math.round((score/QUESTIONS.length)*100);
+    let emoji = '😢';
+    if(percent >= 80) emoji = '😃';
+    else if(percent >= 50) emoji = '🙂';
+    summaryText.textContent = `Correo: ${inputName.value} - ${score}/${QUESTIONS.length} (${percent}%) ${emoji}`;
+    summaryEl.style.display = 'block';
+  }
+
   // reveal correct answers and explanations
   const cards = quizEl.querySelectorAll('.card');
   cards.forEach((card, i)=>{
@@ -184,7 +196,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
   if(build){ build.textContent = 'Build: 2026-02-27'; }
   // optional: focus name input
   const nameInp = document.getElementById('inputName');
-  if(nameInp) nameInp.focus();
+  if(nameInp) {
+    nameInp.focus();
+    nameInp.addEventListener('input', handleEmailChange);
+    attachEnterClose(nameInp);
+    attachEnterClose(document.getElementById('inputArma'));
+    attachEnterClose(document.getElementById('inputServicio'));
+  }
 });
 
 const btnShuffle = document.getElementById('btnShuffle');
@@ -199,6 +217,27 @@ function updateButtonState(){
   } else {
     btnGrade.disabled = true;
   }
+}
+
+function handleEmailChange(){
+  const val = inputName.value.trim();
+  const reviewEl = document.getElementById('reviewIcon');
+  if(val && val.includes('@')){
+    if(reviewEl) reviewEl.style.display = 'block';
+    // message about best programmer
+    reviewEl.title = 'Eres el mejor programador del mundo';
+  } else {
+    if(reviewEl) reviewEl.style.display = 'none';
+  }
+}
+
+function attachEnterClose(element){
+  element.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      const card = document.getElementById('studentInfoCard');
+      if(card) card.style.display = 'none';
+    }
+  });
 }
 
 if(inputName){
