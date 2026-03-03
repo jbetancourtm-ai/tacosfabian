@@ -1,0 +1,65 @@
+﻿<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Tacos Fabián</title>
+    <meta name="description" content="Panel admin para ver todas las reseñas." />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="header" role="banner">
+      <div class="container header__inner">
+        <div class="brand" aria-label="Tacos Fabián">
+          <div class="brand__logo" aria-hidden="true">🌮</div>
+          <div class="brand__text">
+            <span class="brand__name">Tacos Fabián</span>
+            <span class="brand__tagline">Panel de reseñas</span>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Navegación">
+          <ul class="nav__menu nav__menu--admin">
+            <li><a href="/">Volver al sitio</a></li>
+            <li><a class="btn btn--ghost" href="/.auth/logout">Cerrar sesión</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="section">
+      <div class="container">
+        <header class="section__header">
+          <h1 class="h2">Reseñas (Admin)</h1>
+          <p class="muted">Aquí se muestran todas las reseñas guardadas.</p>
+        </header>
+
+        <div class="card">
+          <div class="reviews__top">
+            <h2 class="h3 m0">Listado completo</h2>
+            <button class="btn btn--ghost" id="refreshAdmin" type="button">Actualizar</button>
+          </div>
+
+          <div id="adminSummary" class="muted small" aria-live="polite"></div>
+          <div class="tableWrap" role="region" aria-label="Tabla de reseñas" tabindex="0">
+            <table class="table" aria-describedby="adminSummary">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Nombre</th>
+                  <th>Estrellas</th>
+                  <th>Comentario</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody">
+                <tr><td colspan="4" class="muted">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>
