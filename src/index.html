@@ -1,121 +1,315 @@
 <!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Examen LSP - opción múltiple</title>
-  <style>
-    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    body { margin: 0; background:#0b1020; color:#e8ecff; }
-    header { padding: 20px; background:#111a33; position: sticky; top:0; border-bottom:1px solid #22305e; }
-    h1 { margin:0 0 6px 0; font-size: 18px; }
-    .sub { opacity:.85; font-size: 13px; }
-    main { max-width: 980px; margin: 0 auto; padding: 18px; }
-    .card { background:#111a33; border:1px solid #22305e; border-radius: 14px; padding: 14px; margin: 12px 0; }
-    .qtitle { font-weight:700; margin-bottom: 8px; }
-    .meta { font-size: 12px; opacity:.8; margin-bottom: 10px; }
-    .opts { display: grid; gap: 8px; }
-    label.opt { display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius: 12px;
-      border:1px solid #22305e; background:#0e1630; cursor:pointer; }
-    input[type="radio"] { margin-top: 2px; }
-    .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
-    .btn { border:1px solid #2c3d79; background:#16224b; color:#e8ecff; padding:10px 12px; border-radius: 12px; cursor:pointer; }
-    .btn:hover { filter: brightness(1.08); }
-    .btn:disabled { opacity:.5; cursor:not-allowed; }
-    .pill { padding:6px 10px; border:1px solid #22305e; border-radius: 999px; background:#0e1630; font-size: 12px; }
-    .ok { border-color:#2b7a3d !important; background:#0f2a18 !important; }
-    .bad { border-color:#8b2f2f !important; background:#2a1212 !important; }
-    .small { font-size: 12px; opacity:.85; }
-    footer { padding: 20px; text-align:center; opacity:.75; }
-    .topbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; }
-    .progress { height:10px; background:#0e1630; border:1px solid #22305e; border-radius:999px; overflow:hidden; }
-    .bar { height:100%; width:0%; background:#3f60ff; }
-    .grid2 { display:grid; grid-template-columns: 1fr; gap:10px; }
-    @media (min-width: 800px){ .grid2 { grid-template-columns: 1fr 1fr; } }
-    textarea { width:100%; min-height: 130px; background:#0e1630; color:#e8ecff; border:1px solid #22305e; border-radius:12px; padding:10px; }
-    code { color:#c9d4ff; }
-    .hidden { display:none !important; }
-    #startScreen { position:fixed; top:0; left:0; right:0; bottom:0; z-index:2000; background:rgba(11,16,32,0.98); display:flex; align-items:center; justify-content:center; }
-    #startScreen.hidden { display:none !important; }
-  </style>
-</head>
-<body>
-<header class="hidden">
-  <div class="topbar">
-    <div>
-      <h1 id="examTitle">Examen LSP &#8211; reactivos dinámicos (Opción múltiple)</h1>
-      <div class="sub">CNPP  Ley General de Víctimas  IPH  Primer Respondiente  Cadena de Custodia  Inteligencia Criminal  Datos Personales  Transparencia</div>
-    </div>
-    <div class="row">
-      <span class="pill" id="pillStatus">Sin calificar</span>
-      <span class="pill" id="buildInfo">Build: --</span>
-      <button class="btn" id="btnShuffle">Mezclar preguntas</button>
-      <button class="btn" id="btnGrade">Calificar</button>
-      <button class="btn" id="btnReset">Reiniciar</button>
-    </div>
-  </div>
-  <div style="margin-top:12px" class="row">
-    <div style="flex:1; min-width:260px;">
-      <div class="progress"><div class="bar" id="bar"></div></div>
-      <div class="small" id="progressText" style="margin-top:8px;">0/0 contestadas</div>
-    </div>
-    <div class="row" style="gap:8px;">
-      <span class="pill" id="pillAnswered">Contestadas: 0</span>
-      <span class="pill" id="pillScore">Puntaje: </span>
-      <span class="pill" id="pillTime">Tiempo: 00:00</span>
-    </div>
-  </div>
-</header>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<main class="hidden">
+    <title>Tacos Fabián | Suadero y Trocitos en Texcoco</title>
+    <meta
+      name="description"
+      content="Tacos Fabián en Texcoco: suadero y la especialidad de la casa: trocitos/trozos de carne. Ubicación, menú y reseñas."
+    />
 
-  <div id="feedback" class="card" style="display:none;">
-    <div class="qtitle">Retroalimentación</div>
-    <div id="feedbackText" class="small"></div>
-  </div>
+    <!-- Open Graph -->
+    <meta property="og:title" content="Tacos Fabián | Suadero y Trocitos" />
+    <meta
+      property="og:description"
+      content="Taquería moderna en Texcoco. Conoce el menú, ubicación y reseñas."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://favian.com" />
+    <meta property="og:image" content="/og-image-placeholder.png" />
 
-  <div id="quiz"></div>
-  <div id="questionFeedback" class="small" style="margin-top:10px;"></div>
-  <div class="row" style="margin-top:10px; gap:10px;">
-    <button class="btn" id="btnSubmit" disabled>Enviar</button>
-    <button class="btn" id="btnNext" disabled>Siguiente</button>
-  </div>
+    <link rel="icon" href="/favicon.ico" />
 
-  <style>
-    .explanation { margin-top:8px; font-size:12px; color:#c9d4ff; }
-  </style>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-  <!-- pantalla de resultados finales -->
-  <div id="resultScreen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:1500; background:#111a33; color:#e8ecff; align-items:center; justify-content:center; flex-direction:column; padding:40px;">
-    <div style="max-width:500px;text-align:center;">
-      <h1 style="font-size:36px;margin:0 0 20px 0;">Resultados del Examen</h1>
-      <div id="resultText" class="small" style="margin:20px 0;font-size:18px;line-height:1.6;"></div>
-      <div id="studySuggestion" class="small" style="margin:20px 0;font-size:14px;line-height:1.8;background:#0e1630;padding:20px;border-radius:12px;border:1px solid #22305e;"></div>
-        <button class="btn" id="btnExportResults" style="padding:12px 24px;font-size:16px; margin-right:10px;">Descargar JSON</button>
-      <button class="btn" id="btnRestart" style="padding:12px 24px;font-size:16px;">Volver a inicio</button>
-    </div>
-  </div>
-</main>
+    <!-- Header -->
+    <header class="header" role="banner">
+      <div class="container header__inner">
+        <div class="brand" aria-label="Tacos Fabián">
+          <div class="brand__logo" aria-hidden="true">🌮</div>
+          <div class="brand__text">
+            <span class="brand__name">Tacos Fabián</span>
+            <span class="brand__tagline">Suadero & Trocitos en Texcoco</span>
+          </div>
+        </div>
 
-<!-- pantalla de inicio -->
-<div id="startScreen">
-  <div class="card" style="max-width:400px;width:90%;">
-    <h2 style="margin-top:0;">Bienvenido al Examen LSP</h2>
-    <div class="row" style="flex-wrap:wrap;gap:10px;flex-direction:column;">
-      <div><label>Nombre:<br><input type="text" id="startName" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
-      <div><label>Año:<br><input type="text" id="startYear" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
-      <div><label>Arma:<br><input type="text" id="startArma" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
-      <div><label>Servicio:<br><input type="text" id="startServicio" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
-    </div>
-    <div style="margin-top:20px;text-align:center;"><button class="btn" id="btnStart" disabled style="padding:12px 24px;font-size:16px;">Ir al examen</button></div>
-  </div>
-</div>
+        <nav class="nav" aria-label="Navegación principal">
+          <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">
+            <span class="sr-only">Abrir menú</span>
+            ☰
+          </button>
+          <ul class="nav__menu" id="navMenu">
+            <li><a href="#especialidad">Especialidad</a></li>
+            <li><a href="#menu">Menú</a></li>
+            <li><a href="#ubicacion">Ubicación</a></li>
+            <li><a href="#resenas">Reseñas</a></li>
+            <li>
+              <a class="btn btn--whatsapp" href="https://wa.me/XXXXXXXXXXX" target="_blank" rel="noopener">
+                Pedir por WhatsApp
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
 
-<footer>
-  Hecho para ejecución directa en HTML/JS. Fuente de contenidos: manual cargado. 
-</footer>
+    <main id="contenido">
+      <!-- Hero -->
+      <section class="hero" aria-label="Sección principal">
+        <div class="container hero__inner">
+          <div class="hero__content">
+            <p class="pill">Avenida Colón No. 4 · Centro · Texcoco</p>
+            <h1>Antojo serio de tacos. <span class="accent">Sabor real.</span></h1>
+            <p class="hero__subtitle">
+              Suadero bien doradito y la especialidad de la casa: <strong>trocitos/trozos de carne</strong> con sazón
+              irresistible.
+            </p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#menu">Ver menú</a>
+              <a class="btn btn--ghost" href="#ubicacion">Cómo llegar</a>
+            </div>
+            <div class="hero__highlights" aria-label="Beneficios">
+              <div class="chip">🔥 Tortilla calientita</div>
+              <div class="chip">🥩 Carne bien servida</div>
+              <div class="chip">🧡 Atención rápida</div>
+            </div>
+          </div>
 
-<!-- el código de la aplicación se carga desde script.js -->
-<script src="script.js"></script>
-</body>
+          <div class="hero__card" aria-label="Imagen decorativa de comida">
+            <div class="food-photo" role="img" aria-label="Foto estilizada de tacos apetitosos (placeholder)"></div>
+            <div class="hero__cardFooter">
+              <span class="badge">Especialidad</span>
+              <span class="muted">Trocitos/Trozos de carne</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Especialidad -->
+      <section class="section" id="especialidad" aria-label="Especialidad">
+        <div class="container">
+          <header class="section__header">
+            <h2>Especialidad</h2>
+            <p class="muted">Lo que más se pide (y lo que te va a antojar).</p>
+          </header>
+
+          <div class="grid grid--2">
+            <article class="card">
+              <h3>Tacos de suadero</h3>
+              <p>
+                Suave por dentro, doradito por fuera. Perfecto con cebolla, cilantro y tu salsa favorita.
+              </p>
+              <ul class="list">
+                <li>✅ Por pieza o por orden</li>
+                <li>✅ Ideal para dorar en plancha</li>
+                <li>✅ Acompaña con bebida fría</li>
+              </ul>
+            </article>
+
+            <article class="card card--featured">
+              <h3>Especial: Trocitos / Trozos de carne</h3>
+              <p>
+                <strong>La especialidad de la casa.</strong> Trocitos/trozos de carne bien sazonados y cocinados al punto,
+                con un toque jugoso y un dorado que se siente en cada mordida.
+              </p>
+              <ul class="list">
+                <li>⭐ Recomendado con salsa roja</li>
+                <li>⭐ Excelente para compartir</li>
+                <li>⭐ Sabor “de taquería” real</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menú -->
+      <section class="section section--soft" id="menu" aria-label="Menú">
+        <div class="container">
+          <header class="section__header">
+            <h2>Menú</h2>
+            <p class="muted">Sencillo, directo y delicioso.</p>
+          </header>
+
+          <div class="grid grid--3" id="menuCards" aria-label="Tarjetas de menú">
+            <article class="menu-card">
+              <div class="menu-card__top">
+                <h3>Suadero</h3>
+                <span class="price">$$</span>
+              </div>
+              <p>Taco clásico, doradito, con cebolla y cilantro.</p>
+              <div class="menu-card__meta">
+                <span class="tag">🌮 Taco</span>
+                <span class="tag">🔥 Plancha</span>
+              </div>
+            </article>
+
+            <article class="menu-card menu-card--featured">
+              <div class="menu-card__top">
+                <h3>Trocitos / Trozos de carne</h3>
+                <span class="price">$$$</span>
+              </div>
+              <p>Especialidad de la casa: carne sazonada, jugosa y bien doradita.</p>
+              <div class="menu-card__meta">
+                <span class="tag">🥩 Especial</span>
+                <span class="tag">⭐ Recomendado</span>
+              </div>
+            </article>
+
+            <article class="menu-card">
+              <div class="menu-card__top">
+                <h3>Bebidas</h3>
+                <span class="price">$</span>
+              </div>
+              <p>Opciones frías para bajar el picante (placeholder).</p>
+              <div class="menu-card__meta">
+                <span class="tag">🥤 Refresco</span>
+                <span class="tag">🧊 Frías</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="note" role="note">
+            <strong>Tip:</strong> Si quieres que el “Ver menú” sea más completo, puedes agregar precios e imágenes reales.
+          </div>
+        </div>
+      </section>
+
+      <!-- Ubicación -->
+      <section class="section" id="ubicacion" aria-label="Ubicación">
+        <div class="container">
+          <header class="section__header">
+            <h2>Ubicación</h2>
+            <p class="muted">Visítanos en el centro de Texcoco.</p>
+          </header>
+
+          <div class="grid grid--2 location">
+            <div class="card">
+              <h3>Dirección</h3>
+              <p class="address">
+                Avenida Colón No. 4, Centro, Texcoco de Mora, Estado de México, México
+              </p>
+              <div class="row">
+                <a class="btn btn--primary" href="https://www.google.com/maps/search/?api=1&query=Avenida%20Col%C3%B3n%20No.%204%20Centro%20Texcoco%20de%20Mora%20Estado%20de%20M%C3%A9xico%20M%C3%A9xico"
+                   target="_blank" rel="noopener">
+                  Cómo llegar
+                </a>
+                <a class="btn btn--ghost" href="#resenas">Ver reseñas</a>
+              </div>
+              <p class="muted small">
+                Si prefieres, reemplaza el mapa por el embed exacto desde Google Maps (Compartir → Insertar un mapa).
+              </p>
+            </div>
+
+            <div class="map" aria-label="Mapa">
+              <!-- Placeholder de mapa: pega aquí el iframe embed exacto si deseas -->
+              <iframe
+                title="Mapa de Tacos Fabián (placeholder)"
+                src="https://www.google.com/maps?q=Avenida%20Col%C3%B3n%20No.%204%20Centro%20Texcoco%20de%20Mora%20Estado%20de%20M%C3%A9xico%20M%C3%A9xico&output=embed"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reseñas -->
+      <section class="section section--soft" id="resenas" aria-label="Reseñas">
+        <div class="container">
+          <header class="section__header">
+            <h2>Reseñas</h2>
+            <p class="muted">Lo que dice la banda. Deja la tuya 👇</p>
+          </header>
+
+          <div class="grid grid--2 reviews">
+            <div class="card">
+              <div class="reviews__top">
+                <h3 class="m0">Opiniones</h3>
+                <button class="btn btn--ghost" id="refreshReviews" type="button">Actualizar</button>
+              </div>
+
+              <div id="reviewsSummary" class="muted small" aria-live="polite"></div>
+              <ul class="reviews__list" id="reviewsList" aria-label="Lista de reseñas">
+                <li class="muted">Cargando reseñas...</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Agregar reseña</h3>
+              <form id="reviewForm" class="form" aria-label="Formulario de reseña">
+                <label>
+                  Nombre
+                  <input type="text" name="name" maxlength="60" placeholder="Ej. Ana" required />
+                </label>
+
+                <label>
+                  Estrellas
+                  <select name="stars" required aria-label="Selecciona estrellas de 1 a 5">
+                    <option value="5">★★★★★ (5)</option>
+                    <option value="4">★★★★☆ (4)</option>
+                    <option value="3">★★★☆☆ (3)</option>
+                    <option value="2">★★☆☆☆ (2)</option>
+                    <option value="1">★☆☆☆☆ (1)</option>
+                  </select>
+                </label>
+
+                <label>
+                  Comentario (máx. 300)
+                  <textarea name="comment" rows="4" maxlength="300" placeholder="¿Qué te gustó?" required></textarea>
+                </label>
+
+                <button class="btn btn--primary" type="submit">Enviar reseña</button>
+
+                <p id="formMsg" class="muted small" role="status" aria-live="polite"></p>
+              </form>
+
+              <div class="note" role="note">
+                <strong>Admin:</strong> entra a <a href="/admin">/admin</a> (requiere login GitHub en Azure SWA).
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+      <div class="container footer__inner">
+        <div>
+          <div class="brand brand--footer">
+            <div class="brand__logo" aria-hidden="true">🌮</div>
+            <div class="brand__text">
+              <span class="brand__name">Tacos Fabián</span>
+              <span class="brand__tagline">Texcoco de Mora, Edo. Méx.</span>
+            </div>
+          </div>
+          <p class="muted small">
+            © <span id="year"></span> Tacos Fabián. Todos los derechos reservados.
+          </p>
+        </div>
+
+        <div class="footer__cols" aria-label="Información">
+          <div>
+            <h4>Horario</h4>
+            <p class="muted">Placeholder: Lun–Dom 6:00pm–12:00am</p>
+          </div>
+          <div>
+            <h4>Teléfono</h4>
+            <p class="muted">Placeholder: +52 55 0000 0000</p>
+          </div>
+          <div>
+            <h4>Redes</h4>
+            <p class="muted">Placeholder: Facebook · Instagram</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>
