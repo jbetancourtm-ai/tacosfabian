@@ -45,35 +45,223 @@ const QUESTIONS = [
 // variables de estado
 let startTime;
 const quizEl = document.getElementById('quiz');
+// flow state
+let currentIndex = 0;           // index of the question currently shown
+let score = 0;                  // number of correct answers
+let answersArr = [];            // array of {id,answer} objects
+let wrongSections = {};         // track mistakes by section
+// input elements will be assigned once DOM content has loaded
+let inputName;
+let inputYear;
+let inputArma;
+let inputServicio;
+let btnGrade;
+let btnShuffle;
+let btnReset;
+// let btnExport;  // no longer used
+let startName, startYear, startArma, startServicio;
+let btnStart, btnRestart;
+let btnSubmit, btnNext;
 
-function renderQuiz(){
-  quizEl.innerHTML = '';
-  QUESTIONS.forEach((q,i)=>{
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="qtitle">${i+1}. ${q.section}</div>
-      <div class="meta">${q.q}</div>
-      <div class="opts">
-        ${['A','B','C','D'].map(l=>`<label class="opt"><input type="radio" name="q${i}" value="${l}"> ${q.options[l]}</label>`).join('')}
-      </div>
-      <div class="explanation" style="display:none;"></div>`;
-    quizEl.appendChild(card);
-  });
-  quizEl.querySelectorAll('input[type=radio]').forEach(inp=>{
-    inp.addEventListener('change', updateProgress);
-  });
-  updateProgress();
-}
+
+// original quiz rendering no longer used
 
 function updateProgress(){
-  const answered = quizEl.querySelectorAll('input[type=radio]:checked').length;
-  document.getElementById('pillAnswered').textContent = `Contestadas: ${answered}`;
+  const answered = answersArr.length;
+  document.getElementById('pillAnswered').textContent = `Contestadas: ${answered}/${QUESTIONS.length}`;
   document.getElementById('progressText').textContent = `${answered}/${QUESTIONS.length} contestadas`;
   document.getElementById('bar').style.width = `${(answered/QUESTIONS.length)*100}%`;
 }
 
+function showQuestion(i){
+  const q = QUESTIONS[i];
+  if(!q) return;
+  quizEl.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+      <div class="qtitle">${i+1}. ${q.section}</div>
+      <div class="meta">${q.q}</div>
+      <div class="opts">
+        ${['A','B','C','D'].map(l=>`<label class="opt"><input type="radio" name="answer" value="${l}"> ${q.options[l]}</label>`).join('')}
+      </div>`;
+  quizEl.appendChild(card);
+  quizEl.querySelectorAll('input[type=radio]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{ if(btnSubmit) btnSubmit.disabled=false; });
+  });
+  document.getElementById('questionFeedback').textContent = '';
+  if(btnSubmit) btnSubmit.disabled = true;
+  if(btnNext) btnNext.disabled = true;
+  updateProgress();
+}
+
+// grade wrapper unreachable now; delegate to finishExam
 function grade(){
+  finishExam();
+}
+
+
+function reset(){
+  currentIndex = 0;
+  score = 0;
+  answersArr = [];
+  wrongSections = {};
+  startTime = new Date();
+  document.getElementById('pillStatus').textContent = 'Sin calificar';
+  document.getElementById('pillScore').textContent = 'Puntaje: ';
+  document.getElementById('pillTime').textContent = 'Tiempo: 00:00';
+  // no export button to disable
+  showQuestion(currentIndex);
+}
+
+function shuffle(){
+  for(let i=QUESTIONS.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [QUESTIONS[i], QUESTIONS[j]] = [QUESTIONS[j], QUESTIONS[i]];
+  }
+  reset();
+}
+
+function exportJSON(){
+  const nameVal = inputName ? inputName.value.trim() : '';
+  if(nameVal === ''){
+    return '';
+  }
+  const data = {
+    name: nameVal,
+    year: inputYear ? inputYear.value : '',
+    arma: inputArma ? inputArma.value : '',
+    servicio: inputServicio ? inputServicio.value : '',
+    answers: answersArr,
+    timestamp: new Date().toISOString()
+  };
+  return JSON.stringify(data,null,2);
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  // build info & title
+  const title = document.getElementById('examTitle');
+  if(title){ title.textContent = `Examen LSP – ${QUESTIONS.length} reactivos (Opción múltiple)`; }
+  const build = document.getElementById('buildInfo');
+  if(build){ build.textContent = 'Build: 2026-02-27'; }
+
+  // start screen elements
+  startName = document.getElementById('startName');
+  startYear = document.getElementById('startYear');
+  startArma = document.getElementById('startArma');
+  startServicio = document.getElementById('startServicio');
+  btnStart = document.getElementById('btnStart');
+  btnRestart = document.getElementById('btnRestart');
+
+  // header is hidden until the exam begins
+  const headerEl = document.querySelector('header');
+  if(headerEl) headerEl.classList.add('hidden');
+  
+  // main is hidden until exam starts, startScreen is visible
+  const mainEl = document.querySelector('main');
+  if(mainEl) mainEl.classList.add('hidden');
+
+  // wire persistent buttons (they exist in DOM even if header hidden)
+  btnShuffle = document.getElementById('btnShuffle');
+  btnGrade = document.getElementById('btnGrade');
+  btnReset = document.getElementById('btnReset');
+  if(btnShuffle) btnShuffle.addEventListener('click', shuffle);
+  if(btnGrade) btnGrade.addEventListener('click', grade);
+  if(btnReset) btnReset.addEventListener('click', reset);
+
+  if(startName) {
+    startName.focus();
+    startName.addEventListener('input', updateStartButtonState);
+  }
+  if(startYear) startYear.addEventListener('input', updateStartButtonState);
+  if(btnStart) btnStart.addEventListener('click', startExam);
+  if(btnRestart) btnRestart.addEventListener('click', restart);
+
+  // wire download button on result screen
+  const exportBtn = document.getElementById('btnExportResults');
+  if(exportBtn){
+    exportBtn.addEventListener('click', ()=>{
+      const json = exportJSON();
+      if(!json) return;
+      const blob = new Blob([json],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'examen.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+  // other controls will be wired when exam starts
+});
+
+function updateButtonState(){
+  if(!btnGrade) return; // nothing to do before exam starts
+  if(inputName && inputName.value.trim() !== ''){
+    btnGrade.disabled = false;
+  } else {
+    btnGrade.disabled = true;
+  }
+  // hide student card if still present (should not exist in new UI)
+  const card = document.getElementById('studentInfoCard');
+  if(card && inputName && inputName.value.trim() !== '') card.style.display = 'none';
+}
+
+function attachEnterClose(element){
+  // helper not really needed any more
+  element.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      // no special behavior now
+    }
+  });
+}
+
+// start-screen handlers
+function updateStartButtonState(){
+  if(btnStart){
+    btnStart.disabled = !(startName && startName.value.trim() && startYear && startYear.value.trim());
+  }
+}
+
+// navigation callbacks for the one-question flow
+function handleSubmit(){
+  const q = QUESTIONS[currentIndex];
+  const selected = quizEl.querySelector('input[type=radio]:checked');
+  if(!selected) return;
+  const isCorrect = selected.value === q.answer;
+  if(isCorrect){
+    score++;
+  } else {
+    wrongSections[q.section] = (wrongSections[q.section]||0)+1;
+  }
+  answersArr.push({id: q.id, answer: selected.value});
+
+  // feedback text
+  const fb = document.getElementById('questionFeedback');
+  fb.textContent = isCorrect ? 'Correcto' : `Incorrecto - ${q.explanation || ''}`;
+  fb.classList.toggle('ok', isCorrect);
+  fb.classList.toggle('bad', !isCorrect);
+
+  btnSubmit.disabled = true;
+  if(currentIndex === QUESTIONS.length - 1){
+    btnNext.textContent = 'Terminar';
+  } else {
+    btnNext.textContent = 'Siguiente';
+  }
+  btnNext.disabled = false;
+  updateProgress();
+}
+
+function handleNext(){
+  if(btnNext.textContent === 'Terminar'){
+    finishExam();
+    return;
+  }
+  currentIndex++;
+  showQuestion(currentIndex);
+}
+
+function finishExam(){
   // require name
   const nameVal = inputName ? inputName.value.trim() : '';
   if(nameVal === ''){
@@ -81,27 +269,13 @@ function grade(){
     if(inputName) inputName.focus();
     return;
   }
-  const answeredInputs = quizEl.querySelectorAll('input[type=radio]:checked');
-  let score = 0;
-  const wrongSections = {};
-  answeredInputs.forEach(inp=>{
-    const idx = parseInt(inp.name.slice(1),10);
-    if(inp.value === QUESTIONS[idx].answer) {
-      score++;
-    } else {
-      const sec = QUESTIONS[idx].section;
-      wrongSections[sec] = (wrongSections[sec]||0)+1;
-    }
-  });
   const elapsed = Math.floor((new Date() - startTime)/1000);
   const percent = Math.round((score/QUESTIONS.length)*100);
   document.getElementById('pillScore').textContent = `Puntaje: ${score} (${percent}%)`;
   document.getElementById('pillTime').textContent = `Tiempo: ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
   document.getElementById('pillStatus').textContent = 'Calificado';
-  // fill export area automatically
-  exportJSON();
 
-  // feedback
+  // show feedback summary
   const feedbackEl = document.getElementById('feedback');
   const feedbackText = document.getElementById('feedbackText');
   if(score === QUESTIONS.length){
@@ -116,133 +290,57 @@ function grade(){
   }
   feedbackEl.style.display = 'block';
 
-  // show review icon
-  const reviewEl = document.getElementById('reviewIcon');
-  if(reviewEl) reviewEl.style.display = 'block';
 
-  // display summary card with data, score and emoji
-  const summaryEl = document.getElementById('summaryCard');
-  const summaryText = document.getElementById('summaryText');
-  if(summaryEl && summaryText){
-    const percent = Math.round((score/QUESTIONS.length)*100);
+  // show result screen
+  const resultEl = document.getElementById('resultScreen');
+  const resultText = document.getElementById('resultText');
+  const suggestionEl = document.getElementById('studySuggestion');
+  if(resultEl && resultText && suggestionEl){
     let emoji = '😢';
     if(percent >= 80) emoji = '😃';
     else if(percent >= 50) emoji = '🙂';
-    const yearVal = document.getElementById('inputYear') ? document.getElementById('inputYear').value : '';
-    summaryText.textContent = `Nombre: ${inputName.value} (${yearVal}) - ${score}/${QUESTIONS.length} (${percent}%) ${emoji}`;
-    summaryEl.style.display = 'block';
+    resultText.innerHTML = `<strong>${inputName.value}</strong><br>Año: ${inputYear.value}<br><br>Puntaje: <strong>${score}/${QUESTIONS.length} (${percent}%)</strong> ${emoji}`;
+    if(percent >= 80) suggestionEl.textContent = 'Excelente trabajo. Sigue estudiando para mantener tu nivel.';
+    else if(percent >= 50) suggestionEl.textContent = 'Buen intento. Dedica más tiempo a repasar los temas.';
+    else suggestionEl.textContent = 'Necesitas estudiar más antes del examen.';
+    resultEl.style.display = 'flex';
   }
 
-  // reveal correct answers and explanations
-  const cards = quizEl.querySelectorAll('.card');
-  cards.forEach((card, i)=>{
-    const expl = card.querySelector('.explanation');
-    if(!expl) return;
-    const correct = QUESTIONS[i].answer;
-    const text = `Respuesta correcta: ${correct}. ${QUESTIONS[i].explanation || ''}`;
-    expl.textContent = text;
-    expl.style.display = 'block';
-    const selected = card.querySelector('input[type=radio]:checked');
-    if(selected && selected.value === correct) card.classList.add('ok');
-    else card.classList.add('bad');
-  });
+  quizEl.style.display = 'none';
 }
 
-function reset(){
-  quizEl.querySelectorAll('input[type=radio]').forEach(inp=>inp.checked=false);
-  startTime = new Date();
-  document.getElementById('pillStatus').textContent = 'Sin calificar';
-  document.getElementById('pillScore').textContent = 'Puntaje: ';
-  document.getElementById('pillTime').textContent = 'Tiempo: 00:00';
-  document.getElementById('btnExport').disabled = true;
-  updateProgress();
-}
-
-function shuffle(){
-  for(let i=QUESTIONS.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [QUESTIONS[i], QUESTIONS[j]] = [QUESTIONS[j], QUESTIONS[i]];
-  }
-  renderQuiz();
-  reset();
-}
-
-function exportJSON(){
-  const nameVal = inputName ? inputName.value.trim() : '';
-  if(nameVal === ''){
+function startExam(){
+  if(!startName.value.trim() || !startYear.value.trim()){
+    alert('Por favor ingresa nombre y año para iniciar el examen.');
     return;
   }
-  const answeredInputs = quizEl.querySelectorAll('input[type=radio]:checked');
-  const answersArr = Array.from(answeredInputs).map(inp=>{
-    const idx = parseInt(inp.name.slice(1),10);
-    return {id: QUESTIONS[idx].id, answer: inp.value};
-  });
-  const yearVal = document.getElementById('inputYear') ? document.getElementById('inputYear').value : '';
-  const data = {
-    name: nameVal,
-    year: yearVal,
-    arma: document.getElementById('inputArma').value,
-    servicio: document.getElementById('inputServicio').value,
-    answers: answersArr,
-    timestamp: new Date().toISOString()
-  };
-  document.getElementById('exportArea').value = JSON.stringify(data,null,2);
-}
+  // map start inputs to global vars expected by other code
+  inputName = startName;
+  inputYear = startYear;
+  inputArma = startArma;
+  inputServicio = startServicio;
 
-window.addEventListener('DOMContentLoaded', ()=>{
-  renderQuiz();
+  document.getElementById('startScreen').classList.add('hidden');
+  document.querySelector('main').classList.remove('hidden');
+  const headerEl = document.querySelector('header');
+  if(headerEl) headerEl.classList.remove('hidden');
+
+  // reset and show first question
   reset();
-  const title = document.getElementById('examTitle');
-  if(title){ title.textContent = `Examen LSP – ${QUESTIONS.length} reactivos (Opción múltiple)`; }
-  const build = document.getElementById('buildInfo');
-  if(build){ build.textContent = 'Build: 2026-02-27'; }
-  // optional: focus name input
-  const nameInp = document.getElementById('inputName');
-  if(nameInp) {
-    nameInp.focus();
-    attachEnterClose(nameInp);
-    attachEnterClose(document.getElementById('inputYear'));
-    attachEnterClose(document.getElementById('inputArma'));
-    attachEnterClose(document.getElementById('inputServicio'));
-  }
-});
-
-const btnShuffle = document.getElementById('btnShuffle');
-const btnGrade = document.getElementById('btnGrade');
-const btnReset = document.getElementById('btnReset');
-const btnExport = document.getElementById('btnExport');
-const inputName = document.getElementById('inputName');
-
-function updateButtonState(){
-  if(inputName && inputName.value.trim() !== ''){
-    btnGrade.disabled = false;
-  } else {
-    btnGrade.disabled = true;
-  }
-  // hide student card when both name and year provided
-  const yearEl = document.getElementById('inputYear');
-  if(inputName && yearEl && inputName.value.trim() !== '' && yearEl.value.trim() !== ''){
-    const card = document.getElementById('studentInfoCard');
-    if(card) card.style.display = 'none';
-  }
+  showQuestion(currentIndex);
+  startTime = new Date();
 }
 
-function attachEnterClose(element){
-  element.addEventListener('keydown', e=>{
-    if(e.key === 'Enter'){
-      const card = document.getElementById('studentInfoCard');
-      if(card) card.style.display = 'none';
-    }
-  });
+function restart(){
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('startScreen').classList.remove('hidden');
+  document.querySelector('main').classList.add('hidden');
+  const headerEl = document.querySelector('header');
+  if(headerEl) headerEl.classList.add('hidden');
+  startName.value = '';
+  startYear.value = '';
+  startArma.value = '';
+  startServicio.value = '';
+  updateStartButtonState();
 }
 
-if(inputName){
-  inputName.addEventListener('input', updateButtonState);
-}
-if(btnShuffle) btnShuffle.addEventListener('click', shuffle);
-if(btnGrade) btnGrade.addEventListener('click', grade);
-if(btnReset) btnReset.addEventListener('click', reset);
-if(btnExport) btnExport.addEventListener('click', exportJSON);
-
-// initialize button state
-updateButtonState();

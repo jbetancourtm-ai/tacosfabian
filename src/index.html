@@ -34,10 +34,13 @@
     @media (min-width: 800px){ .grid2 { grid-template-columns: 1fr 1fr; } }
     textarea { width:100%; min-height: 130px; background:#0e1630; color:#e8ecff; border:1px solid #22305e; border-radius:12px; padding:10px; }
     code { color:#c9d4ff; }
+    .hidden { display:none !important; }
+    #startScreen { position:fixed; top:0; left:0; right:0; bottom:0; z-index:2000; background:rgba(11,16,32,0.98); display:flex; align-items:center; justify-content:center; }
+    #startScreen.hidden { display:none !important; }
   </style>
 </head>
 <body>
-<header>
+<header class="hidden">
   <div class="topbar">
     <div>
       <h1 id="examTitle">Examen LSP &#8211; reactivos dinámicos (Opción múltiple)</h1>
@@ -64,29 +67,7 @@
   </div>
 </header>
 
-<main>
-  <div class="card" id="studentInfoCard" style="position:fixed; bottom:10px; left:10px; width:260px; z-index:900;">
-    <div class="row" style="flex-wrap:wrap; gap:10px;">
-      <div>
-        <label>Nombre:<br><input type="text" id="inputName"></label>
-      </div>
-      <div>
-        <label>Año:<br><input type="text" id="inputYear"></label>
-      </div>
-      <div>
-        <label>Arma:<br><input type="text" id="inputArma"></label>
-      </div>
-      <div>
-        <label>Servicio:<br><input type="text" id="inputServicio"></label>
-      </div>
-    </div>
-  </div>
-
-  <div class="card" style="z-index:1100; position:fixed; bottom:10px; left:300px; width:300px;">
-    <div style="margin-top:10px">
-      <textarea id="exportArea" placeholder="Resultados del examen..." readonly></textarea>
-    </div>
-  </div>
+<main class="hidden">
 
   <div id="feedback" class="card" style="display:none;">
     <div class="qtitle">Retroalimentación</div>
@@ -94,17 +75,41 @@
   </div>
 
   <div id="quiz"></div>
+  <div id="questionFeedback" class="small" style="margin-top:10px;"></div>
+  <div class="row" style="margin-top:10px; gap:10px;">
+    <button class="btn" id="btnSubmit" disabled>Enviar</button>
+    <button class="btn" id="btnNext" disabled>Siguiente</button>
+  </div>
 
   <style>
     .explanation { margin-top:8px; font-size:12px; color:#c9d4ff; }
-    #studentInfoCard input { width:100%; box-sizing:border-box; }
   </style>
 
-  <div id="summaryCard" class="card" style="display:none; position:fixed; bottom:10px; right:10px; width:260px; z-index:1000;">
-    <div class="qtitle">Resumen</div>
-    <div id="summaryText" class="small"></div>
+  <!-- pantalla de resultados finales -->
+  <div id="resultScreen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:1500; background:#111a33; color:#e8ecff; align-items:center; justify-content:center; flex-direction:column; padding:40px;">
+    <div style="max-width:500px;text-align:center;">
+      <h1 style="font-size:36px;margin:0 0 20px 0;">Resultados del Examen</h1>
+      <div id="resultText" class="small" style="margin:20px 0;font-size:18px;line-height:1.6;"></div>
+      <div id="studySuggestion" class="small" style="margin:20px 0;font-size:14px;line-height:1.8;background:#0e1630;padding:20px;border-radius:12px;border:1px solid #22305e;"></div>
+        <button class="btn" id="btnExportResults" style="padding:12px 24px;font-size:16px; margin-right:10px;">Descargar JSON</button>
+      <button class="btn" id="btnRestart" style="padding:12px 24px;font-size:16px;">Volver a inicio</button>
+    </div>
   </div>
 </main>
+
+<!-- pantalla de inicio -->
+<div id="startScreen">
+  <div class="card" style="max-width:400px;width:90%;">
+    <h2 style="margin-top:0;">Bienvenido al Examen LSP</h2>
+    <div class="row" style="flex-wrap:wrap;gap:10px;flex-direction:column;">
+      <div><label>Nombre:<br><input type="text" id="startName" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
+      <div><label>Año:<br><input type="text" id="startYear" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
+      <div><label>Arma:<br><input type="text" id="startArma" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
+      <div><label>Servicio:<br><input type="text" id="startServicio" style="width:100%;padding:8px;box-sizing:border-box;background:#0e1630;border:1px solid #22305e;border-radius:8px;color:#e8ecff;"></label></div>
+    </div>
+    <div style="margin-top:20px;text-align:center;"><button class="btn" id="btnStart" disabled style="padding:12px 24px;font-size:16px;">Ir al examen</button></div>
+  </div>
+</div>
 
 <footer>
   Hecho para ejecución directa en HTML/JS. Fuente de contenidos: manual cargado. 
