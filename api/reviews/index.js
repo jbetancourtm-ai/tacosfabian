@@ -1,115 +1,167 @@
-﻿import { TableClient } from "@azure/data-tables";
+import { TableClient } from "@azure/data-tables";
 
 const TABLE_NAME = process.env.REVIEWS_TABLE_NAME || "TacosFabianReviews";
 const PARTITION_KEY = "reviews";
+const MAX_NAME_LENGTH = 60;
+const MAX_COMMENT_LENGTH = 300;
+const MAX_ITEMS = 500;
 
-function json(res, status, body) {
-  res.status = status;
-  res.headers = { "Content-Type": "application/json; charset=utf-8" };
-  res.body = body;
-  return res;
+function reply(context, status, body) {
+  context.res = {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
+    body,
+  };
 }
 
-function isNonEmptyString(s) {
-  return typeof s === "string" && s.trim().length > 0;
+function sanitizeText(value, maxLength) {
+  const clean = String(value || "").trim();
+  return clean.slice(0, maxLength);
 }
 
-function clampStars(n) {
-  const v = Number(n);
-  if (!Number.isFinite(v)) return null;
-  if (v < 1 || v > 5) return null;
-  return Math.round(v);
-}
-
-function safeTrim(s, max) {
-  const t = String(s ?? "").trim();
-  return t.length > max ? t.slice(0, max) : t;
-}
-
-function makeRowKey() {
-  const iso = new Date().toISOString();
-  const rand = Math.random().toString(16).slice(2);
-  return `${iso}_${rand}`;
+function parseStars(value) {
+  const stars = Number(value);
+  if (!Number.isInteger(stars)) return null;
+  if (stars < 1 || stars > 5) return null;
+  return stars;
 }
 
 function getClient() {
-  const conn = process.env.AZURE_STORAGE_CONNECTION_STRING;
-  if (!conn) throw new Error("Falta AZURE_STORAGE_CONNECTION_STRING.");
-  return TableClient.fromConnectionString(conn, TABLE_NAME);
+  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+
+  if (!connectionString) {
+    throw new Error("Missing AZURE_STORAGE_CONNECTION_STRING setting.");
+  }
+
+  return TableClient.fromConnectionString(connectionString, TABLE_NAME);
 }
 
-async function ensureTable(client) {
-  try { await client.createTable(); } catch {}
+async function ensureTableExists(client) {
+  try {
+    await client.createTable();
+  } catch {
+    // Table may already exist.
+  }
 }
 
-export default async function (context, req) {
-  const method = (req.method || "GET").toUpperCase();
+function buildRowKey() {
+  return `${new Date().toISOString()}_${crypto.randomUUID()}`;
+}
+
+async function listReviews(client) {
+  const entities = [];
+  const iterator = client.listEntities({
+    queryOptions: {
+      filter: `PartitionKey eq '${PARTITION_KEY}'`,
+    },
+  });
+
+  for await (const entity of iterator) {
+    entities.push({
+      id: entity.rowKey,
+      name: entity.name,
+      stars: entity.stars,
+      comment: entity.comment,
+      date: entity.date,
+    });
+
+    if (entities.length >= MAX_ITEMS) break;
+  }
+
+  entities.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+  return entities;
+}
+
+async function createReview(client, payload) {
+  const name = sanitizeText(payload.name, MAX_NAME_LENGTH);
+  const comment = sanitizeText(payload.comment, MAX_COMMENT_LENGTH);
+  const stars = parseStars(payload.stars);
+
+  if (!name) {
+    return { ok: false, status: 400, error: "El nombre es obligatorio." };
+  }
+
+  if (stars === null) {
+    return { ok: false, status: 400, error: "Las estrellas deben ser un número entero entre 1 y 5." };
+  }
+
+  if (!comment) {
+    return { ok: false, status: 400, error: "El comentario es obligatorio." };
+  }
+
+  if (String(payload.comment || "").trim().length > MAX_COMMENT_LENGTH) {
+    return { ok: false, status: 400, error: "El comentario no puede exceder 300 caracteres." };
+  }
+
+  const item = {
+    partitionKey: PARTITION_KEY,
+    rowKey: buildRowKey(),
+    name,
+    stars,
+    comment,
+    date: new Date().toISOString(),
+  };
+
+  await client.createEntity(item);
+
+  return {
+    ok: true,
+    status: 201,
+    item: {
+      id: item.rowKey,
+      name: item.name,
+      stars: item.stars,
+      comment: item.comment,
+      date: item.date,
+    },
+  };
+}
+
+export default async function reviews(context, req) {
+  const method = String(req.method || "GET").toUpperCase();
 
   let client;
   try {
     client = getClient();
-    await ensureTable(client);
-  } catch (e) {
-    context.log("Storage error:", e?.message || e);
-    return json(context.res, 500, { error: "Error de configuración de almacenamiento." });
+    await ensureTableExists(client);
+  } catch (error) {
+    context.log("Storage setup error:", error.message);
+    reply(context, 500, { error: "Error de configuración de almacenamiento." });
+    return;
   }
 
   if (method === "GET") {
     try {
-      const items = [];
-      const iter = client.listEntities({
-        queryOptions: { filter: `PartitionKey eq '${PARTITION_KEY}'` }
-      });
-
-      for await (const entity of iter) {
-        items.push({
-          id: entity.rowKey,
-          name: entity.name,
-          stars: entity.stars,
-          comment: entity.comment,
-          date: entity.date
-        });
-        if (items.length >= 200) break;
-      }
-
-      items.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-      return json(context.res, 200, { items });
-    } catch (e) {
-      context.log("GET error:", e?.message || e);
-      return json(context.res, 500, { error: "No se pudieron obtener las reseñas." });
+      const items = await listReviews(client);
+      reply(context, 200, { items });
+      return;
+    } catch (error) {
+      context.log("GET /api/reviews failed:", error.message);
+      reply(context, 500, { error: "No se pudieron obtener las reseñas." });
+      return;
     }
   }
 
   if (method === "POST") {
-    const body = req.body || {};
-    const name = safeTrim(body.name, 60);
-    const comment = safeTrim(body.comment, 300);
-    const stars = clampStars(body.stars);
-
-    if (!isNonEmptyString(name)) return json(context.res, 400, { error: "El nombre es obligatorio." });
-    if (stars === null) return json(context.res, 400, { error: "Las estrellas deben ser del 1 al 5." });
-    if (!isNonEmptyString(comment)) return json(context.res, 400, { error: "El comentario es obligatorio." });
-    if (comment.length > 300) return json(context.res, 400, { error: "El comentario excede 300 caracteres." });
-
-    const date = new Date().toISOString();
-    const rowKey = makeRowKey();
-
     try {
-      await client.createEntity({
-        partitionKey: PARTITION_KEY,
-        rowKey,
-        name,
-        stars,
-        comment,
-        date
-      });
+      const result = await createReview(client, req.body || {});
 
-      return json(context.res, 201, { ok: true, item: { id: rowKey, name, stars, comment, date } });
-    } catch (e) {
-      context.log("POST error:", e?.message || e);
-      return json(context.res, 500, { error: "No se pudo guardar la reseña." });
+      if (!result.ok) {
+        reply(context, result.status, { error: result.error });
+        return;
+      }
+
+      reply(context, result.status, { item: result.item });
+      return;
+    } catch (error) {
+      context.log("POST /api/reviews failed:", error.message);
+      reply(context, 500, { error: "No se pudo guardar la reseña." });
+      return;
     }
   }
 
-  return json(context.res, 405, { error: "Método no permitido." });
+  reply(context, 405, { error: "Método no permitido." });
 }
+

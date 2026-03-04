@@ -1,0 +1,4 @@
+﻿node_modules/
+dist/
+/test-results/
+api/local.settings.json

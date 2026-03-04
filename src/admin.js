@@ -1,77 +1,77 @@
-const $ = (sel) => document.querySelector(sel);
+const adminStatus = document.querySelector("#adminStatus");
+const adminTableBody = document.querySelector("#adminTableBody");
 
-function starsToText(n) {
-  const full = "★★★★★";
-  const empty = "☆☆☆☆☆";
-  return full.slice(0, n) + empty.slice(0, 5 - n);
-}
-
-function formatDateTime(iso) {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleString("es-MX", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" });
-  } catch {
-    return iso;
-  }
-}
-
-function escapeHtml(str) {
-  return String(str)
+function escapeHtml(text) {
+  return String(text)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+    .replaceAll("'", "&#39;");
 }
 
-async function fetchAllReviews() {
-  // Para este ejemplo, el endpoint público ya devuelve todo.
-  const res = await fetch("/api/reviews", { headers: { "Accept": "application/json" } });
-  if (!res.ok) throw new Error(`Error (${res.status})`);
-  return res.json();
+function starsLabel(stars) {
+  const total = Math.max(1, Math.min(5, Number(stars) || 0));
+  return `${"\u2605".repeat(total)}${"\u2606".repeat(5 - total)}`;
+}
+
+function formatDateTime(dateValue) {
+  if (!dateValue) return "Sin fecha";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+
+  return new Intl.DateTimeFormat("es-MX", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 }
 
 function renderTable(items) {
-  const body = $("#adminTableBody");
-  const summary = $("#adminSummary");
-  if (!body || !summary) return;
-
   if (!Array.isArray(items) || items.length === 0) {
-    body.innerHTML = `<tr><td colspan="4" class="muted">No hay reseñas.</td></tr>`;
-    summary.textContent = "";
+    adminStatus.textContent = "No hay reseñas guardadas.";
+    adminTableBody.innerHTML = "<tr><td colspan=\"4\">Sin registros</td></tr>";
     return;
   }
 
-  const sorted = [...items].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-  const avg = sorted.reduce((acc, r) => acc + (Number(r.stars) || 0), 0) / sorted.length;
-  summary.textContent = `Total: ${sorted.length} · Promedio: ${avg.toFixed(1)} / 5`;
+  adminStatus.textContent = `Total de reseñas: ${items.length}`;
+  adminTableBody.innerHTML = items
+    .map((item) => {
+      const date = formatDateTime(item.date);
+      const name = escapeHtml(item.name || "Sin nombre");
+      const comment = escapeHtml(item.comment || "");
+      const stars = Number(item.stars) || 0;
 
-  body.innerHTML = sorted.map((r) => {
-    const date = r.date ? formatDateTime(r.date) : "";
-    const name = escapeHtml(r.name ?? "");
-    const comment = escapeHtml(r.comment ?? "");
-    const stars = Number(r.stars) || 0;
-
-    return `
-      <tr>
-        <td>${date}</td>
-        <td><strong>${name}</strong></td>
-        <td><span class="stars" aria-label="${stars} de 5 estrellas">${starsToText(stars)}</span></td>
-        <td>${comment}</td>
-      </tr>
-    `;
-  }).join("");
+      return `
+        <tr>
+          <td>${date}</td>
+          <td>${name}</td>
+          <td class="stars" aria-label="${stars} de 5 estrellas">${starsLabel(stars)}</td>
+          <td>${comment}</td>
+        </tr>
+      `;
+    })
+    .join("");
 }
 
-async function load() {
+async function loadAdminReviews() {
+  adminStatus.textContent = "Cargando reseñas...";
+
   try {
-    const data = await fetchAllReviews();
-    renderTable(data?.items || []);
-  } catch (e) {
-    const body = $("#adminTableBody");
-    if (body) body.innerHTML = `<tr><td colspan="4" class="muted">No se pudieron cargar las reseñas.</td></tr>`;
+    const response = await fetch("/api/reviews", {
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}`);
+    }
+
+    const payload = await response.json();
+    renderTable(payload.items || []);
+  } catch (error) {
+    adminStatus.textContent = "No se pudieron cargar las reseñas.";
+    adminTableBody.innerHTML = "<tr><td colspan=\"4\">Error al cargar datos</td></tr>";
   }
 }
 
-$("#refreshAdmin")?.addEventListener("click", load);
-load();
+loadAdminReviews();
+

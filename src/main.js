@@ -1,156 +1,123 @@
-const $ = (sel) => document.querySelector(sel);
+const menuBtn = document.querySelector("#menuBtn");
+const menu = document.querySelector("#menu");
+const reviewsStatus = document.querySelector("#reviewsStatus");
+const reviewsList = document.querySelector("#reviewsList");
+const reviewForm = document.querySelector("#reviewForm");
+const formStatus = document.querySelector("#formStatus");
 
-function setYear() {
-  const y = new Date().getFullYear();
-  const el = $("#year");
-  if (el) el.textContent = String(y);
-}
-
-function setupMobileNav() {
-  const btn = $("#navToggle");
-  const menu = $("#navMenu");
-  if (!btn || !menu) return;
-
-  btn.addEventListener("click", () => {
-    const open = menu.classList.toggle("is-open");
-    btn.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-
-  menu.addEventListener("click", (e) => {
-    const target = e.target;
-    if (target && target.tagName === "A") {
-      menu.classList.remove("is-open");
-      btn.setAttribute("aria-expanded", "false");
-    }
+if (menuBtn && menu) {
+  menuBtn.addEventListener("click", () => {
+    const isOpen = menu.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
   });
 }
 
-function starsToText(n) {
-  const full = "★★★★★";
-  const empty = "☆☆☆☆☆";
-  return full.slice(0, n) + empty.slice(0, 5 - n);
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
-function formatDate(iso) {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString("es-MX", { year: "numeric", month: "short", day: "2-digit" });
-  } catch {
-    return iso;
-  }
+function renderStars(stars) {
+  const total = Math.max(1, Math.min(5, Number(stars) || 0));
+  return `${"\u2605".repeat(total)}${"\u2606".repeat(5 - total)}`;
 }
 
-function renderReviews(list) {
-  const ul = $("#reviewsList");
-  const summary = $("#reviewsSummary");
-  if (!ul || !summary) return;
+function formatDate(dateValue) {
+  if (!dateValue) return "Sin fecha";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+  return new Intl.DateTimeFormat("es-MX", {
+    dateStyle: "medium",
+  }).format(date);
+}
 
-  if (!Array.isArray(list) || list.length === 0) {
-    ul.innerHTML = `<li class="muted">Aún no hay reseñas. ¡Sé el primero en dejar una!</li>`;
-    summary.textContent = "";
+function paintReviews(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    reviewsStatus.textContent = "Aún no hay reseñas.";
+    reviewsList.innerHTML = "";
     return;
   }
 
-  // Mostrar las más recientes primero
-  const sorted = [...list].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-  const top = sorted.slice(0, 6);
+  reviewsStatus.textContent = `${items.length} reseña(s) publicadas`;
+  reviewsList.innerHTML = items
+    .map((item) => {
+      const name = escapeHtml(item.name || "Anónimo");
+      const comment = escapeHtml(item.comment || "");
+      const stars = Number(item.stars) || 0;
+      const dateText = formatDate(item.date);
 
-  const avg = sorted.reduce((acc, r) => acc + (Number(r.stars) || 0), 0) / sorted.length;
-  summary.textContent = `Total: ${sorted.length} · Promedio: ${avg.toFixed(1)} / 5`;
-
-  ul.innerHTML = top
-    .map((r) => {
-      const name = escapeHtml(r.name ?? "");
-      const comment = escapeHtml(r.comment ?? "");
-      const stars = Number(r.stars) || 0;
-      const date = r.date ? formatDate(r.date) : "";
       return `
-        <li class="review">
-          <div class="review__head">
-            <div>
-              <div class="review__name">${name}</div>
-              <div class="stars" aria-label="${stars} de 5 estrellas">${starsToText(stars)}</div>
-            </div>
-            <div class="review__date">${date}</div>
+        <li class="review-item">
+          <div class="review-item-head">
+            <strong>${name}</strong>
+            <span class="muted">${dateText}</span>
           </div>
-          <p class="review__comment">${comment}</p>
+          <p class="stars" aria-label="${stars} de 5 estrellas">${renderStars(stars)}</p>
+          <p>${comment}</p>
         </li>
       `;
     })
     .join("");
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+async function loadReviews() {
+  reviewsStatus.textContent = "Cargando reseñas...";
+  try {
+    const response = await fetch("/api/reviews", {
+      headers: { Accept: "application/json" },
+    });
 
-async function fetchReviews() {
-  const res = await fetch("/api/reviews", { headers: { "Accept": "application/json" } });
-  if (!res.ok) throw new Error(`Error al cargar reseñas (${res.status})`);
-  return res.json();
-}
-
-async function postReview(payload) {
-  const res = await fetch("/api/reviews", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Accept": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = data?.error || `No se pudo enviar (${res.status})`;
-    throw new Error(msg);
-  }
-  return data;
-}
-
-function setupReviews() {
-  const refreshBtn = $("#refreshReviews");
-  const form = $("#reviewForm");
-  const msg = $("#formMsg");
-
-  async function load() {
-    try {
-      const data = await fetchReviews();
-      renderReviews(data?.items || []);
-    } catch (e) {
-      const ul = $("#reviewsList");
-      if (ul) ul.innerHTML = `<li class="muted">No se pudieron cargar las reseñas. Intenta más tarde.</li>`;
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}`);
     }
+
+    const payload = await response.json();
+    paintReviews(payload.items || []);
+  } catch (error) {
+    reviewsStatus.textContent = "No fue posible cargar reseñas. Intenta más tarde.";
   }
+}
 
-  refreshBtn?.addEventListener("click", load);
+if (reviewForm) {
+  reviewForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    formStatus.textContent = "Enviando reseña...";
 
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!msg) return;
-
-    msg.textContent = "Enviando...";
-    const fd = new FormData(form);
-    const payload = {
-      name: String(fd.get("name") || "").trim(),
-      stars: Number(fd.get("stars") || 0),
-      comment: String(fd.get("comment") || "").trim()
+    const formData = new FormData(reviewForm);
+    const data = {
+      name: String(formData.get("name") || "").trim(),
+      stars: Number(formData.get("stars") || 0),
+      comment: String(formData.get("comment") || "").trim(),
     };
 
     try {
-      await postReview(payload);
-      form.reset();
-      msg.textContent = "¡Gracias! Tu reseña se guardó correctamente.";
-      await load();
-    } catch (err) {
-      msg.textContent = err?.message || "Ocurrió un error al enviar la reseña.";
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error || "No se pudo guardar la reseña.");
+      }
+
+      reviewForm.reset();
+      formStatus.textContent = "Reseña enviada. Gracias por compartir tu opinión.";
+      await loadReviews();
+    } catch (error) {
+      formStatus.textContent = error.message;
     }
   });
-
-  load();
 }
 
-setYear();
-setupMobileNav();
-setupReviews();
+loadReviews();
+

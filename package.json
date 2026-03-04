@@ -7,12 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "swa": "swa start http://localhost:5173 --run \"npm run dev\" --api-location api"
-  },
-  "dependencies": {
-    "@azure/data-tables": "^13.3.0"
+    "start:swa": "swa start http://localhost:5173 --run \"npm run dev\" --api-location api"
   },
   "devDependencies": {
     "vite": "^5.4.0"
   }
 }
+

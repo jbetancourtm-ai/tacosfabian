@@ -1,14 +1,212 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es-MX">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tacos Fabián | Suadero y Trocitos en Texcoco</title>
-    <meta name="description" content="Tacos Fabián en Texcoco: suadero y trocitos/trozos de carne. ¡Pide por WhatsApp!" />
+    <meta
+      name="description"
+      content="Taquería Tacos Fabián en Texcoco de Mora: suadero y especialidad de la casa en trocitos de carne."
+    />
+    <meta property="og:title" content="Tacos Fabián" />
+    <meta
+      property="og:description"
+      content="Suadero y trocitos de carne en Avenida Colón No. 4, Centro, Texcoco de Mora."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://favian.com" />
+    <meta property="og:image" content="/og-image-placeholder.jpg" />
     <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="site-header" role="banner">
+      <div class="container header-inner">
+        <a class="brand" href="#inicio" aria-label="Inicio Tacos Fabián">
+          <span class="brand-mark" aria-hidden="true">TF</span>
+          <span class="brand-text">
+            <strong>Tacos Fabián</strong>
+            <small>Texcoco de Mora</small>
+          </span>
+        </a>
+
+        <button
+          id="menuBtn"
+          class="menu-btn"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          aria-controls="menu"
+        >
+          Menú
+        </button>
+
+        <nav aria-label="Navegación principal">
+          <ul id="menu" class="menu">
+            <li><a href="#especialidad">Especialidad</a></li>
+            <li><a href="#menu-taqueria">Menú</a></li>
+            <li><a href="#ubicacion">Ubicación</a></li>
+            <li><a href="#resenas">Reseñas</a></li>
+          </ul>
+        </nav>
+
+        <a class="btn btn-whatsapp" href="https://wa.me/0000000000" target="_blank" rel="noreferrer noopener">
+          Pedir por WhatsApp
+        </a>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section id="inicio" class="hero">
+        <div class="container hero-grid">
+          <div>
+            <p class="eyebrow">Sabor auténtico en el Centro de Texcoco</p>
+            <h1>Tacos que se antojan desde la primera mordida</h1>
+            <p>
+              En <strong>Tacos Fabián</strong> preparamos suadero jugoso y nuestra especialidad de la casa:
+              <strong>trocitos de carne</strong> bien doraditos, al momento.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#menu-taqueria">Ver menú</a>
+              <a class="btn" href="#ubicacion">Visítanos hoy</a>
+            </div>
+          </div>
+          <article class="hero-card" aria-label="Recomendación del día">
+            <h2>Recomendación</h2>
+            <p class="dish">Taco de trocitos</p>
+            <p class="muted">Especialidad de la casa con salsa verde tatemada y cebolla asada.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="especialidad" class="section">
+        <div class="container">
+          <h2>Especialidad</h2>
+          <div class="cards two-col">
+            <article class="card">
+              <h3>Tacos de suadero</h3>
+              <p>
+                Cocción lenta para lograr un suadero suave por dentro y doradito por fuera. Se sirve con
+                tortilla caliente y cilantro fresco.
+              </p>
+            </article>
+            <article class="card featured">
+              <h3>Trocitos / Trozos de carne</h3>
+              <p>
+                Nuestra especialidad de la casa: trocitos de carne seleccionada, dorados al punto y llenos de
+                sabor. Ideal para pedir en tacos o por orden.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="menu-taqueria" class="section section-soft">
+        <div class="container">
+          <h2>Menú</h2>
+          <div class="cards three-col">
+            <article class="card menu-item">
+              <h3>Suadero</h3>
+              <p>Taco clásico de suadero, suave y jugoso.</p>
+              <span class="price">Desde $25 MXN</span>
+            </article>
+            <article class="card menu-item featured">
+              <h3>Trocitos de carne</h3>
+              <p>Especialidad de la casa con opción de salsa de la casa.</p>
+              <span class="price">Desde $30 MXN</span>
+            </article>
+            <article class="card menu-item">
+              <h3>Bebidas</h3>
+              <p>Refrescos, agua fresca del día y agua natural.</p>
+              <span class="price">Desde $20 MXN</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="ubicacion" class="section">
+        <div class="container location-grid">
+          <div>
+            <h2>Ubicación</h2>
+            <p class="address">Avenida Colón No. 4, Centro, Texcoco de Mora, Estado de México, México</p>
+            <div class="location-actions">
+              <a
+                class="btn btn-primary"
+                href="https://www.google.com/maps/search/?api=1&query=Avenida+Col%C3%B3n+No.+4,+Centro,+Texcoco+de+Mora,+Estado+de+M%C3%A9xico,+M%C3%A9xico"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                Cómo llegar
+              </a>
+            </div>
+            <p class="muted small">
+              Si deseas otro mapa, reemplaza el contenido del iframe con tu código Embed de Google Maps.
+            </p>
+          </div>
+          <div class="map-wrap">
+            <iframe
+              title="Mapa de Tacos Fabián"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=Avenida%20Col%C3%B3n%20No.%204%2C%20Centro%2C%20Texcoco%20de%20Mora%2C%20Estado%20de%20M%C3%A9xico%2C%20M%C3%A9xico&output=embed"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section id="resenas" class="section section-soft">
+        <div class="container">
+          <div class="reviews-head">
+            <h2>Reseñas</h2>
+            <a class="btn" href="/admin">Ver panel admin</a>
+          </div>
+
+          <div id="reviewsStatus" class="muted" aria-live="polite">Cargando reseñas...</div>
+          <ul id="reviewsList" class="reviews-list" aria-label="Lista de reseñas"></ul>
+
+          <article class="card review-form-wrap">
+            <h3>Agrega tu reseña</h3>
+            <form id="reviewForm" class="review-form" novalidate>
+              <label for="name">Nombre</label>
+              <input id="name" name="name" type="text" maxlength="60" required />
+
+              <label for="stars">Estrellas</label>
+              <select id="stars" name="stars" required>
+                <option value="">Selecciona</option>
+                <option value="5">5 - Excelente</option>
+                <option value="4">4 - Muy bueno</option>
+                <option value="3">3 - Bueno</option>
+                <option value="2">2 - Regular</option>
+                <option value="1">1 - Malo</option>
+              </select>
+
+              <label for="comment">Comentario</label>
+              <textarea id="comment" name="comment" rows="4" maxlength="300" required></textarea>
+
+              <button class="btn btn-primary" type="submit">Enviar reseña</button>
+              <p id="formStatus" class="muted" aria-live="polite"></p>
+            </form>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <h3>Tacos Fabián</h3>
+          <p class="muted">Horario: Lun-Dom 6:00 pm - 1:00 am (placeholder)</p>
+        </div>
+        <div>
+          <p>Teléfono: +52 000 000 0000 (placeholder)</p>
+          <p>Redes: Facebook / Instagram / TikTok (placeholder)</p>
+        </div>
+      </div>
+    </footer>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
+
