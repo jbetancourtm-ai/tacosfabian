@@ -142,7 +142,7 @@ a {
 }
 
 .btn-whatsapp {
-  display: none;
+  display: inline-flex;
   color: var(--primary-dark);
 }
 
@@ -366,6 +366,17 @@ td {
   display: none;
 }
 
+@media (max-width: 899px) {
+  .header-inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .btn-whatsapp {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
 @media (min-width: 900px) {
   .menu-btn {
     display: none;
@@ -412,7 +423,7 @@ td {
   }
 
   .btn-whatsapp {
-    display: inline-flex;
+    width: auto;
   }
 
   .desktop-only {
