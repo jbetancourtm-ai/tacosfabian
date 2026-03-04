@@ -250,6 +250,28 @@ h2 {
   font-weight: 700;
 }
 
+.price-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.price-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.8rem;
+  border-bottom: 1px dashed #f1e5db;
+  padding-bottom: 0.3rem;
+}
+
+.price-list li strong {
+  color: var(--primary-dark);
+  white-space: nowrap;
+}
+
 .location-grid {
   display: grid;
   gap: 1rem;
