@@ -1,18 +1,32 @@
-﻿const menuBtn = document.querySelector("#menuBtn");
+const menuBtn = document.querySelector("#menuBtn");
 const navMenu = document.querySelector("#navMenu");
+const navOverlay = document.querySelector("#navOverlay");
+const siteHeader = document.querySelector(".site-header");
+const navLinks = Array.from(document.querySelectorAll('#navMenu a[href^="#"]'));
 const reviewsStatus = document.querySelector("#reviewsStatus");
+const reviewsAverage = document.querySelector("#reviewsAverage");
 const reviewsList = document.querySelector("#reviewsList");
 const reviewForm = document.querySelector("#reviewForm");
 const formStatus = document.querySelector("#formStatus");
 const commentInput = document.querySelector("#comment");
 const commentCounter = document.querySelector("#commentCounter");
 const toastRegion = document.querySelector("#toastRegion");
+const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
+const footer = document.querySelector(".site-footer");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
 const menuPrev = document.querySelector("#menuPrev");
 const menuNext = document.querySelector("#menuNext");
 const menuDots = document.querySelector("#menuDots");
+
+const menuModal = document.querySelector("#menuModal");
+const menuModalBackdrop = document.querySelector("#menuModalBackdrop");
+const menuModalClose = document.querySelector("#menuModalClose");
+const menuModalTitle = document.querySelector("#menuModalTitle");
+const menuModalDescription = document.querySelector("#menuModalDescription");
+const menuModalPrice = document.querySelector("#menuModalPrice");
+const menuCards = Array.from(document.querySelectorAll(".menu-item"));
 
 function showToast(message, type = "info") {
   if (!toastRegion) return;
@@ -29,18 +43,76 @@ function showToast(message, type = "info") {
 }
 
 if (menuBtn && navMenu) {
+  const closeMenu = () => {
+    navMenu.classList.remove("open");
+    navOverlay?.classList.remove("open");
+    menuBtn.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
+  };
+
   menuBtn.addEventListener("click", () => {
     const isOpen = navMenu.classList.toggle("open");
+    navOverlay?.classList.toggle("open", isOpen);
     menuBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    document.body.classList.toggle("menu-open", isOpen);
   });
 
   navMenu.addEventListener("click", (event) => {
     const target = event.target;
-    if (target instanceof HTMLAnchorElement) {
-      navMenu.classList.remove("open");
-      menuBtn.setAttribute("aria-expanded", "false");
-    }
+    if (target instanceof HTMLAnchorElement) closeMenu();
   });
+
+  navOverlay?.addEventListener("click", closeMenu);
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
+  });
+}
+
+function setupHeaderEffects() {
+  if (siteHeader) {
+    const onScroll = () => {
+      siteHeader.classList.toggle("is-scrolled", window.scrollY > 12);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  if (!navLinks.length) return;
+
+  const sections = navLinks
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = `#${entry.target.id}`;
+        navLinks.forEach((link) => {
+          link.classList.toggle("is-active", link.getAttribute("href") === id);
+        });
+      });
+    },
+    { threshold: 0.5, rootMargin: "-20% 0px -35% 0px" }
+  );
+
+  sections.forEach((section) => observer.observe(section));
+}
+
+function setupFloatingWhatsapp() {
+  if (!floatingWhatsapp || !footer) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        floatingWhatsapp.classList.toggle("is-hidden", entry.isIntersecting);
+      });
+    },
+    { threshold: 0.1 }
+  );
+
+  observer.observe(footer);
 }
 
 function escapeHtml(text) {
@@ -54,7 +126,13 @@ function escapeHtml(text) {
 
 function renderStars(stars) {
   const total = Math.max(1, Math.min(5, Number(stars) || 0));
-  return `${"\u2605".repeat(total)}${"\u2606".repeat(5 - total)}`;
+  const starSvg = (filled) => `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="star-icon ${filled ? "is-filled" : ""}">
+      <path d="M12 2.5l2.9 5.88 6.5.95-4.7 4.58 1.1 6.48L12 17.3l-5.8 3.09 1.11-6.48-4.72-4.58 6.53-.95L12 2.5z"></path>
+    </svg>
+  `;
+
+  return Array.from({ length: 5 }, (_, index) => starSvg(index < total)).join("");
 }
 
 function formatDate(dateValue) {
@@ -67,16 +145,27 @@ function formatDate(dateValue) {
 function paintReviews(items) {
   if (!Array.isArray(items) || items.length === 0) {
     reviewsStatus.textContent = "Aun no hay resenas. Se la primera persona en opinar.";
+    if (reviewsAverage) reviewsAverage.textContent = "Promedio: --/5";
     reviewsList.innerHTML = "";
     return;
   }
 
+  const avg = items.reduce((sum, item) => sum + (Number(item.stars) || 0), 0) / items.length;
   reviewsStatus.textContent = `${items.length} resena(s) publicadas`;
+  if (reviewsAverage) reviewsAverage.textContent = `Promedio: ${avg.toFixed(1)}/5`;
 
   reviewsList.innerHTML = items
     .map((item) => {
       const name = escapeHtml(item.name || "Anonimo");
-      const avatar = escapeHtml((item.name || "A").trim().charAt(0).toUpperCase() || "A");
+      const avatar = escapeHtml(
+        String(item.name || "A")
+          .trim()
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) => part[0]?.toUpperCase() || "")
+          .join("") || "A"
+      );
       const comment = escapeHtml(item.comment || "");
       const stars = Number(item.stars) || 0;
       const dateText = formatDate(item.date);
@@ -97,6 +186,12 @@ function paintReviews(items) {
 
 async function loadReviews() {
   reviewsStatus.textContent = "Cargando resenas...";
+  if (reviewsAverage) reviewsAverage.textContent = "Promedio: calculando...";
+  reviewsList.innerHTML = `
+    <li class="review-item review-skeleton"></li>
+    <li class="review-item review-skeleton"></li>
+    <li class="review-item review-skeleton"></li>
+  `;
 
   try {
     const response = await fetch("/api/reviews", {
@@ -220,6 +315,29 @@ function setupMenuCarousel() {
   menuPrev.addEventListener("click", prevSlide);
   menuNext.addEventListener("click", nextSlide);
 
+  let pointerStartX = 0;
+  let pointerEndX = 0;
+
+  menuCarousel.addEventListener("pointerdown", (event) => {
+    pointerStartX = event.clientX;
+    pointerEndX = event.clientX;
+  });
+
+  menuCarousel.addEventListener("pointermove", (event) => {
+    if (pointerStartX === 0) return;
+    pointerEndX = event.clientX;
+  });
+
+  menuCarousel.addEventListener("pointerup", () => {
+    const delta = pointerEndX - pointerStartX;
+    if (Math.abs(delta) > 45) {
+      if (delta < 0) nextSlide();
+      if (delta > 0) prevSlide();
+    }
+    pointerStartX = 0;
+    pointerEndX = 0;
+  });
+
   menuCarousel.addEventListener("keydown", (event) => {
     if (event.key === "ArrowRight") {
       event.preventDefault();
@@ -236,11 +354,100 @@ function setupMenuCarousel() {
   updateSlide();
 }
 
-function setupRevealAnimations() {
-  const items = document.querySelectorAll(
-    ".hero-content, .hero-side, .section-head, .card, .carousel-slide, .review-item, .review-form-wrap, .map-wrap"
-  );
+function setupMenuSpotlightModal() {
+  if (
+    !menuModal ||
+    !menuModalBackdrop ||
+    !menuModalClose ||
+    !menuModalTitle ||
+    !menuModalDescription ||
+    !menuModalPrice ||
+    menuCards.length === 0
+  ) {
+    return;
+  }
 
+  let lastFocused = null;
+
+  const openModal = (title, description, price) => {
+    lastFocused = document.activeElement;
+    menuModalTitle.textContent = title;
+    menuModalDescription.textContent = description;
+    menuModalPrice.textContent = price;
+    menuModal.classList.add("open");
+    menuModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    menuModalClose.focus();
+  };
+
+  const closeModal = () => {
+    menuModal.classList.remove("open");
+    menuModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    if (lastFocused instanceof HTMLElement) lastFocused.focus();
+  };
+
+  menuCards.forEach((card) => {
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Ver detalle de ${card.querySelector("h3")?.textContent || "producto"}`);
+
+    const trigger = () => {
+      const title = card.querySelector("h3")?.textContent?.trim() || "Producto";
+      const firstItem = card.querySelector("li");
+      const description = firstItem
+        ? `${firstItem.querySelector("span")?.textContent || "Especialidad"} hecho al momento.`
+        : "Especialidad de la casa con sabor real.";
+      const priceValue = firstItem?.querySelector("strong")?.textContent?.trim();
+      const price = priceValue ? `Desde ${priceValue} MXN` : "Pregunta por precios";
+      openModal(title, description, price);
+    };
+
+    card.addEventListener("click", trigger);
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        trigger();
+      }
+    });
+  });
+
+  menuModalClose.addEventListener("click", closeModal);
+  menuModalBackdrop.addEventListener("click", closeModal);
+
+  window.addEventListener("keydown", (event) => {
+    if (!menuModal.classList.contains("open")) return;
+
+    if (event.key === "Escape") closeModal();
+
+    if (event.key === "Tab") {
+      const focusables = menuModal.querySelectorAll("button, a, [tabindex]:not([tabindex='-1'])");
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  });
+}
+
+function setupRevealAnimations() {
+  const groups = [
+    ".hero-content, .hero-side",
+    "#especialidad .card",
+    "#menu .carousel-slide",
+    "#menu .menu-item",
+    "#ubicacion .location-copy, #ubicacion .map-wrap",
+    "#resenas .review-item, #resenas .review-form-wrap",
+  ];
+
+  const items = document.querySelectorAll(groups.join(", "));
   if (!items.length) return;
 
   if (!("IntersectionObserver" in window)) {
@@ -257,14 +464,13 @@ function setupRevealAnimations() {
       });
     },
     {
-      root: null,
       threshold: 0.12,
       rootMargin: "0px 0px -8% 0px",
     }
   );
 
   items.forEach((item, index) => {
-    const delay = (index % 6) * 70;
+    const delay = (index % 6) * 60;
     item.style.setProperty("--reveal-delay", `${delay}ms`);
     item.classList.add("reveal-item");
     observer.observe(item);
@@ -274,5 +480,8 @@ function setupRevealAnimations() {
 setupCommentCounter();
 setupReviewsForm();
 setupMenuCarousel();
+setupMenuSpotlightModal();
 setupRevealAnimations();
+setupHeaderEffects();
+setupFloatingWhatsapp();
 loadReviews();

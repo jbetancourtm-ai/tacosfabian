@@ -42,6 +42,11 @@ body {
   overflow-x: hidden;
 }
 
+body.menu-open,
+body.modal-open {
+  overflow: hidden;
+}
+
 body::before,
 body::after {
   content: "";
@@ -130,6 +135,13 @@ p {
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.site-header.is-scrolled {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 24px rgba(112, 67, 30, 0.12);
+  border-color: #f0d4bf;
 }
 
 .header-inner {
@@ -230,19 +242,26 @@ p {
   list-style: none;
   margin: 0;
   padding: 0.55rem;
-  position: absolute;
-  right: 4vw;
-  top: 72px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: min(80vw, 320px);
   min-width: 230px;
   display: none;
   background: var(--surface-solid);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-left: 1px solid var(--line);
+  border-radius: 0;
   box-shadow: var(--shadow-md);
+  z-index: 130;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  padding-top: 5rem;
 }
 
 .menu.open {
   display: block;
+  transform: translateX(0);
 }
 
 .menu li a {
@@ -257,6 +276,38 @@ p {
   background: var(--surface-soft);
   color: var(--primary-800);
   outline: none;
+}
+
+.menu li a.is-active {
+  color: var(--primary-700);
+  background: var(--surface-soft);
+  font-weight: 700;
+}
+
+.admin-menu {
+  height: auto;
+  width: auto;
+  min-width: auto;
+  transform: none;
+  border-left: 0;
+  padding-top: 0;
+}
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 23, 18, 0.32);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+  z-index: 120;
+}
+
+.nav-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .btn {
@@ -341,6 +392,33 @@ button:focus-visible,
   background-size: 18px 18px;
   opacity: 0.35;
   pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  right: -50px;
+  bottom: -40px;
+  width: 320px;
+  height: 220px;
+  background:
+    radial-gradient(circle at 28% 62%, rgba(255, 255, 255, 0.72) 0%, transparent 56%),
+    radial-gradient(circle at 60% 45%, rgba(255, 185, 135, 0.38) 0%, transparent 52%),
+    radial-gradient(circle at 76% 70%, rgba(255, 255, 255, 0.55) 0%, transparent 48%);
+  filter: blur(14px);
+  animation: hero-smoke 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes hero-smoke {
+  from {
+    transform: translateY(0) translateX(0);
+    opacity: 0.55;
+  }
+  to {
+    transform: translateY(-14px) translateX(6px);
+    opacity: 0.82;
+  }
 }
 
 .hero-texture {
@@ -513,6 +591,11 @@ button:focus-visible,
 
 .menu-item:hover {
   transform: translateY(-6px) scale(1.02) perspective(800px) rotateX(2deg);
+}
+
+.menu-item:focus-visible {
+  transform: translateY(-4px) scale(1.01);
+  border-color: var(--line-strong);
 }
 
 .menu-carousel {
@@ -914,6 +997,31 @@ button:focus-visible,
   opacity: 1;
 }
 
+.review-skeleton {
+  min-height: 120px;
+  padding-left: 0.9rem;
+  overflow: hidden;
+}
+
+.review-skeleton::before {
+  display: none;
+}
+
+.review-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 241, 230, 0.85) 45%, rgba(255, 255, 255, 0) 100%);
+  transform: translateX(-100%);
+  animation: skeleton-shimmer 1.15s linear infinite;
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .review-item-head {
   display: flex;
   justify-content: space-between;
@@ -927,9 +1035,25 @@ button:focus-visible,
 
 .stars {
   color: var(--primary-700);
-  font-size: 1rem;
-  letter-spacing: 0.06em;
   margin: 0.26rem 0 0.38rem;
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.star-icon {
+  width: 18px;
+  height: 18px;
+  fill: #f3d5c2;
+}
+
+.star-icon.is-filled {
+  fill: #ff7a1a;
+}
+
+.reviews-average {
+  margin-top: 0.6rem;
+  font-weight: 600;
 }
 
 .review-form-wrap {
@@ -1060,7 +1184,150 @@ td {
   transform: translateY(0);
 }
 
+.floating-whatsapp {
+  position: fixed;
+  right: 1rem;
+  bottom: 1.05rem;
+  z-index: 320;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.44rem;
+  border-radius: 999px;
+  border: 1px solid #ffd1b1;
+  background: linear-gradient(135deg, #ff6a00, #ff8d37);
+  color: #fff;
+  padding: 0.62rem 0.88rem;
+  box-shadow: 0 16px 32px rgba(181, 82, 22, 0.32);
+  animation: float-pulse 2.8s ease-in-out infinite;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.floating-whatsapp:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.floating-whatsapp__icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-whatsapp__text {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.floating-whatsapp::after {
+  content: "Pide por WhatsApp";
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  background: #fff;
+  color: #7b3608;
+  border: 1px solid #ffd3b5;
+  border-radius: 9px;
+  padding: 0.26rem 0.5rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.floating-whatsapp:hover::after,
+.floating-whatsapp:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.floating-whatsapp.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes float-pulse {
+  0%,
+  100% {
+    box-shadow: 0 16px 32px rgba(181, 82, 22, 0.26);
+  }
+  50% {
+    box-shadow: 0 16px 32px rgba(181, 82, 22, 0.42), 0 0 0 8px rgba(255, 106, 0, 0.12);
+  }
+}
+
+.menu-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 340;
+  display: none;
+}
+
+.menu-modal.open {
+  display: block;
+}
+
+.menu-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 12, 9, 0.52);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.menu-modal__panel {
+  position: relative;
+  width: min(92vw, 440px);
+  margin: 11vh auto 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.1rem;
+  box-shadow: var(--shadow-md);
+  display: grid;
+  gap: 0.7rem;
+}
+
+.menu-modal__badge {
+  width: fit-content;
+  background: #fff2e8;
+  color: var(--primary-700);
+  border: 1px solid #ffcfb0;
+  border-radius: 999px;
+  padding: 0.24rem 0.58rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.menu-modal__price {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--primary-700);
+}
+
+.menu-modal__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #f0d3bf;
+  background: #fff;
+  color: #6a3110;
+  font-size: 1.28rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 @media (min-width: 900px) {
+  .nav-overlay {
+    display: none !important;
+  }
+
   .header-inner {
     grid-template-columns: auto auto 1fr auto;
     gap: 0.8rem;
@@ -1073,16 +1340,36 @@ td {
   .menu {
     position: static;
     display: flex;
+    height: auto;
+    width: auto;
     min-width: auto;
     padding: 0;
     border: 0;
     background: transparent;
     box-shadow: none;
+    transform: none;
     justify-content: end;
   }
 
   .menu li a {
     padding: 0.55rem 0.7rem;
+    position: relative;
+  }
+
+  .menu li a.is-active {
+    background: transparent;
+    color: var(--primary-700);
+  }
+
+  .menu li a.is-active::after {
+    content: "";
+    position: absolute;
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0.22rem;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff6a00, #ff9a58);
   }
 
   .btn-whatsapp {
@@ -1110,6 +1397,22 @@ td {
   .carousel-slide {
     grid-template-columns: 180px 1fr;
     align-items: center;
+  }
+}
+
+@media (max-width: 899px) {
+  .nav-overlay {
+    display: block;
+  }
+
+  .admin-menu {
+    position: static;
+    display: flex;
+    box-shadow: none;
+  }
+
+  .floating-whatsapp__text {
+    display: none;
   }
 }
 
