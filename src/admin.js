@@ -1,4 +1,4 @@
-const adminStatus = document.querySelector("#adminStatus");
+﻿const adminStatus = document.querySelector("#adminStatus");
 const adminTableBody = document.querySelector("#adminTableBody");
 
 function escapeHtml(text) {
@@ -28,12 +28,12 @@ function formatDateTime(dateValue) {
 
 function renderTable(items) {
   if (!Array.isArray(items) || items.length === 0) {
-    adminStatus.textContent = "No hay reseñas guardadas.";
+    adminStatus.textContent = "No hay resenas guardadas.";
     adminTableBody.innerHTML = "<tr><td colspan=\"4\">Sin registros</td></tr>";
     return;
   }
 
-  adminStatus.textContent = `Total de reseñas: ${items.length}`;
+  adminStatus.textContent = `Total de resenas: ${items.length}`;
   adminTableBody.innerHTML = items
     .map((item) => {
       const date = formatDateTime(item.date);
@@ -54,7 +54,7 @@ function renderTable(items) {
 }
 
 async function loadAdminReviews() {
-  adminStatus.textContent = "Cargando reseñas...";
+  adminStatus.textContent = "Cargando resenas...";
 
   try {
     const response = await fetch("/api/reviews", {
@@ -67,11 +67,10 @@ async function loadAdminReviews() {
 
     const payload = await response.json();
     renderTable(payload.items || []);
-  } catch (error) {
-    adminStatus.textContent = "No se pudieron cargar las reseñas.";
+  } catch {
+    adminStatus.textContent = "No se pudieron cargar las resenas.";
     adminTableBody.innerHTML = "<tr><td colspan=\"4\">Error al cargar datos</td></tr>";
   }
 }
 
 loadAdminReviews();
-

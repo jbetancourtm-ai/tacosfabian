@@ -6,12 +6,12 @@
     <title>Tacos Fabian | Suadero y Trocitos en Texcoco</title>
     <meta
       name="description"
-      content="Taqueria Tacos Fabian en Texcoco de Mora: suadero y especialidad de la casa en trocitos de carne."
+      content="Taqueria Tacos Fabian en Texcoco de Mora. Suadero, trocitos de carne y pedidos por WhatsApp."
     />
     <meta property="og:title" content="Tacos Fabian" />
     <meta
       property="og:description"
-      content="Suadero y trocitos de carne en Colon 216, CP 56226, Texcoco de Mora."
+      content="Tacos que se antojan desde la primera mordida. Colon 216, CP 56226, Texcoco de Mora."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.tacosfabiantexcoco.com.mx" />
@@ -26,8 +26,11 @@
     <header class="site-header" role="banner">
       <div class="container header-inner">
         <a class="brand" href="#inicio" aria-label="Inicio Tacos Fabian">
-          <span class="brand-mark brand-mark--image" aria-hidden="true">
-            <img class="brand-logo" src="/logo-tacos-fabian.svg" alt="" />
+          <span class="brand-orbit" aria-hidden="true">
+            <span class="brand-orbit-dot"></span>
+            <span class="brand-mark brand-mark--image">
+              <img class="brand-logo" src="/logo-tacos-fabian.svg" alt="" />
+            </span>
           </span>
           <span class="brand-text">
             <strong>Tacos Fabian</strong>
@@ -41,15 +44,15 @@
           type="button"
           aria-label="Abrir menu"
           aria-expanded="false"
-          aria-controls="menu"
+          aria-controls="navMenu"
         >
-          Menu
+          <span></span><span></span><span></span>
         </button>
 
         <nav aria-label="Navegacion principal">
-          <ul id="menu" class="menu">
+          <ul id="navMenu" class="menu">
             <li><a href="#especialidad">Especialidad</a></li>
-            <li><a href="#menu-taqueria">Menu</a></li>
+            <li><a href="#menu">Menu</a></li>
             <li><a href="#ubicacion">Ubicacion</a></li>
             <li><a href="#resenas">Resenas</a></li>
           </ul>
@@ -69,53 +72,120 @@
 
     <main id="contenido">
       <section id="inicio" class="hero">
+        <div class="hero-texture" aria-hidden="true"></div>
         <div class="container hero-grid">
-          <div>
-            <p class="eyebrow">Sabor autentico en el Centro de Texcoco</p>
+          <div class="hero-content">
+            <span class="eyebrow">Taqueria top en Texcoco</span>
             <h1>Tacos que se antojan desde la primera mordida</h1>
             <p>
-              En <strong>Tacos Fabian</strong> preparamos suadero jugoso y nuestra especialidad de la casa:
-              <strong>trocitos de carne</strong> bien doraditos, al momento.
+              Suadero jugoso, trocitos doraditos y sabor de calle premium.
+              Pide rapido o ven directo al local.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#menu-taqueria">Ver menu</a>
-              <a class="btn" href="#ubicacion">Visitanos hoy</a>
+              <a class="btn btn-primary" href="#menu">Ver menu</a>
+              <a class="btn btn-secondary" href="#ubicacion">Visitanos hoy</a>
             </div>
           </div>
-          <article class="hero-card" aria-label="Recomendacion del dia">
-            <h2>Recomendacion</h2>
-            <p class="dish">Taco de trocitos</p>
-            <p class="muted">Especialidad de la casa con salsa verde tatemada y cebolla asada.</p>
-          </article>
+
+          <aside class="hero-side" aria-label="Recomendacion">
+            <span class="hero-badge">Recomendacion</span>
+            <h2>Taco de trocitos</h2>
+            <p>Especialidad de la casa con salsa verde tatemada y cebolla asada.</p>
+          </aside>
         </div>
       </section>
 
       <section id="especialidad" class="section">
         <div class="container">
-          <h2>Especialidad</h2>
+          <div class="section-head">
+            <h2>Especialidad</h2>
+            <p>Lo mas pedido por nuestros clientes en Texcoco.</p>
+          </div>
+
           <div class="cards two-col">
-            <article class="card">
+            <article class="card card-icon">
+              <span class="card-ico" aria-hidden="true">S</span>
               <h3>Tacos de suadero</h3>
               <p>
-                Coccion lenta para lograr un suadero suave por dentro y doradito por fuera. Se sirve con
-                tortilla caliente y cilantro fresco.
+                Coccion lenta para lograr suadero suave por dentro y doradito por fuera.
+                Tortilla caliente, cilantro fresco y salsa al gusto.
               </p>
             </article>
-            <article class="card featured">
+
+            <article class="card card-icon featured">
+              <span class="card-ico" aria-hidden="true">T</span>
               <h3>Trocitos / Trozos de carne</h3>
               <p>
-                Nuestra especialidad de la casa: trocitos de carne seleccionada, dorados al punto y llenos de
-                sabor. Ideal para pedir en tacos o por orden.
+                Especialidad de la casa: trocitos seleccionados, dorados al punto
+                y con sabor potente para taco, torta o tostada.
               </p>
             </article>
           </div>
         </div>
       </section>
 
-      <section id="menu-taqueria" class="section section-soft">
+      <section id="menu" class="section section-soft">
         <div class="container">
-          <h2>Menu</h2>
-          <div class="cards two-col">
+          <div class="section-head">
+            <h2>Menu</h2>
+            <p>Sabores clasicos, precios claros y porciones cumplidoras.</p>
+          </div>
+
+          <div
+            id="menuCarousel"
+            class="menu-carousel"
+            role="region"
+            aria-label="Carrusel de productos destacados"
+            tabindex="0"
+          >
+            <button id="menuPrev" class="carousel-arrow" type="button" aria-label="Slide anterior">&#10094;</button>
+
+            <div class="carousel-viewport" aria-live="polite">
+              <div id="menuTrack" class="carousel-track">
+                <article class="carousel-slide" aria-label="Suadero destacado">
+                  <div class="slide-visual taco" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Suadero</h3>
+                    <p>Jugoso, doradito y al momento.</p>
+                    <strong>Desde $16 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Trocitos destacados">
+                  <div class="slide-visual trocitos" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Trocitos / Trozos</h3>
+                    <p>Especialidad de la casa, sabor intenso.</p>
+                    <strong>Desde $24 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Bebidas destacadas">
+                  <div class="slide-visual drink" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Bebidas</h3>
+                    <p>Refrescos y aguas para acompanar.</p>
+                    <strong>Desde $30 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Combo destacado">
+                  <div class="slide-visual combo" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Especialidad de la casa</h3>
+                    <p>Taco de trocitos + bebida para cerrar el antojo.</p>
+                    <strong>Desde $54 MXN</strong>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <button id="menuNext" class="carousel-arrow" type="button" aria-label="Siguiente slide">&#10095;</button>
+          </div>
+
+          <div id="menuDots" class="carousel-dots" aria-label="Navegacion del carrusel"></div>
+
+          <div class="cards two-col menu-grid">
             <article class="card menu-item">
               <h3>Tacos</h3>
               <ul class="price-list">
@@ -176,9 +246,12 @@
 
       <section id="ubicacion" class="section">
         <div class="container location-grid">
-          <div>
-            <h2>Ubicacion</h2>
-            <p class="address">Colon 216, CP 56226, Texcoco de Mora, Estado de Mexico, Mexico</p>
+          <div class="location-copy">
+            <div class="section-head">
+              <h2>Ubicacion</h2>
+              <p>Ven por tus tacos o pide para llevar.</p>
+            </div>
+            <p class="address"><span aria-hidden="true">&#128205;</span> Colon 216, CP 56226, Texcoco de Mora, Estado de Mexico, Mexico</p>
             <div class="location-actions">
               <a
                 class="btn btn-primary"
@@ -189,11 +262,9 @@
                 Como llegar
               </a>
             </div>
-            <p class="muted small">
-              Si deseas otro mapa, reemplaza el contenido del iframe con tu codigo Embed de Google Maps.
-            </p>
           </div>
-          <div class="map-wrap">
+
+          <div class="map-wrap card">
             <iframe
               title="Mapa de Tacos Fabian"
               loading="lazy"
@@ -207,8 +278,11 @@
       <section id="resenas" class="section section-soft">
         <div class="container">
           <div class="reviews-head">
-            <h2>Resenas</h2>
-            <a class="btn" href="/admin">Ver panel admin</a>
+            <div class="section-head">
+              <h2>Resenas</h2>
+              <p>Tu opinion nos ayuda a mejorar cada noche.</p>
+            </div>
+            <a class="btn btn-secondary" href="/admin">Ver panel admin</a>
           </div>
 
           <div id="reviewsStatus" class="muted" aria-live="polite">Cargando resenas...</div>
@@ -232,6 +306,7 @@
 
               <label for="comment">Comentario</label>
               <textarea id="comment" name="comment" rows="4" maxlength="300" required></textarea>
+              <p id="commentCounter" class="counter" aria-live="polite">0 / 300</p>
 
               <button class="btn btn-primary" type="submit">Enviar resena</button>
               <p id="formStatus" class="muted" aria-live="polite"></p>
@@ -248,15 +323,22 @@
           <p class="muted">Horario: Lun-Dom 6:00 pm - 1:00 am</p>
         </div>
         <div>
+          <h4>Contacto</h4>
           <p>
             WhatsApp:
             <a href="https://wa.me/525615496107?text=Hola%20Tacos%20Fabian%2C%20quiero%20hacer%20un%20pedido.">56-15-49-61-07</a>
           </p>
           <p>Telefono: <a href="tel:+525951742135">595-174-21-35</a></p>
-          <p>Direccion: Colon 216, CP 56226, Texcoco de Mora</p>
+        </div>
+        <div>
+          <h4>Direccion</h4>
+          <p>Colon 216, CP 56226, Texcoco de Mora</p>
+          <p class="muted">Facebook / Instagram / TikTok (placeholder)</p>
         </div>
       </div>
     </footer>
+
+    <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
     <script type="module" src="/src/main.js"></script>
   </body>
