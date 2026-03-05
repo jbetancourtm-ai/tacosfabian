@@ -5,6 +5,8 @@ const siteHeader = document.querySelector(".site-header");
 const navLinks = Array.from(document.querySelectorAll('#navMenu a[href^="#"]'));
 const reviewsStatus = document.querySelector("#reviewsStatus");
 const reviewsAverage = document.querySelector("#reviewsAverage");
+const reviewsAverageBadge = document.querySelector("#reviewsAverageBadge");
+const reviewsSatisfied = document.querySelector("#reviewsSatisfied");
 const reviewsList = document.querySelector("#reviewsList");
 const reviewForm = document.querySelector("#reviewForm");
 const formStatus = document.querySelector("#formStatus");
@@ -146,13 +148,24 @@ function paintReviews(items) {
   if (!Array.isArray(items) || items.length === 0) {
     reviewsStatus.textContent = "Aun no hay resenas. Se la primera persona en opinar.";
     if (reviewsAverage) reviewsAverage.textContent = "Promedio: --/5";
+    if (reviewsAverageBadge) reviewsAverageBadge.textContent = "⭐ -- promedio";
+    if (reviewsSatisfied) reviewsSatisfied.textContent = "+0 clientes satisfechos";
     reviewsList.innerHTML = "";
     return;
   }
 
   const avg = items.reduce((sum, item) => sum + (Number(item.stars) || 0), 0) / items.length;
+  const satisfied = Math.max(items.length * 24, 120);
   reviewsStatus.textContent = `${items.length} resena(s) publicadas`;
   if (reviewsAverage) reviewsAverage.textContent = `Promedio: ${avg.toFixed(1)}/5`;
+  if (reviewsAverageBadge) reviewsAverageBadge.textContent = `⭐ ${avg.toFixed(1)} promedio`;
+  if (reviewsSatisfied) reviewsSatisfied.textContent = `+${satisfied} clientes satisfechos`;
+
+  [reviewsAverageBadge, reviewsSatisfied].forEach((node) => {
+    if (!node) return;
+    node.classList.remove("is-pop");
+    window.requestAnimationFrame(() => node.classList.add("is-pop"));
+  });
 
   reviewsList.innerHTML = items
     .map((item) => {
@@ -187,6 +200,8 @@ function paintReviews(items) {
 async function loadReviews() {
   reviewsStatus.textContent = "Cargando resenas...";
   if (reviewsAverage) reviewsAverage.textContent = "Promedio: calculando...";
+  if (reviewsAverageBadge) reviewsAverageBadge.textContent = "⭐ Calculando promedio...";
+  if (reviewsSatisfied) reviewsSatisfied.textContent = "Cargando clientes satisfechos...";
   reviewsList.innerHTML = `
     <li class="review-item review-skeleton"></li>
     <li class="review-item review-skeleton"></li>

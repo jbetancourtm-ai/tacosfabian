@@ -363,6 +363,11 @@ button:focus-visible,
   animation: whatsapp-pulse 3.1s ease-in-out infinite;
 }
 
+.btn-whatsapp:hover,
+.btn-whatsapp:focus-visible {
+  box-shadow: 0 0 0 5px rgba(255, 106, 0, 0.14), 0 10px 26px rgba(255, 106, 0, 0.28);
+}
+
 @keyframes whatsapp-pulse {
   0%,
   100% {
@@ -528,6 +533,18 @@ button:focus-visible,
   margin-top: 0.72rem;
   font-weight: 700;
   color: #7e3a10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.62rem;
+  border-radius: 999px;
+  border: 1px solid #ffd9bd;
+  background: #fff7ef;
+}
+
+.hero-emotion::before {
+  content: "🔥";
+  font-size: 0.9rem;
 }
 
 .eyebrow {
@@ -743,6 +760,7 @@ button:focus-visible,
   border: 1px solid #ffd6bb;
   background: #fff5eb;
   color: #b74b0f;
+  letter-spacing: 0.01em;
 }
 
 .badge-house {
@@ -1280,6 +1298,46 @@ button:focus-visible,
   font-weight: 600;
 }
 
+.reviews-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.48rem;
+  margin-top: 0.62rem;
+}
+
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #ffcfae;
+  background: #fff3e7;
+  color: #9a4412;
+  padding: 0.32rem 0.64rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-xs);
+}
+
+.metric-pill--soft {
+  background: #fff9f3;
+  color: #805840;
+}
+
+.metric-pill.is-pop {
+  animation: metric-pop 0.35s ease;
+}
+
+@keyframes metric-pop {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .review-form-wrap {
   margin-top: 1rem;
 }
@@ -1318,6 +1376,12 @@ button:focus-visible,
 .cta-final-btn {
   margin-top: 0.78rem;
   min-width: min(100%, 360px);
+  box-shadow: 0 12px 28px rgba(255, 106, 0, 0.28);
+}
+
+.cta-final-btn:hover,
+.cta-final-btn:focus-visible {
+  box-shadow: 0 0 0 6px rgba(255, 106, 0, 0.14), 0 14px 34px rgba(255, 106, 0, 0.36);
 }
 
 .references-grid {
