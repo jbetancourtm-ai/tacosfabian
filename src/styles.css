@@ -166,6 +166,20 @@ p {
   border-radius: 50%;
 }
 
+.brand-orbit::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  top: -3px;
+  left: 25px;
+  background: rgba(69, 156, 255, 0.95);
+  box-shadow: 0 0 0 6px rgba(69, 156, 255, 0.2), 0 0 14px rgba(69, 156, 255, 0.45);
+  filter: blur(0.2px);
+  animation: orbit-dot-blue 6.8s linear infinite reverse;
+}
+
 .brand-orbit-dot {
   position: absolute;
   width: 9px;
@@ -179,6 +193,15 @@ p {
 }
 
 @keyframes orbit-dot {
+  from {
+    transform: rotate(0deg) translateX(30px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(30px) rotate(-360deg);
+  }
+}
+
+@keyframes orbit-dot-blue {
   from {
     transform: rotate(0deg) translateX(30px) rotate(0deg);
   }
