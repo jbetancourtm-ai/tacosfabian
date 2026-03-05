@@ -572,6 +572,50 @@ button:focus-visible,
   margin-top: 1.2rem;
 }
 
+.hero-microcopy {
+  margin-top: 0.95rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hero-microcopy span {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #7a4c2f;
+  background: #fff8f1;
+  border: 1px solid #f5d8c2;
+  border-radius: 999px;
+  padding: 0.28rem 0.58rem;
+}
+
+.hero-proof {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.hero-proof-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ffd0ae;
+  border-radius: 999px;
+  background: #fff3e7;
+  color: #9b4312;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 0.38rem 0.72rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.hero-proof-pill--soft {
+  background: #fffaf5;
+  color: #7d5942;
+}
+
 .hero-actions .btn-primary {
   box-shadow: 0 12px 28px rgba(255, 106, 0, 0.32), 0 0 0 5px rgba(255, 165, 96, 0.14);
 }
@@ -1215,6 +1259,12 @@ button:focus-visible,
   overflow: hidden;
 }
 
+.map-label {
+  font-weight: 700;
+  color: #7b421d;
+  padding: 0.8rem 0.9rem 0.45rem;
+}
+
 .map-wrap iframe {
   width: 100%;
   min-height: 390px;
@@ -1394,6 +1444,8 @@ button:focus-visible,
   margin-top: 1rem;
   text-align: center;
   padding: 1.2rem;
+  background: linear-gradient(180deg, #fff2e6 0%, #ffefe0 100%);
+  border-color: #ffcaa7;
 }
 
 .cta-final h3 {
@@ -1633,7 +1685,7 @@ td {
 }
 
 .floating-whatsapp::after {
-  content: "WhatsApp · Pedidos";
+  content: "Pedir ahora";
   position: absolute;
   right: 0;
   bottom: calc(100% + 10px);

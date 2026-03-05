@@ -7,6 +7,8 @@ const reviewsStatus = document.querySelector("#reviewsStatus");
 const reviewsAverage = document.querySelector("#reviewsAverage");
 const reviewsAverageBadge = document.querySelector("#reviewsAverageBadge");
 const reviewsSatisfied = document.querySelector("#reviewsSatisfied");
+const heroProofAvg = document.querySelector("#heroProofAvg");
+const heroProofCount = document.querySelector("#heroProofCount");
 const reviewsList = document.querySelector("#reviewsList");
 const reviewForm = document.querySelector("#reviewForm");
 const formStatus = document.querySelector("#formStatus");
@@ -103,18 +105,8 @@ function setupHeaderEffects() {
 }
 
 function setupFloatingWhatsapp() {
-  if (!floatingWhatsapp || !footer) return;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        floatingWhatsapp.classList.toggle("is-hidden", entry.isIntersecting);
-      });
-    },
-    { threshold: 0.1 }
-  );
-
-  observer.observe(footer);
+  if (!floatingWhatsapp) return;
+  floatingWhatsapp.classList.remove("is-hidden");
 }
 
 function escapeHtml(text) {
@@ -148,8 +140,10 @@ function paintReviews(items) {
   if (!Array.isArray(items) || items.length === 0) {
     reviewsStatus.textContent = "Aun no hay resenas. Se la primera persona en opinar.";
     if (reviewsAverage) reviewsAverage.textContent = "Promedio: --/5";
-    if (reviewsAverageBadge) reviewsAverageBadge.textContent = "⭐ -- promedio";
+    if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 -- promedio";
     if (reviewsSatisfied) reviewsSatisfied.textContent = "+0 clientes satisfechos";
+    if (heroProofAvg) heroProofAvg.textContent = "\u2605 4.8 calificacion promedio";
+    if (heroProofCount) heroProofCount.textContent = "+120 clientes satisfechos";
     reviewsList.innerHTML = "";
     return;
   }
@@ -158,10 +152,12 @@ function paintReviews(items) {
   const satisfied = Math.max(items.length * 24, 120);
   reviewsStatus.textContent = `${items.length} resena(s) publicadas`;
   if (reviewsAverage) reviewsAverage.textContent = `Promedio: ${avg.toFixed(1)}/5`;
-  if (reviewsAverageBadge) reviewsAverageBadge.textContent = `⭐ ${avg.toFixed(1)} promedio`;
+  if (reviewsAverageBadge) reviewsAverageBadge.textContent = `\u2605 ${avg.toFixed(1)} promedio`;
   if (reviewsSatisfied) reviewsSatisfied.textContent = `+${satisfied} clientes satisfechos`;
+  if (heroProofAvg) heroProofAvg.textContent = `\u2605 ${avg.toFixed(1)} calificacion promedio`;
+  if (heroProofCount) heroProofCount.textContent = `+${satisfied} clientes satisfechos`;
 
-  [reviewsAverageBadge, reviewsSatisfied].forEach((node) => {
+  [reviewsAverageBadge, reviewsSatisfied, heroProofAvg, heroProofCount].forEach((node) => {
     if (!node) return;
     node.classList.remove("is-pop");
     window.requestAnimationFrame(() => node.classList.add("is-pop"));
@@ -200,7 +196,7 @@ function paintReviews(items) {
 async function loadReviews() {
   reviewsStatus.textContent = "Cargando resenas...";
   if (reviewsAverage) reviewsAverage.textContent = "Promedio: calculando...";
-  if (reviewsAverageBadge) reviewsAverageBadge.textContent = "⭐ Calculando promedio...";
+  if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 Calculando promedio...";
   if (reviewsSatisfied) reviewsSatisfied.textContent = "Cargando clientes satisfechos...";
   reviewsList.innerHTML = `
     <li class="review-item review-skeleton"></li>
@@ -454,7 +450,7 @@ function setupMenuSpotlightModal() {
 
 function setupRevealAnimations() {
   const groups = [
-    ".hero-content, .hero-side",
+    ".hero-content, .hero-side, .hero-proof",
     "#especialidad .card",
     "#menu .carousel-slide",
     "#menu .menu-item",
@@ -501,3 +497,4 @@ setupRevealAnimations();
 setupHeaderEffects();
 setupFloatingWhatsapp();
 loadReviews();
+
