@@ -559,6 +559,35 @@ button:focus-visible,
   box-shadow: var(--shadow-sm);
 }
 
+.hero-media {
+  display: grid;
+  gap: 0.46rem;
+  margin-bottom: 0.82rem;
+}
+
+.hero-media-main {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #ffd4b8;
+  box-shadow: var(--shadow-xs);
+}
+
+.hero-media-thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.46rem;
+}
+
+.hero-media-thumbs img {
+  width: 100%;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ffd9c0;
+}
+
 .hero-badge {
   display: inline-flex;
   padding: 0.35rem 0.62rem;
@@ -1566,6 +1595,14 @@ td {
 
   .floating-whatsapp__text {
     display: none;
+  }
+
+  .hero-media-main {
+    height: 165px;
+  }
+
+  .hero-media-thumbs img {
+    height: 80px;
   }
 }
 
