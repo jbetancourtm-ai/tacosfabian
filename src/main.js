@@ -76,12 +76,13 @@ function paintReviews(items) {
   reviewsList.innerHTML = items
     .map((item) => {
       const name = escapeHtml(item.name || "Anonimo");
+      const avatar = escapeHtml((item.name || "A").trim().charAt(0).toUpperCase() || "A");
       const comment = escapeHtml(item.comment || "");
       const stars = Number(item.stars) || 0;
       const dateText = formatDate(item.date);
 
       return `
-        <li class="review-item">
+        <li class="review-item" data-avatar="${avatar}">
           <div class="review-item-head">
             <strong>${name}</strong>
             <span class="muted">${dateText}</span>
@@ -196,6 +197,9 @@ function setupMenuCarousel() {
   function updateSlide() {
     const offset = currentIndex * 100;
     menuTrack.style.transform = `translateX(-${offset}%)`;
+    slides.forEach((slide, index) => {
+      slide.classList.toggle("is-active", index === currentIndex);
+    });
 
     const dots = Array.from(menuDots.children);
     dots.forEach((dot, index) => {
@@ -232,7 +236,43 @@ function setupMenuCarousel() {
   updateSlide();
 }
 
+function setupRevealAnimations() {
+  const items = document.querySelectorAll(
+    ".hero-content, .hero-side, .section-head, .card, .carousel-slide, .review-item, .review-form-wrap, .map-wrap"
+  );
+
+  if (!items.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    items.forEach((item) => item.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    {
+      root: null,
+      threshold: 0.12,
+      rootMargin: "0px 0px -8% 0px",
+    }
+  );
+
+  items.forEach((item, index) => {
+    const delay = (index % 6) * 70;
+    item.style.setProperty("--reveal-delay", `${delay}ms`);
+    item.classList.add("reveal-item");
+    observer.observe(item);
+  });
+}
+
 setupCommentCounter();
 setupReviewsForm();
 setupMenuCarousel();
+setupRevealAnimations();
 loadReviews();
