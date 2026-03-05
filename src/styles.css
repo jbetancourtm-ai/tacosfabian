@@ -1159,6 +1159,56 @@ button:focus-visible,
   margin-top: 1rem;
 }
 
+.references-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.reference-video h3,
+.reference-links h3 {
+  margin-bottom: 0.6rem;
+}
+
+.video-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
+  background: #f7ede5;
+}
+
+.video-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.reference-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.reference-list li {
+  border: 1px solid #f1ddcd;
+  border-radius: 12px;
+  padding: 0.72rem;
+  background: #fffdfb;
+}
+
+.reference-list a {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
 .review-form {
   margin-top: 0.7rem;
   display: grid;
@@ -1487,6 +1537,10 @@ td {
 
   .location-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .references-grid {
+    grid-template-columns: 1.3fr 0.7fr;
   }
 
   .footer-grid {
