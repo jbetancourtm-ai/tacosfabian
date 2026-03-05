@@ -524,6 +524,12 @@ button:focus-visible,
   color: #4e3f35;
 }
 
+.hero-emotion {
+  margin-top: 0.72rem;
+  font-weight: 700;
+  color: #7e3a10;
+}
+
 .eyebrow {
   display: inline-flex;
   background: var(--surface-solid);
@@ -557,6 +563,26 @@ button:focus-visible,
   border-radius: var(--radius-lg);
   padding: 1.3rem;
   box-shadow: var(--shadow-sm);
+}
+
+.hero-side--spotlight {
+  position: relative;
+}
+
+.hero-side--spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 14% 8% auto 8%;
+  height: 46%;
+  background: radial-gradient(circle, rgba(255, 136, 53, 0.28) 0%, rgba(255, 136, 53, 0.06) 58%, transparent 75%);
+  filter: blur(20px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-side--spotlight > * {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-media {
@@ -642,6 +668,11 @@ button:focus-visible,
   margin-top: 0.52rem;
 }
 
+.fire-accent {
+  font-size: 0.92rem;
+  margin-left: 0.2rem;
+}
+
 .cards {
   display: grid;
   gap: 1rem;
@@ -701,6 +732,31 @@ button:focus-visible,
   line-height: 1.56;
 }
 
+.menu-badge {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  margin-bottom: 0.52rem;
+  border: 1px solid #ffd6bb;
+  background: #fff5eb;
+  color: #b74b0f;
+}
+
+.badge-house {
+  background: #fff1e4;
+}
+
+.badge-top {
+  background: #ffe9da;
+}
+
+.badge-reco {
+  background: #fff6ef;
+}
+
 .menu-item:hover {
   transform: translateY(-6px) scale(1.02) perspective(800px) rotateX(2deg);
 }
@@ -708,6 +764,23 @@ button:focus-visible,
 .menu-item:focus-visible {
   transform: translateY(-4px) scale(1.01);
   border-color: var(--line-strong);
+}
+
+.menu-item h3 {
+  position: relative;
+  padding-bottom: 0.34rem;
+  margin-bottom: 0.44rem;
+}
+
+.menu-item h3::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 42px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff6a00, rgba(255, 106, 0, 0.15));
 }
 
 .menu-carousel {
@@ -1019,6 +1092,10 @@ button:focus-visible,
     height: 36px;
     font-size: 1rem;
   }
+
+  .map-wrap iframe {
+    min-height: 340px;
+  }
 }
 
 .menu-grid {
@@ -1073,7 +1150,7 @@ button:focus-visible,
 
 .map-wrap iframe {
   width: 100%;
-  min-height: 330px;
+  min-height: 390px;
   border: 0;
 }
 
@@ -1186,6 +1263,25 @@ button:focus-visible,
 
 .review-form-wrap {
   margin-top: 1rem;
+}
+
+.cta-final {
+  margin-top: 1rem;
+  text-align: center;
+  padding: 1.2rem;
+}
+
+.cta-final h3 {
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+}
+
+.cta-final p {
+  margin-top: 0.38rem;
+}
+
+.cta-final-btn {
+  margin-top: 0.78rem;
+  min-width: min(100%, 360px);
 }
 
 .references-grid {
