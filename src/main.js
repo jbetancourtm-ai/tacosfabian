@@ -444,7 +444,8 @@ function setupRevealAnimations() {
     "#menu .carousel-slide",
     "#menu .menu-item",
     "#ubicacion .location-copy, #ubicacion .map-wrap",
-    "#resenas .review-item, #resenas .review-form-wrap",
+    "#resenas .review-item, #resenas .review-form-wrap, #resenas .cta-final, #resenas .review-trust",
+    "#referencias .card",
   ];
 
   const items = document.querySelectorAll(groups.join(", "));
@@ -470,7 +471,7 @@ function setupRevealAnimations() {
   );
 
   items.forEach((item, index) => {
-    const delay = (index % 6) * 60;
+    const delay = (index % 6) * 55;
     item.style.setProperty("--reveal-delay", `${delay}ms`);
     item.classList.add("reveal-item");
     observer.observe(item);
