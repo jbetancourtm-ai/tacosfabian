@@ -643,6 +643,22 @@ button:focus-visible,
   box-shadow: 0 10px 24px rgba(187, 97, 33, 0.16);
 }
 
+.slide-visual--photo {
+  overflow: hidden;
+}
+
+.slide-visual--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slide-visual--photo::before,
+.slide-visual--photo::after {
+  display: none;
+}
+
 .slide-visual::before,
 .slide-visual::after {
   content: "";
