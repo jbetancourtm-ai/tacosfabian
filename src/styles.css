@@ -857,9 +857,16 @@ button:focus-visible,
 }
 
 .btn-hero-highlight {
-  border-color: #ffbf98;
-  background: #fff9f2;
-  color: #9c4312;
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, #ff6a00, #ff8f3d);
+  box-shadow: 0 10px 26px rgba(255, 106, 0, 0.3);
+}
+
+.btn-hero-highlight:hover,
+.btn-hero-highlight:focus-visible {
+  background: linear-gradient(135deg, #ff5800, #ff7f2b);
+  box-shadow: 0 14px 30px rgba(255, 106, 0, 0.36);
 }
 
 .hero-proof {
@@ -1552,9 +1559,9 @@ button:focus-visible,
   }
 
   .hero-actions .btn-hero-highlight {
-    background: #fff3e7;
-    color: #9c4312;
-    border-color: #ffbf98;
+    color: #fff;
+    background: linear-gradient(135deg, #ff6a00, #ff8f3d);
+    border-color: transparent;
   }
 
   .menu-carousel {
