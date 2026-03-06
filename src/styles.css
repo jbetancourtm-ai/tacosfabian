@@ -1522,6 +1522,41 @@ button:focus-visible,
 }
 
 @media (max-width: 599px) {
+  .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.42rem;
+    width: 100%;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    min-width: 0;
+    padding: 0.6rem 0.3rem;
+    font-size: 0.76rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    border-radius: 12px;
+  }
+
+  .hero-actions .btn-primary {
+    color: #fff;
+    background: linear-gradient(135deg, #ff6a00, #ff8f3d);
+    border-color: transparent;
+  }
+
+  .hero-actions .btn-secondary {
+    background: #fff;
+    color: #9c4312;
+    border-color: #ffc6a1;
+  }
+
+  .hero-actions .btn-hero-highlight {
+    background: #fff3e7;
+    color: #9c4312;
+    border-color: #ffbf98;
+  }
+
   .menu-carousel {
     gap: 0.35rem;
   }
@@ -1587,6 +1622,13 @@ button:focus-visible,
 
   .map-wrap iframe {
     min-height: 340px;
+  }
+}
+
+@media (max-width: 389px) {
+  .hero-actions .btn {
+    padding: 0.54rem 0.22rem;
+    font-size: 0.7rem;
   }
 }
 
