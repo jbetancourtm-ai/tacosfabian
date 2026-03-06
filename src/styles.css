@@ -566,21 +566,58 @@ button:focus-visible,
 }
 
 .hero-gallery {
-  margin-top: 1rem;
+  margin-top: 1.05rem;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
+  gap: 0.72rem;
 }
 
 .hero-gallery-item {
+  --hero-enter-delay: 0ms;
   margin: 0;
   position: relative;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid #ffd7bd;
-  box-shadow: var(--shadow-xs);
-  min-height: 128px;
+  border: 1px solid #ffd5b6;
+  box-shadow:
+    0 20px 36px rgba(33, 17, 10, 0.34),
+    0 0 0 1px rgba(255, 186, 136, 0.2),
+    0 12px 24px rgba(255, 120, 30, 0.18);
+  min-height: 136px;
   isolation: isolate;
+  transform: translateY(14px) scale(0.975);
+  opacity: 0;
+  animation: hero-photo-enter 400ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  animation-delay: var(--hero-enter-delay);
+}
+
+.hero-gallery-item:nth-child(1) {
+  --hero-enter-delay: 20ms;
+}
+
+.hero-gallery-item:nth-child(2) {
+  --hero-enter-delay: 95ms;
+}
+
+.hero-gallery-item:nth-child(3) {
+  --hero-enter-delay: 170ms;
+}
+
+.hero-gallery-item::before {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -20%;
+  height: 56%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 60%, rgba(255, 122, 38, 0.38) 0%, rgba(255, 122, 38, 0.1) 42%, rgba(255, 122, 38, 0) 72%),
+    radial-gradient(ellipse at 68% 55%, rgba(255, 168, 88, 0.28) 0%, rgba(255, 168, 88, 0.08) 40%, rgba(255, 168, 88, 0) 70%);
+  filter: blur(20px);
+  opacity: 0.68;
+  animation: ember-drift 10.5s ease-in-out infinite alternate;
 }
 
 .hero-gallery-item img {
@@ -588,90 +625,103 @@ button:focus-visible,
   z-index: 1;
   width: 100%;
   height: 100%;
-  min-height: 128px;
+  min-height: 136px;
   object-fit: cover;
   display: block;
+  filter: contrast(1.09) saturate(1.08) brightness(0.98);
+  transform: scale(1.02);
 }
 
-.hero-gallery-item::before,
 .hero-gallery-item::after {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 92%;
-  height: 82%;
-  transform: translate(-50%, 0);
+  width: 88%;
+  height: 84%;
+  transform: translate(-50%, 4px);
   border-radius: 999px;
   pointer-events: none;
-  z-index: 3;
-  opacity: 0.38;
+  z-index: 2;
+  opacity: 0.32;
+  mix-blend-mode: screen;
   will-change: transform, opacity;
-}
-
-.hero-gallery-item::before {
   background:
-    radial-gradient(ellipse at 30% 100%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.16) 44%, rgba(255, 255, 255, 0) 74%),
-    radial-gradient(ellipse at 70% 100%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.14) 40%, rgba(255, 255, 255, 0) 72%);
-  filter: blur(13px);
-  animation: steam-rise-a 5.8s ease-in-out infinite;
-}
-
-.hero-gallery-item::after {
-  background:
-    radial-gradient(ellipse at 50% 100%, rgba(255, 252, 248, 0.46) 0%, rgba(255, 252, 248, 0.15) 42%, rgba(255, 252, 248, 0) 74%),
-    radial-gradient(ellipse at 80% 100%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.08) 36%, rgba(255, 255, 255, 0) 70%);
-  filter: blur(16px);
-  animation: steam-rise-b 7.2s ease-in-out infinite;
+    radial-gradient(ellipse at 38% 100%, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.12) 42%, rgba(255, 255, 255, 0) 74%),
+    radial-gradient(ellipse at 72% 100%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.1) 39%, rgba(255, 255, 255, 0) 72%),
+    radial-gradient(ellipse at 54% 100%, rgba(255, 248, 241, 0.3) 0%, rgba(255, 248, 241, 0.08) 34%, rgba(255, 248, 241, 0) 66%);
+  filter: blur(14px);
+  animation: steam-cinema 8s ease-in-out infinite;
 }
 
 .hero-gallery-item:nth-child(2)::before {
-  animation-duration: 8.3s;
+  animation-duration: 12.2s;
   animation-delay: -1.8s;
 }
 
 .hero-gallery-item:nth-child(2)::after {
-  animation-duration: 10.1s;
-  animation-delay: -2.6s;
+  animation-duration: 8.9s;
+  animation-delay: -2.1s;
 }
 
 .hero-gallery-item:nth-child(3)::before {
-  animation-duration: 7.9s;
-  animation-delay: -1.2s;
+  animation-duration: 11.4s;
+  animation-delay: -0.9s;
 }
 
 .hero-gallery-item:nth-child(3)::after {
-  animation-duration: 10.8s;
+  animation-duration: 9.6s;
   animation-delay: -3.4s;
 }
 
-@keyframes steam-rise-a {
+.hero-gallery-garnish {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 82% 26%, rgba(255, 199, 150, 0.32) 0 5%, rgba(255, 199, 150, 0) 22%),
+    radial-gradient(circle at 28% 72%, rgba(75, 168, 93, 0.3) 0 3.5%, rgba(75, 168, 93, 0) 15%),
+    radial-gradient(circle at 40% 66%, rgba(82, 182, 102, 0.25) 0 3.5%, rgba(82, 182, 102, 0) 15%),
+    linear-gradient(180deg, rgba(255, 162, 84, 0.09) 0%, rgba(255, 255, 255, 0) 36%);
+  mix-blend-mode: screen;
+  opacity: 0.74;
+}
+
+@keyframes hero-photo-enter {
   0% {
-    transform: translate(-50%, 16px) scale(0.92);
-    opacity: 0.16;
-  }
-  50% {
-    transform: translate(-44%, -8px) scale(1.08);
-    opacity: 0.34;
+    transform: translateY(14px) scale(0.975);
+    opacity: 0;
   }
   100% {
-    transform: translate(-56%, -24px) scale(1.18);
-    opacity: 0.12;
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
 
-@keyframes steam-rise-b {
+@keyframes steam-cinema {
   0% {
-    transform: translate(-50%, 14px) scale(0.88);
+    transform: translate(-50%, 8px) scale(0.86);
     opacity: 0.12;
   }
   55% {
-    transform: translate(-57%, -10px) scale(1.06);
-    opacity: 0.3;
+    transform: translate(-56%, -10px) scale(1.06);
+    opacity: 0.33;
   }
   100% {
-    transform: translate(-43%, -26px) scale(1.22);
-    opacity: 0.1;
+    transform: translate(-44%, -24px) scale(1.16);
+    opacity: 0.08;
+  }
+}
+
+@keyframes ember-drift {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.62;
+  }
+  100% {
+    transform: translateY(-8px) scale(1.04);
+    opacity: 0.8;
   }
 }
 
@@ -2015,6 +2065,11 @@ td {
   }
 
   .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hero-gallery-item {
     opacity: 1 !important;
     transform: none !important;
   }
