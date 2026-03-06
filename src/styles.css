@@ -122,9 +122,21 @@ a {
 }
 
 .header-social {
+  position: fixed;
+  left: 0.8rem;
+  bottom: 1rem;
+  z-index: 315;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.42rem;
+  padding: 0.42rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid #f3d8c5;
+  box-shadow: 0 10px 20px rgba(106, 65, 34, 0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .header-social a {
@@ -425,66 +437,20 @@ button:focus-visible,
 .btn-whatsapp {
   grid-column: 1 / -1;
   width: 100%;
-  position: relative;
-  overflow: hidden;
-  color: #fff;
-  border: 1px solid #ffbd96;
-  background: linear-gradient(135deg, #ff6a00, #ff8e3a);
-  box-shadow: 0 14px 28px rgba(255, 106, 0, 0.34);
+  color: var(--primary-700);
+  border: 1px solid #ffd1b1;
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(122, 73, 37, 0.13);
   font-weight: 800;
-  animation: whatsapp-pulse 3.1s ease-in-out infinite;
-}
-
-.btn-whatsapp::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 1px;
-  width: 22px;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), #fff5ec 40%, #ff6a00 100%);
-  box-shadow: 0 0 10px rgba(255, 106, 0, 0.44);
-  animation: whatsapp-laser 2.5s ease-in-out infinite;
+  animation: none;
 }
 
 .btn-whatsapp:hover,
 .btn-whatsapp:focus-visible {
-  box-shadow: 0 0 0 5px rgba(255, 106, 0, 0.15), 0 14px 32px rgba(255, 106, 0, 0.38);
-}
-
-@keyframes whatsapp-pulse {
-  0%,
-  100% {
-    background: linear-gradient(135deg, #ff6a00, #ff8e3a);
-    color: #fff;
-    border-color: #ffbd96;
-    box-shadow: 0 0 0 0 rgba(255, 106, 0, 0);
-  }
-  50% {
-    background: linear-gradient(135deg, #fffdfa, #fff3e8);
-    color: #cb4f00;
-    border-color: #ffd6b7;
-    box-shadow: 0 0 0 6px rgba(255, 106, 0, 0.1), 0 14px 28px rgba(255, 106, 0, 0.2);
-  }
-}
-
-@keyframes whatsapp-laser {
-  0% {
-    transform: translateX(0);
-    opacity: 0.2;
-  }
-  20% {
-    opacity: 0.88;
-  }
-  55% {
-    transform: translateX(calc(100% - 24px));
-    opacity: 0.98;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 0.2;
-  }
+  color: #b84a0f;
+  border-color: #ffc29a;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(255, 106, 0, 0.1), 0 12px 24px rgba(122, 73, 37, 0.16);
 }
 
 .hero {
@@ -2295,9 +2261,15 @@ td {
   }
 
   .header-social {
-    order: 5;
-    justify-content: center;
-    grid-column: 1 / -1;
+    left: 0.62rem;
+    bottom: 0.9rem;
+    gap: 0.34rem;
+    padding: 0.34rem;
+  }
+
+  .header-social a {
+    width: 28px;
+    height: 28px;
   }
 
   .hero-gallery {
