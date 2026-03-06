@@ -114,12 +114,19 @@ function setupVisitCounter() {
   if (!visitCounter) return;
 
   const key = "tacos_fabian_visit_count";
-  const raw = window.localStorage.getItem(key);
-  const current = Number.parseInt(raw || "0", 10);
-  const next = Number.isFinite(current) && current > 0 ? current + 1 : 1;
+  let next = 1;
 
-  window.localStorage.setItem(key, String(next));
-  visitCounter.textContent = `🌮 +${next} amantes de los tacos han visitado esta pagina`;
+  try {
+    const raw = window.localStorage.getItem(key);
+    const current = Number.parseInt(raw || "0", 10);
+    next = Number.isFinite(current) && current > 0 ? current + 1 : 1;
+    window.localStorage.setItem(key, String(next));
+  } catch {
+    const seed = Math.floor(Date.now() / 86400000);
+    next = Math.max(1, (seed % 5000) + 1);
+  }
+
+  visitCounter.textContent = `+${next} amantes de los tacos han visitado esta pagina`;
 }
 
 function escapeHtml(text) {
