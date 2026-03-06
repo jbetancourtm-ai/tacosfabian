@@ -17,6 +17,7 @@ const commentCounter = document.querySelector("#commentCounter");
 const toastRegion = document.querySelector("#toastRegion");
 const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
+const visitCounter = document.querySelector("#visitCounter");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -107,6 +108,18 @@ function setupHeaderEffects() {
 function setupFloatingWhatsapp() {
   if (!floatingWhatsapp) return;
   floatingWhatsapp.classList.remove("is-hidden");
+}
+
+function setupVisitCounter() {
+  if (!visitCounter) return;
+
+  const key = "tacos_fabian_visit_count";
+  const raw = window.localStorage.getItem(key);
+  const current = Number.parseInt(raw || "0", 10);
+  const next = Number.isFinite(current) && current > 0 ? current + 1 : 1;
+
+  window.localStorage.setItem(key, String(next));
+  visitCounter.textContent = `🌮 +${next} amantes de los tacos han visitado esta pagina`;
 }
 
 function escapeHtml(text) {
@@ -496,5 +509,6 @@ setupMenuSpotlightModal();
 setupRevealAnimations();
 setupHeaderEffects();
 setupFloatingWhatsapp();
+setupVisitCounter();
 loadReviews();
 
