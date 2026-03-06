@@ -18,6 +18,7 @@ const toastRegion = document.querySelector("#toastRegion");
 const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
+const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -126,7 +127,16 @@ function setupVisitCounter() {
     next = Math.max(1, (seed % 5000) + 1);
   }
 
-  visitCounter.textContent = `\uD83C\uDF2E +${next} amantes de los tacos han visitado esta pagina`;
+  visitCounter.textContent = String(next).padStart(6, "0");
+}
+
+function setupMenuDestacadoButton() {
+  if (!heroMenuDestacadoBtn || !menuCarousel) return;
+
+  heroMenuDestacadoBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    menuCarousel.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 function escapeHtml(text) {
@@ -517,5 +527,6 @@ setupRevealAnimations();
 setupHeaderEffects();
 setupFloatingWhatsapp();
 setupVisitCounter();
+setupMenuDestacadoButton();
 loadReviews();
 

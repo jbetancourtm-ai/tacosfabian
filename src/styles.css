@@ -459,7 +459,7 @@ button:focus-visible,
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  padding: 3.8rem 0 2.6rem;
+  padding: 2.95rem 0 2.6rem;
   background: linear-gradient(170deg, #fff0df 0%, #fff9f2 44%, #ffffff 100%);
 }
 
@@ -604,7 +604,7 @@ button:focus-visible,
 }
 
 .hero-content .eyebrow {
-  margin-top: 0.78rem;
+  margin-top: 0.2rem;
 }
 
 
@@ -843,7 +843,23 @@ button:focus-visible,
   display: flex;
   flex-wrap: wrap;
   gap: 0.62rem;
-  margin-top: 1.2rem;
+  margin-top: 0.56rem;
+}
+
+.hero-actions .btn {
+  box-shadow: 0 8px 18px rgba(90, 49, 23, 0.14);
+}
+
+.hero-actions .btn:hover,
+.hero-actions .btn:focus-visible {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 14px 26px rgba(90, 49, 23, 0.2);
+}
+
+.btn-hero-highlight {
+  border-color: #ffbf98;
+  background: #fff9f2;
+  color: #9c4312;
 }
 
 .hero-proof {
@@ -1963,17 +1979,37 @@ textarea:focus {
 }
 
 .footer-visit {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #8f3f11;
+  margin-top: 0.24rem;
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
-  border: 1px solid #ffcfae;
-  background: linear-gradient(180deg, #fff8f2, #fff1e6);
-  padding: 0.28rem 0.64rem;
-  box-shadow: 0 8px 16px rgba(126, 76, 34, 0.12);
+  justify-content: center;
+  min-width: 148px;
+  padding: 0.32rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid #ffd2b2;
+  background:
+    linear-gradient(180deg, #29160f 0%, #140c09 100%);
+  color: #ffd7b5;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  font-family: "Roboto Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  text-shadow:
+    0 0 6px rgba(255, 170, 102, 0.48),
+    0 0 11px rgba(255, 123, 41, 0.32);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 176, 120, 0.22),
+    0 10px 20px rgba(31, 18, 10, 0.24);
+}
+
+.footer-visit-label {
+  margin-top: 0.52rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8a6043;
+  display: inline-flex;
 }
 
 .footer-grid {
@@ -2290,7 +2326,7 @@ td {
   }
 
   .hero {
-    padding-top: 2.15rem;
+    padding-top: 1.75rem;
   }
 
   .hero-content {
