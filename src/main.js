@@ -126,7 +126,7 @@ function setupVisitCounter() {
     next = Math.max(1, (seed % 5000) + 1);
   }
 
-  visitCounter.textContent = `+${next} amantes de los tacos han visitado esta pagina`;
+  visitCounter.textContent = `\uD83C\uDF2E +${next} amantes de los tacos han visitado esta pagina`;
 }
 
 function escapeHtml(text) {

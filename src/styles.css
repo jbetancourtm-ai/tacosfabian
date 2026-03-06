@@ -223,22 +223,34 @@ p {
 
 .brand-orbit-dot {
   position: absolute;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--primary);
-  top: -2px;
-  left: 26px;
-  box-shadow: 0 0 0 4px rgba(255, 106, 0, 0.2);
-  animation: orbit-dot 5s linear infinite;
+  width: 2px;
+  height: 16px;
+  border-radius: 999px;
+  bottom: 2px;
+  left: 2px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), #fff4ec 45%, #ff6a00 100%);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.14), 0 0 14px rgba(255, 106, 0, 0.5);
+  animation: brand-laser 2.7s ease-in-out infinite;
 }
 
-@keyframes orbit-dot {
-  from {
-    transform: rotate(0deg) translateX(30px) rotate(0deg);
+@keyframes brand-laser {
+  0% {
+    transform: translateX(0);
+    opacity: 0.2;
   }
-  to {
-    transform: rotate(360deg) translateX(30px) rotate(-360deg);
+  15% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(52px);
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0.2;
   }
 }
 
@@ -588,6 +600,10 @@ button:focus-visible,
   color: #5b4638;
 }
 
+.hero-content .eyebrow {
+  margin-top: 0.78rem;
+}
+
 
 .eyebrow {
   display: inline-flex;
@@ -609,7 +625,7 @@ button:focus-visible,
 }
 
 .hero-app-badges {
-  margin-top: 0.72rem;
+  margin-top: 0.58rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.46rem;
@@ -1961,13 +1977,16 @@ textarea:focus {
 
 .footer-visit {
   margin-top: 0.5rem;
-  font-size: 0.84rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #8f3f11;
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  border: 1px solid #f0d4bf;
-  background: #fffaf5;
-  padding: 0.24rem 0.55rem;
+  border: 1px solid #ffcfae;
+  background: linear-gradient(180deg, #fff8f2, #fff1e6);
+  padding: 0.28rem 0.64rem;
+  box-shadow: 0 8px 16px rgba(126, 76, 34, 0.12);
 }
 
 .footer-grid {
