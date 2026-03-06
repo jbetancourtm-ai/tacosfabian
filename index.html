@@ -21,7 +21,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/src/styles.css" />
@@ -89,6 +89,26 @@
         <div class="container hero-grid">
           <div class="hero-content">
             <span class="eyebrow">Recomendado en Texcoco</span>
+            <div class="hero-gallery" aria-label="Galeria destacada de tacos">
+              <figure class="hero-gallery-item">
+                <img
+                  src="/images/tacossuadero.jpg"
+                  alt="Taco de suadero recien preparado"
+                />
+              </figure>
+              <figure class="hero-gallery-item">
+                <img
+                  src="/images/trozo.jpg"
+                  alt="Trozos de carne dorados"
+                />
+              </figure>
+              <figure class="hero-gallery-item">
+                <img
+                  src="/images/trozo1.jpg"
+                  alt="Especialidad de trozos de carne"
+                />
+              </figure>
+            </div>
             <h1>Tacos que se antojan desde la primera mordida</h1>
             <p>Suadero jugoso, trocitos doraditos y sabor unico.</p>
             <div class="hero-actions">
@@ -97,29 +117,11 @@
             </div>
             <div class="hero-microcopy" aria-hidden="true">
               <span>Hechos al momento</span>
-              <span>Sabor real en cada taco</span>
               <span>El sabor que te hace volver</span>
             </div>
           </div>
 
           <aside class="hero-side hero-side--spotlight" aria-label="Recomendacion">
-            <div class="hero-media">
-              <img
-                class="hero-media-main"
-                src="/images/tacossuadero.jpg"
-                alt="Taco de suadero recien preparado"
-              />
-              <div class="hero-media-thumbs">
-                <img
-                  src="/images/trozo.jpg"
-                  alt="Trozos de carne dorados"
-                />
-                <img
-                  src="/images/trozo1.jpg"
-                  alt="Especialidad de trozos de carne"
-                />
-              </div>
-            </div>
             <span class="hero-badge">Recomendacion</span>
             <h2>Taco de trocitos</h2>
             <p>Especialidad de la casa con salsa roja, receta secreta.</p>
@@ -131,41 +133,10 @@
         </div>
       </section>
 
-      <section id="especialidad" class="section">
+      <section class="section section-soft" aria-label="Menu destacado">
         <div class="container">
           <div class="section-head">
-            <h2>Especialidad</h2>
-            <p>Lo mas pedido por nuestros clientes en Texcoco. <span class="fire-accent" aria-hidden="true">🔥</span></p>
-          </div>
-
-          <div class="cards two-col">
-            <article class="card card-icon">
-              <span class="menu-badge badge-house">🔥 Especialidad de la casa</span>
-              <span class="card-ico" aria-hidden="true">S</span>
-              <h3>Tacos de suadero</h3>
-              <p>
-                Coccion lenta para lograr suadero suave por dentro y doradito por fuera.
-                Tortilla caliente, cilantro fresco y salsa al gusto.
-              </p>
-            </article>
-
-            <article class="card card-icon featured">
-              <span class="menu-badge badge-top">⭐ Mas pedido</span>
-              <span class="card-ico" aria-hidden="true">T</span>
-              <h3>Trocitos / Trozos de carne</h3>
-              <p>
-                Especialidad de la casa: trocitos seleccionados, dorados al punto
-                y con sabor potente para taco, torta o tostada.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="menu" class="section section-soft">
-        <div class="container">
-          <div class="section-head">
-            <h2>Menu</h2>
+            <h2>Menu destacado</h2>
             <p>Sabores clasicos, precios claros y porciones cumplidoras. <span class="fire-accent" aria-hidden="true">🔥</span></p>
           </div>
 
@@ -264,6 +235,46 @@
           </div>
 
           <div id="menuDots" class="carousel-dots" aria-label="Navegacion del carrusel"></div>
+        </div>
+      </section>
+
+      <section id="especialidad" class="section">
+        <div class="container">
+          <div class="section-head">
+            <h2>Especialidad</h2>
+            <p>Lo mas pedido por nuestros clientes en Texcoco. <span class="fire-accent" aria-hidden="true">🔥</span></p>
+          </div>
+
+          <div class="cards two-col">
+            <article class="card card-icon">
+              <span class="menu-badge badge-house">🔥 Especialidad de la casa</span>
+              <span class="card-ico" aria-hidden="true">S</span>
+              <h3>Tacos de suadero</h3>
+              <p>
+                Coccion lenta para lograr suadero suave por dentro y doradito por fuera.
+                Tortilla caliente, cilantro fresco y salsa al gusto.
+              </p>
+            </article>
+
+            <article class="card card-icon featured">
+              <span class="menu-badge badge-top">⭐ Mas pedido</span>
+              <span class="card-ico" aria-hidden="true">T</span>
+              <h3>Trocitos / Trozos de carne</h3>
+              <p>
+                Especialidad de la casa: trocitos seleccionados, dorados al punto
+                y con sabor potente para taco, torta o tostada.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="menu" class="section section-soft">
+        <div class="container">
+          <div class="section-head">
+            <h2>Menu completo</h2>
+            <p>Todo lo que preparamos cada noche en Tacos Fabian. <span class="fire-accent" aria-hidden="true">🔥</span></p>
+          </div>
 
           <div class="cards two-col menu-grid">
             <article class="card menu-item">
