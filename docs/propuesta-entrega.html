@@ -1,0 +1,96 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Propuesta de Entrega - Tacos Fabian Texcoco</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 40px; color: #1b1b1b; }
+    h1 { color: #cf540f; margin: 0 0 8px; }
+    h2 { color: #cf540f; margin-top: 26px; font-size: 18px; }
+    p, li { line-height: 1.5; font-size: 14px; }
+    .muted { color: #666; }
+    .card { border: 1px solid #f0d7c3; border-radius: 10px; padding: 14px; background: #fffaf5; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tag { display: inline-block; background: #fff2e6; border: 1px solid #ffd7b5; border-radius: 999px; padding: 6px 10px; font-size: 12px; margin-right: 6px; }
+    ul { margin-top: 8px; }
+    .footer { margin-top: 30px; font-size: 12px; color: #666; border-top: 1px solid #eee; padding-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Propuesta de Entrega - Tacos Fabian Texcoco</h1>
+  <p class="muted">Documento de cierre tecnico y comercial</p>
+
+  <div class="card">
+    <p><strong>Cliente:</strong> Tacos Fabian Texcoco</p>
+    <p><strong>Proyecto:</strong> Sitio web informativo con reseñas administrables</p>
+    <p><strong>Dominio:</strong> www.tacosfabiantexcoco.com.mx</p>
+    <p><strong>Fecha:</strong> 5 de marzo de 2026</p>
+  </div>
+
+  <h2>1. Resultado entregado</h2>
+  <ul>
+    <li>Sitio web responsive con enfoque comercial para taqueria.</li>
+    <li>Secciones: inicio, especialidad, menu, ubicacion y reseñas.</li>
+    <li>Boton de pedido por WhatsApp funcional.</li>
+    <li>Logo integrado en header y favicon.</li>
+    <li>Dominio personalizado configurado en Azure Static Web Apps.</li>
+  </ul>
+
+  <h2>2. Funcionalidad implementada</h2>
+  <div class="grid">
+    <div class="card">
+      <p><strong>Frontend</strong></p>
+      <p>HTML + CSS + JavaScript (Vite)</p>
+      <p class="tag">Responsive</p><p class="tag">SEO basico</p><p class="tag">Accesibilidad</p>
+    </div>
+    <div class="card">
+      <p><strong>Backend/API</strong></p>
+      <p>Azure Functions + Azure Table Storage</p>
+      <p>Endpoints:</p>
+      <ul>
+        <li>GET /api/reviews</li>
+        <li>POST /api/reviews</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>3. Seguridad y administracion</h2>
+  <ul>
+    <li>Ruta /admin protegida con autenticacion en Azure Static Web Apps.</li>
+    <li>Validaciones en reseñas: nombre obligatorio, estrellas 1-5, comentario maximo 300 caracteres.</li>
+    <li>Reseñas persistentes en nube y visibles en panel admin.</li>
+  </ul>
+
+  <h2>4. Estado actual</h2>
+  <ul>
+    <li>Sitio en produccion y operativo.</li>
+    <li>Dominio activo.</li>
+    <li>Carga y lectura de reseñas funcionando.</li>
+  </ul>
+
+  <h2>5. Inversion sugerida</h2>
+  <ul>
+    <li><strong>Desarrollo e implementacion:</strong> $12,000 a $18,000 MXN</li>
+    <li><strong>Mantenimiento opcional:</strong> $1,000 a $3,000 MXN / mes</li>
+  </ul>
+
+  <h2>6. Costos operativos del cliente</h2>
+  <ul>
+    <li>Dominio (anual, segun registrador).</li>
+    <li>Azure Static Web Apps + Storage (consumo bajo, monitoreado con alertas).</li>
+  </ul>
+
+  <h2>7. Siguientes mejoras recomendadas</h2>
+  <ul>
+    <li>Integrar galeria fotografica profesional de productos.</li>
+    <li>SEO local avanzado (Google Business Profile + schema).</li>
+    <li>Campañas con landing de promociones y cupones.</li>
+    <li>Medicion de conversiones a WhatsApp.</li>
+  </ul>
+
+  <div class="footer">
+    Elaborado por: Desarrollo Web\nDocumento generado para presentacion comercial y tecnica.
+  </div>
+</body>
+</html>
