@@ -603,30 +603,25 @@ button:focus-visible,
   border-radius: 999px;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.16;
+  opacity: 0.26;
+  mix-blend-mode: screen;
   will-change: transform, opacity;
 }
 
 .hero-gallery-item::before {
-  background: radial-gradient(
-    ellipse at 50% 100%,
-    rgba(255, 255, 255, 0.28) 0%,
-    rgba(255, 255, 255, 0.12) 42%,
-    rgba(255, 255, 255, 0) 72%
-  );
-  filter: blur(10px);
-  animation: steam-rise-a 7.4s ease-in-out infinite;
+  background:
+    radial-gradient(ellipse at 35% 100%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0) 74%),
+    radial-gradient(ellipse at 65% 100%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.07) 42%, rgba(255, 255, 255, 0) 72%);
+  filter: blur(12px);
+  animation: steam-rise-a 6.8s ease-in-out infinite;
 }
 
 .hero-gallery-item::after {
-  background: radial-gradient(
-    ellipse at 50% 100%,
-    rgba(255, 252, 248, 0.32) 0%,
-    rgba(255, 252, 248, 0.1) 36%,
-    rgba(255, 252, 248, 0) 70%
-  );
-  filter: blur(14px);
-  animation: steam-rise-b 9.2s ease-in-out infinite;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(255, 252, 248, 0.34) 0%, rgba(255, 252, 248, 0.09) 40%, rgba(255, 252, 248, 0) 74%),
+    radial-gradient(ellipse at 72% 100%, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 36%, rgba(255, 255, 255, 0) 68%);
+  filter: blur(15px);
+  animation: steam-rise-b 8.6s ease-in-out infinite;
 }
 
 .hero-gallery-item:nth-child(2)::before {
@@ -651,31 +646,31 @@ button:focus-visible,
 
 @keyframes steam-rise-a {
   0% {
-    transform: translate(-50%, 12px) scale(0.9);
-    opacity: 0.06;
+    transform: translate(-50%, 14px) scale(0.88);
+    opacity: 0.1;
   }
   50% {
-    transform: translate(-46%, -6px) scale(1.03);
-    opacity: 0.16;
+    transform: translate(-44%, -8px) scale(1.06);
+    opacity: 0.26;
   }
   100% {
-    transform: translate(-54%, -16px) scale(1.08);
-    opacity: 0.04;
+    transform: translate(-56%, -20px) scale(1.14);
+    opacity: 0.08;
   }
 }
 
 @keyframes steam-rise-b {
   0% {
-    transform: translate(-50%, 10px) scale(0.84);
-    opacity: 0.05;
+    transform: translate(-50%, 12px) scale(0.84);
+    opacity: 0.08;
   }
   55% {
-    transform: translate(-55%, -7px) scale(1.02);
-    opacity: 0.13;
+    transform: translate(-56%, -9px) scale(1.04);
+    opacity: 0.2;
   }
   100% {
-    transform: translate(-45%, -18px) scale(1.1);
-    opacity: 0.03;
+    transform: translate(-43%, -22px) scale(1.16);
+    opacity: 0.07;
   }
 }
 
