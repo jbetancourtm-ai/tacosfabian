@@ -192,6 +192,19 @@ function createFireGroup(texture) {
   return { group, emberLight, flames: [flameMain, flameSide] };
 }
 
+function createHeatLayer() {
+  const material = new THREE.MeshBasicMaterial({
+    color: "#ffbf7f",
+    transparent: true,
+    opacity: 0.075,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.1), material);
+  mesh.position.set(0, 1.04, 1.92);
+  return mesh;
+}
+
 function buildSpeechQueue() {
   let active = true;
   const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
@@ -366,24 +379,28 @@ export async function initIntroExperience({
   fireGroup.visible = false;
   scene.add(fireGroup);
 
+  const heatLayer = createHeatLayer();
+  heatLayer.visible = false;
+  scene.add(heatLayer);
+
   const smokeTexture = createSmokeTexture();
   const smokeMaterial = new THREE.PointsMaterial({
     map: smokeTexture,
     transparent: true,
-    opacity: 0.18,
-    size: 1.3,
+    opacity: 0.16,
+    size: 1.5,
     depthWrite: false,
     color: "#ffd7b1",
     blending: THREE.AdditiveBlending,
   });
   const smokeGeometry = new THREE.BufferGeometry();
-  const smokeCount = 42;
+  const smokeCount = 58;
   const smokePositions = new Float32Array(smokeCount * 3);
   const smokeData = Array.from({ length: smokeCount }, () => ({
-    x: (Math.random() - 0.5) * 2.2,
-    y: 1 + Math.random() * 1.3,
-    z: 1.35 + Math.random() * 0.8,
-    speed: 0.004 + Math.random() * 0.009,
+    x: (Math.random() - 0.5) * 1.7,
+    y: 0.96 + Math.random() * 1.1,
+    z: 1.4 + Math.random() * 0.82,
+    speed: 0.0035 + Math.random() * 0.0065,
   }));
 
   smokeData.forEach((particle, index) => {
@@ -394,6 +411,34 @@ export async function initIntroExperience({
   smokeGeometry.setAttribute("position", new THREE.BufferAttribute(smokePositions, 3));
   const smoke = new THREE.Points(smokeGeometry, smokeMaterial);
   scene.add(smoke);
+
+  const steamMaterial = new THREE.PointsMaterial({
+    map: smokeTexture,
+    transparent: true,
+    opacity: 0.11,
+    size: 2.2,
+    depthWrite: false,
+    color: "#fff0dd",
+    blending: THREE.AdditiveBlending,
+  });
+  const steamGeometry = new THREE.BufferGeometry();
+  const steamCount = 24;
+  const steamPositions = new Float32Array(steamCount * 3);
+  const steamData = Array.from({ length: steamCount }, () => ({
+    x: (Math.random() - 0.5) * 1.1,
+    y: 0.88 + Math.random() * 0.5,
+    z: 1.72 + Math.random() * 0.34,
+    speed: 0.0024 + Math.random() * 0.0032,
+  }));
+
+  steamData.forEach((particle, index) => {
+    steamPositions[index * 3] = particle.x;
+    steamPositions[index * 3 + 1] = particle.y;
+    steamPositions[index * 3 + 2] = particle.z;
+  });
+  steamGeometry.setAttribute("position", new THREE.BufferAttribute(steamPositions, 3));
+  const steam = new THREE.Points(steamGeometry, steamMaterial);
+  scene.add(steam);
 
   const particlesGeometry = new THREE.BufferGeometry();
   const particleCount = 120;
@@ -415,6 +460,37 @@ export async function initIntroExperience({
     })
   );
   scene.add(particles);
+
+  const emberGeometry = new THREE.BufferGeometry();
+  const emberCount = 18;
+  const emberPositions = new Float32Array(emberCount * 3);
+  const emberData = Array.from({ length: emberCount }, () => ({
+    x: (Math.random() - 0.5) * 0.72,
+    y: 0.48 + Math.random() * 0.18,
+    z: 1.98 + Math.random() * 0.18,
+    speed: 0.002 + Math.random() * 0.003,
+  }));
+
+  emberData.forEach((particle, index) => {
+    emberPositions[index * 3] = particle.x;
+    emberPositions[index * 3 + 1] = particle.y;
+    emberPositions[index * 3 + 2] = particle.z;
+  });
+  emberGeometry.setAttribute("position", new THREE.BufferAttribute(emberPositions, 3));
+  const embers = new THREE.Points(
+    emberGeometry,
+    new THREE.PointsMaterial({
+      color: "#ffb065",
+      transparent: true,
+      opacity: 0.42,
+      size: 0.07,
+      sizeAttenuation: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
+  );
+  embers.visible = false;
+  scene.add(embers);
 
   const resize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -490,7 +566,10 @@ export async function initIntroExperience({
     renderer.dispose();
     smokeGeometry.dispose();
     smokeMaterial.dispose();
+    steamGeometry.dispose();
+    steamMaterial.dispose();
     particlesGeometry.dispose();
+    emberGeometry.dispose();
 
     window.setTimeout(() => {
       introScreen.remove();
@@ -539,6 +618,8 @@ export async function initIntroExperience({
     .call(() => {
       fireGroup.visible = true;
       grillLight.intensity = 1.2;
+      heatLayer.visible = true;
+      embers.visible = true;
     }, null, 4.2)
     .to(curtainLeft.position, { x: -4.4, duration: 1.35 }, 5.6)
     .to(curtainRight.position, { x: 4.4, duration: 1.35 }, 5.6)
@@ -570,6 +651,9 @@ export async function initIntroExperience({
     spotRight.target.position.x = Math.cos(elapsed * 0.28) * 1.2;
     grillLight.intensity = fireGroup.visible ? 1 + Math.sin(elapsed * 11) * 0.14 + Math.cos(elapsed * 6) * 0.08 : 0.08;
     emberLight.intensity = fireGroup.visible ? 1.3 + Math.sin(elapsed * 13) * 0.22 : 0.2;
+    heatLayer.visible = fireGroup.visible;
+    heatLayer.material.opacity = fireGroup.visible ? 0.06 + Math.abs(Math.sin(elapsed * 2.6)) * 0.035 : 0;
+    heatLayer.lookAt(camera.position);
 
     titlePlane.lookAt(camera.position);
     particles.rotation.y += 0.0009;
@@ -587,14 +671,43 @@ export async function initIntroExperience({
       particle.y += particle.speed * 0.82;
       particle.x += Math.sin(elapsed * 0.8 + index) * 0.0012;
       if (particle.y > 3.05) {
-        particle.y = 1 + Math.random() * 0.28;
-        particle.x = (Math.random() - 0.5) * 1.55;
+        particle.y = 0.98 + Math.random() * 0.24;
+        particle.x = (Math.random() - 0.5) * 1.32;
       }
       positions[index * 3] = particle.x;
       positions[index * 3 + 1] = particle.y;
       positions[index * 3 + 2] = particle.z;
     });
     smokeGeometry.attributes.position.needsUpdate = true;
+
+    const steamPositionsArray = steamGeometry.attributes.position.array;
+    steamData.forEach((particle, index) => {
+      particle.y += particle.speed;
+      particle.x += Math.sin(elapsed * 0.55 + index * 0.6) * 0.0009;
+      if (particle.y > 2.34) {
+        particle.y = 0.9 + Math.random() * 0.16;
+        particle.x = (Math.random() - 0.5) * 0.92;
+      }
+      steamPositionsArray[index * 3] = particle.x;
+      steamPositionsArray[index * 3 + 1] = particle.y;
+      steamPositionsArray[index * 3 + 2] = particle.z;
+    });
+    steamGeometry.attributes.position.needsUpdate = true;
+
+    const emberPositionsArray = emberGeometry.attributes.position.array;
+    emberData.forEach((particle, index) => {
+      particle.y += particle.speed;
+      particle.x += Math.sin(elapsed * (2.4 + index * 0.14)) * 0.0012;
+      if (particle.y > 0.96) {
+        particle.y = 0.48 + Math.random() * 0.08;
+        particle.x = (Math.random() - 0.5) * 0.68;
+      }
+      emberPositionsArray[index * 3] = particle.x;
+      emberPositionsArray[index * 3 + 1] = particle.y;
+      emberPositionsArray[index * 3 + 2] = particle.z;
+    });
+    emberGeometry.attributes.position.needsUpdate = true;
+    embers.visible = fireGroup.visible;
 
     hostPlane.position.y = hostPlane.visible ? 1.55 + Math.sin(elapsed * 2.1) * 0.05 : 0.8;
     hostPlane.rotation.z = hostPlane.visible ? Math.sin(elapsed * 2.4) * 0.035 : 0;
