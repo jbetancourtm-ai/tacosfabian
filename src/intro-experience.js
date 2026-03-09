@@ -252,7 +252,6 @@ export async function initIntroExperience({
   const narration = introScreen.querySelector("#introNarration");
   const hostCard = introScreen.querySelector("#introHostCard");
   const hostLine = introScreen.querySelector("#introHostLine");
-  const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const autoDismissMs = reducedMotion ? 500 : 10000;
   const speechQueue = buildSpeechQueue();
@@ -432,13 +431,11 @@ export async function initIntroExperience({
       narrationAudio.currentTime = 0;
       await narrationAudio.play();
       useSpeechFallback = false;
-      introSoundBtn?.classList.add("is-hidden");
       return true;
     } catch {
       ambientAudio.pause();
       ambientAudio.currentTime = 0;
       useSpeechFallback = true;
-      introSoundBtn?.classList.remove("is-hidden");
       return false;
     }
   };
@@ -497,10 +494,6 @@ export async function initIntroExperience({
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
-  introSoundBtn?.addEventListener("click", async () => {
-    const started = await tryPlayNarrationAudio();
-    if (started) pulseSpeaking(2200);
-  });
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") finishIntro();
   });
