@@ -656,10 +656,9 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__host-portrait img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
-  filter: saturate(1.06) contrast(1.02) brightness(1.01);
-  padding: 0.35rem;
+  object-fit: cover;
+  filter: saturate(1.15) contrast(1.12) brightness(1.03);
+  transform: scale(1.06);
 }
 
 .intro-screen__host-copy {
