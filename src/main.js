@@ -120,52 +120,24 @@ function setupIntroScreen() {
     return;
   }
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const autoDismissMs = reducedMotion ? 300 : 18000;
-  let closed = false;
-  let countdownInterval = null;
-  let autoDismissTimer = null;
-
-  const finishIntro = () => {
-    if (closed) return;
-    closed = true;
-
-    if (countdownInterval) window.clearInterval(countdownInterval);
-    if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
-
-    introScreen.classList.add("is-hidden");
-    introScreen.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("intro-active");
-    document.body.classList.add("intro-complete");
-
-    window.setTimeout(() => {
-      introScreen.remove();
-      if (introSkipBtn instanceof HTMLElement) introSkipBtn.blur();
-    }, reducedMotion ? 20 : 700);
-  };
-
-  if (introCountdown) {
-    const startedAt = Date.now();
-    const updateCountdown = () => {
-      const remainingMs = Math.max(0, autoDismissMs - (Date.now() - startedAt));
-      const remainingSeconds = Math.max(1, Math.ceil(remainingMs / 1000));
-      introCountdown.textContent =
-        remainingMs > 0
-          ? `La experiencia continuara automaticamente en ${remainingSeconds} segundo${remainingSeconds === 1 ? "" : "s"}.`
-          : "Abriendo Taqueria Fabian...";
-    };
-
-    updateCountdown();
-    countdownInterval = window.setInterval(updateCountdown, 1000);
-  }
-
-  introSkipBtn?.addEventListener("click", finishIntro);
-
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") finishIntro();
-  });
-
-  autoDismissTimer = window.setTimeout(finishIntro, autoDismissMs);
+  import("./intro-experience.js")
+    .then(({ initIntroExperience }) =>
+      initIntroExperience({
+        introScreen,
+        introSkipBtn,
+        introCountdown,
+      })
+    )
+    .catch(() => {
+      if (introCountdown) introCountdown.textContent = "Abriendo Taqueria Fabian...";
+      window.setTimeout(() => {
+        introScreen.classList.add("is-hidden");
+        introScreen.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("intro-active");
+        document.body.classList.add("intro-complete");
+        window.setTimeout(() => introScreen.remove(), 700);
+      }, 1200);
+    });
 }
 
 function setupVisitCounter() {
