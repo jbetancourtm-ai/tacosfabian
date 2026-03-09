@@ -140,15 +140,15 @@ function createTaqueriaGroup() {
 }
 
 function createHostPlane(textureLoader) {
-  const texture = textureLoader.load("/brand/mascot-fabian.svg");
+  const texture = textureLoader.load("/images/fabian.jpg");
   texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
     depthWrite: false,
   });
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.25, 2.75), material);
-  mesh.position.set(2.55, 1.55, 0.55);
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.42, 1.92), material);
+  mesh.position.set(3.15, 1.28, 0.75);
   mesh.visible = false;
   return mesh;
 }
@@ -255,7 +255,7 @@ function buildSpeechQueue() {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = voice?.lang || "es-MX";
       utterance.voice = voice;
-      utterance.rate = 1.05;
+      utterance.rate = 1.18;
       utterance.pitch = 1;
       utterance.volume = 1;
       try {
@@ -274,7 +274,6 @@ function buildSpeechQueue() {
 export async function initIntroExperience({
   introScreen,
   introSkipBtn,
-  introCountdown,
 }) {
   const canvas = introScreen.querySelector("#introCanvas");
   const narration = introScreen.querySelector("#introNarration");
@@ -284,12 +283,13 @@ export async function initIntroExperience({
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steamQuality = inferSteamQuality(reducedMotion);
-  const autoDismissMs = reducedMotion ? 500 : 15000;
+  const autoDismissMs = reducedMotion ? 500 : 7200;
   const speechQueue = buildSpeechQueue();
   const narrationAudio = new Audio("/audio/intro-narration-es-mx.mp3");
   const ambientAudio = new Audio("/audio/taqueria-ambient-night.wav");
   narrationAudio.preload = "auto";
   narrationAudio.playsInline = true;
+  narrationAudio.playbackRate = 1.18;
   ambientAudio.preload = "auto";
   ambientAudio.playsInline = true;
   ambientAudio.loop = true;
@@ -303,7 +303,6 @@ export async function initIntroExperience({
 
   let closed = false;
   let autoDismissTimer = 0;
-  let countdownInterval = 0;
   let rafId = 0;
   let speakingTimer = 0;
 
@@ -572,8 +571,6 @@ export async function initIntroExperience({
     narrationAudio.currentTime = 0;
     speechQueue.stop();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
-    if (countdownInterval) window.clearInterval(countdownInterval);
-
     introScreen.classList.add("is-hidden");
     introScreen.setAttribute("aria-hidden", "true");
     document.body.classList.remove("intro-active");
@@ -607,55 +604,41 @@ export async function initIntroExperience({
     if (event.key === "Escape") finishIntro();
   });
 
-  if (introCountdown) {
-    const startedAt = Date.now();
-    const updateCountdown = () => {
-      const remainingMs = Math.max(0, autoDismissMs - (Date.now() - startedAt));
-      const remainingSeconds = Math.max(1, Math.ceil(remainingMs / 1000));
-      introCountdown.textContent =
-        remainingMs > 0
-          ? `Entrando al menu en ${remainingSeconds} segundo${remainingSeconds === 1 ? "" : "s"}`
-          : "Abriendo Taqueria Fabian...";
-    };
-    updateCountdown();
-    countdownInterval = window.setInterval(updateCountdown, 1000);
-  }
-
   const timeline = gsap.timeline({
     defaults: { ease: "power2.inOut" },
     onComplete: finishIntro,
   });
 
   timeline
-    .to([spotLeft, spotRight], { intensity: 2.8, duration: 1.15 }, 0)
-    .to(signLight, { intensity: 5.9, duration: 1.35 }, 0.2)
-    .to(titlePlane.material, { opacity: 0.5, duration: 1.25 }, 0.3)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.35)
-    .to(camera.position, { z: 8.35, y: 2.3, duration: 3.1 }, 0.95)
-    .to(taqueria.scale, { x: 0.98, y: 0.98, z: 0.98, duration: 3.1 }, 0.95)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 3.4)
+    .to([spotLeft, spotRight], { intensity: 2.45, duration: 0.7 }, 0)
+    .to(signLight, { intensity: 5.5, duration: 0.82 }, 0.08)
+    .to(titlePlane.material, { opacity: 0.46, duration: 0.82 }, 0.15)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.2)
+    .to(camera.position, { z: 8.7, y: 2.26, duration: 1.7 }, 0.5)
+    .to(taqueria.scale, { x: 0.88, y: 0.88, z: 0.88, duration: 1.7 }, 0.5)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 1.75)
     .call(() => {
       fireGroup.visible = true;
       grillLight.intensity = 1.2;
       heatLayer.visible = true;
       embers.visible = true;
-    }, null, 4.2)
-    .to(curtainLeft.position, { x: -4.4, duration: 1.35 }, 5.6)
-    .to(curtainRight.position, { x: 4.4, duration: 1.35 }, 5.6)
-    .to(doorPivotLeft.rotation, { y: -1.04, duration: 1.05 }, 5.9)
-    .to(doorPivotRight.rotation, { y: 1.04, duration: 1.05 }, 5.9)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 6.25)
+    }, null, 2.05)
+    .to(curtainLeft.position, { x: -4.4, duration: 0.76 }, 2.8)
+    .to(curtainRight.position, { x: 4.4, duration: 0.76 }, 2.8)
+    .to(doorPivotLeft.rotation, { y: -1.04, duration: 0.68 }, 2.92)
+    .to(doorPivotRight.rotation, { y: 1.04, duration: 0.68 }, 2.92)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 3.2)
     .call(() => {
       hostPlane.visible = true;
       hostCard?.classList.add("is-visible");
       hostMural?.classList.add("is-visible");
-    }, null, 8.05)
-    .fromTo(hostPlane.position, { y: 0.8 }, { y: 1.55, duration: 1.15, ease: "back.out(1.3)" }, 8.05)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 10.55)
-    .to(camera.position, { z: 7.72, y: 2.14, duration: 1.45 }, 12.25)
-    .to([spotLeft, spotRight], { intensity: 1.7, duration: 1.2 }, 12.7)
-    .to(signLight, { intensity: 3.9, duration: 1.2 }, 12.7)
-    .to(titlePlane.material, { opacity: 0.28, duration: 1.05 }, 13.1);
+    }, null, 4.15)
+    .fromTo(hostPlane.position, { x: 3.45, y: 0.98 }, { x: 2.82, y: 1.28, duration: 0.92, ease: "power2.out" }, 4.15)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 5.15)
+    .to(camera.position, { z: 7.92, y: 2.08, duration: 0.95 }, 5.8)
+    .to([spotLeft, spotRight], { intensity: 1.45, duration: 0.8 }, 6.05)
+    .to(signLight, { intensity: 3.5, duration: 0.8 }, 6.05)
+    .to(titlePlane.material, { opacity: 0.24, duration: 0.75 }, 6.2);
 
   const clock = new THREE.Clock();
   const render = () => {
@@ -728,9 +711,10 @@ export async function initIntroExperience({
     emberGeometry.attributes.position.needsUpdate = true;
     embers.visible = fireGroup.visible;
 
-    hostPlane.position.y = hostPlane.visible ? 1.55 + Math.sin(elapsed * 2.1) * 0.05 : 0.8;
-    hostPlane.rotation.z = hostPlane.visible ? Math.sin(elapsed * 2.4) * 0.035 : 0;
-    hostPlane.rotation.y = hostPlane.visible ? Math.sin(elapsed * 1.9) * 0.07 : 0;
+    hostPlane.position.y = hostPlane.visible ? hostPlane.position.y + Math.sin(elapsed * 2.4) * 0.003 : 0.98;
+    hostPlane.position.x = hostPlane.visible ? hostPlane.position.x + Math.sin(elapsed * 1.7) * 0.0022 : 3.45;
+    hostPlane.rotation.z = hostPlane.visible ? Math.sin(elapsed * 2.8) * 0.03 : 0;
+    hostPlane.rotation.y = hostPlane.visible ? Math.sin(elapsed * 2.1) * 0.08 : 0;
     renderer.render(scene, camera);
     rafId = window.requestAnimationFrame(render);
   };

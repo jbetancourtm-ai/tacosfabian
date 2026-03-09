@@ -21,7 +21,6 @@ const visitCounter = document.querySelector("#visitCounter");
 const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
-const introCountdown = document.querySelector("#introCountdown");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -125,11 +124,9 @@ function setupIntroScreen() {
       initIntroExperience({
         introScreen,
         introSkipBtn,
-        introCountdown,
       })
     )
     .catch(() => {
-      if (introCountdown) introCountdown.textContent = "Abriendo Taqueria Fabian...";
       window.setTimeout(() => {
         introScreen.classList.add("is-hidden");
         introScreen.setAttribute("aria-hidden", "true");
