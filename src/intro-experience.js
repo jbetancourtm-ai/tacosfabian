@@ -255,7 +255,7 @@ function buildSpeechQueue() {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = voice?.lang || "es-MX";
       utterance.voice = voice;
-      utterance.rate = 1.18;
+      utterance.rate = 1.05;
       utterance.pitch = 1;
       utterance.volume = 1;
       try {
@@ -283,13 +283,13 @@ export async function initIntroExperience({
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steamQuality = inferSteamQuality(reducedMotion);
-  const autoDismissMs = reducedMotion ? 500 : 7200;
+  const autoDismissMs = reducedMotion ? 500 : 15000;
   const speechQueue = buildSpeechQueue();
   const narrationAudio = new Audio("/audio/intro-narration-es-mx.mp3");
   const ambientAudio = new Audio("/audio/taqueria-ambient-night.wav");
   narrationAudio.preload = "auto";
   narrationAudio.playsInline = true;
-  narrationAudio.playbackRate = 1.18;
+  narrationAudio.playbackRate = 1.04;
   ambientAudio.preload = "auto";
   ambientAudio.playsInline = true;
   ambientAudio.loop = true;
@@ -539,7 +539,7 @@ export async function initIntroExperience({
     }
   };
 
-  const pulseSpeaking = (duration = 2200) => {
+  const pulseSpeaking = (duration = 2500) => {
     if (!hostCard) return;
     hostCard.classList.add("is-speaking");
     if (speakingTimer) window.clearTimeout(speakingTimer);
@@ -611,35 +611,35 @@ export async function initIntroExperience({
   });
 
   timeline
-    .to([spotLeft, spotRight], { intensity: 2.45, duration: 0.7 }, 0)
-    .to(signLight, { intensity: 5.5, duration: 0.82 }, 0.08)
-    .to(titlePlane.material, { opacity: 0.46, duration: 0.82 }, 0.15)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.2)
-    .to(camera.position, { z: 8.7, y: 2.26, duration: 1.7 }, 0.5)
-    .to(taqueria.scale, { x: 0.88, y: 0.88, z: 0.88, duration: 1.7 }, 0.5)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 1.75)
+    .to([spotLeft, spotRight], { intensity: 2.65, duration: 1.05 }, 0)
+    .to(signLight, { intensity: 5.8, duration: 1.2 }, 0.12)
+    .to(titlePlane.material, { opacity: 0.5, duration: 1.12 }, 0.2)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.28)
+    .to(camera.position, { z: 8.45, y: 2.28, duration: 2.9 }, 0.9)
+    .to(taqueria.scale, { x: 0.96, y: 0.96, z: 0.96, duration: 2.9 }, 0.9)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 3.2)
     .call(() => {
       fireGroup.visible = true;
       grillLight.intensity = 1.2;
       heatLayer.visible = true;
       embers.visible = true;
-    }, null, 2.05)
-    .to(curtainLeft.position, { x: -4.4, duration: 0.76 }, 2.8)
-    .to(curtainRight.position, { x: 4.4, duration: 0.76 }, 2.8)
-    .to(doorPivotLeft.rotation, { y: -1.04, duration: 0.68 }, 2.92)
-    .to(doorPivotRight.rotation, { y: 1.04, duration: 0.68 }, 2.92)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 3.2)
+    }, null, 4.05)
+    .to(curtainLeft.position, { x: -4.4, duration: 1.1 }, 5.55)
+    .to(curtainRight.position, { x: 4.4, duration: 1.1 }, 5.55)
+    .to(doorPivotLeft.rotation, { y: -1.04, duration: 0.9 }, 5.8)
+    .to(doorPivotRight.rotation, { y: 1.04, duration: 0.9 }, 5.8)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 6.15)
     .call(() => {
       hostPlane.visible = true;
       hostCard?.classList.add("is-visible");
       hostMural?.classList.add("is-visible");
-    }, null, 4.15)
-    .fromTo(hostPlane.position, { x: hostBasePosition.x, y: hostBasePosition.y }, { x: 2.82, y: 1.28, duration: 0.92, ease: "power2.out" }, 4.15)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 5.15)
-    .to(camera.position, { z: 7.92, y: 2.08, duration: 0.95 }, 5.8)
-    .to([spotLeft, spotRight], { intensity: 1.45, duration: 0.8 }, 6.05)
-    .to(signLight, { intensity: 3.5, duration: 0.8 }, 6.05)
-    .to(titlePlane.material, { opacity: 0.24, duration: 0.75 }, 6.2);
+    }, null, 8.2)
+    .fromTo(hostPlane.position, { x: hostBasePosition.x, y: hostBasePosition.y }, { x: 2.82, y: 1.28, duration: 1.05, ease: "power2.out" }, 8.2)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 10.55)
+    .to(camera.position, { z: 7.88, y: 2.1, duration: 1.15 }, 12.25)
+    .to([spotLeft, spotRight], { intensity: 1.5, duration: 1.05 }, 12.65)
+    .to(signLight, { intensity: 3.55, duration: 1.05 }, 12.65)
+    .to(titlePlane.material, { opacity: 0.24, duration: 0.95 }, 12.95);
 
   const clock = new THREE.Clock();
   const render = () => {
