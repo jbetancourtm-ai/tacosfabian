@@ -307,7 +307,6 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__subtitle {
-.intro-screen__subtitle {
   margin-top: 0.9rem;
   font-size: clamp(0.95rem, 1.9vw, 1.15rem);
   letter-spacing: 0.1em;
@@ -434,7 +433,6 @@ body.intro-complete .floating-whatsapp {
   color: rgba(255, 240, 223, 0.88);
   font-size: 0.98rem;
   line-height: 1.55;
-}
 }
 
 .social-floating-links {
