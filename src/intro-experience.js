@@ -255,6 +255,10 @@ export async function initIntroExperience({
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const autoDismissMs = reducedMotion ? 500 : 10000;
   const speechQueue = buildSpeechQueue();
+  const narrationAudio = new Audio("/audio/intro-narration-es-mx.mp3");
+  narrationAudio.preload = "auto";
+  narrationAudio.playsInline = true;
+  let useSpeechFallback = true;
 
   if (!(canvas instanceof HTMLCanvasElement) || !(narration instanceof HTMLElement)) {
     document.body.classList.remove("intro-active");
@@ -412,6 +416,19 @@ export async function initIntroExperience({
   };
   window.addEventListener("resize", resize);
 
+  const tryPlayNarrationAudio = async () => {
+    if (reducedMotion) return false;
+    try {
+      narrationAudio.currentTime = 0;
+      await narrationAudio.play();
+      useSpeechFallback = false;
+      return true;
+    } catch {
+      useSpeechFallback = true;
+      return false;
+    }
+  };
+
   const setNarrationLine = (text, narratorText = text) => {
     narration.innerHTML = "";
     const line = document.createElement("p");
@@ -419,13 +436,15 @@ export async function initIntroExperience({
     line.textContent = text;
     narration.appendChild(line);
     if (hostLine) hostLine.textContent = text;
-    speechQueue.speak(narratorText);
+    if (useSpeechFallback) speechQueue.speak(narratorText);
   };
 
   const finishIntro = () => {
     if (closed) return;
     closed = true;
 
+    narrationAudio.pause();
+    narrationAudio.currentTime = 0;
     speechQueue.stop();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
     if (countdownInterval) window.clearInterval(countdownInterval);
@@ -549,6 +568,7 @@ export async function initIntroExperience({
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
   }
 
+  void tryPlayNarrationAudio();
   autoDismissTimer = window.setTimeout(finishIntro, autoDismissMs);
   render();
 }
