@@ -205,6 +205,21 @@ function createHeatLayer() {
   return mesh;
 }
 
+function inferSteamQuality(reducedMotion) {
+  if (reducedMotion) return "off";
+
+  const isMobileViewport = window.innerWidth <= 720;
+  const lowMemory =
+    typeof navigator.deviceMemory === "number" && navigator.deviceMemory > 0 && navigator.deviceMemory <= 4;
+  const lowCpu =
+    typeof navigator.hardwareConcurrency === "number" &&
+    navigator.hardwareConcurrency > 0 &&
+    navigator.hardwareConcurrency <= 4;
+
+  if (isMobileViewport || lowMemory || lowCpu) return "light";
+  return "full";
+}
+
 function buildSpeechQueue() {
   let active = true;
   const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
@@ -268,6 +283,7 @@ export async function initIntroExperience({
   const hostMural = introScreen.querySelector("#introHostMural");
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
   const speechQueue = buildSpeechQueue();
   const narrationAudio = new Audio("/audio/intro-narration-es-mx.mp3");
@@ -387,20 +403,22 @@ export async function initIntroExperience({
   const smokeMaterial = new THREE.PointsMaterial({
     map: smokeTexture,
     transparent: true,
-    opacity: 0.16,
-    size: 1.5,
+    opacity: steamQuality === "light" ? 0.11 : 0.14,
+    size: steamQuality === "light" ? 1.2 : 1.42,
     depthWrite: false,
-    color: "#ffd7b1",
+    color: "#fff1df",
     blending: THREE.AdditiveBlending,
   });
   const smokeGeometry = new THREE.BufferGeometry();
-  const smokeCount = 58;
+  const smokeCount = steamQuality === "light" ? 24 : 42;
   const smokePositions = new Float32Array(smokeCount * 3);
   const smokeData = Array.from({ length: smokeCount }, () => ({
-    x: (Math.random() - 0.5) * 1.7,
-    y: 0.96 + Math.random() * 1.1,
-    z: 1.4 + Math.random() * 0.82,
-    speed: 0.0035 + Math.random() * 0.0065,
+    x: (Math.random() - 0.5) * 0.9,
+    y: 0.94 + Math.random() * 0.44,
+    z: 1.7 + Math.random() * 0.28,
+    speed: 0.0018 + Math.random() * 0.0026,
+    drift: 0.0004 + Math.random() * 0.0008,
+    swirl: 0.35 + Math.random() * 0.55,
   }));
 
   smokeData.forEach((particle, index) => {
@@ -415,20 +433,21 @@ export async function initIntroExperience({
   const steamMaterial = new THREE.PointsMaterial({
     map: smokeTexture,
     transparent: true,
-    opacity: 0.11,
-    size: 2.2,
+    opacity: steamQuality === "light" ? 0.07 : 0.095,
+    size: steamQuality === "light" ? 1.65 : 2,
     depthWrite: false,
-    color: "#fff0dd",
+    color: "#ffdcb8",
     blending: THREE.AdditiveBlending,
   });
   const steamGeometry = new THREE.BufferGeometry();
-  const steamCount = 24;
+  const steamCount = steamQuality === "light" ? 10 : 18;
   const steamPositions = new Float32Array(steamCount * 3);
   const steamData = Array.from({ length: steamCount }, () => ({
-    x: (Math.random() - 0.5) * 1.1,
-    y: 0.88 + Math.random() * 0.5,
-    z: 1.72 + Math.random() * 0.34,
-    speed: 0.0024 + Math.random() * 0.0032,
+    x: (Math.random() - 0.5) * 1.2,
+    y: 0.9 + Math.random() * 0.24,
+    z: 1.6 + Math.random() * 0.46,
+    speed: 0.0014 + Math.random() * 0.0018,
+    drift: 0.00055 + Math.random() * 0.00055,
   }));
 
   steamData.forEach((particle, index) => {
@@ -462,13 +481,13 @@ export async function initIntroExperience({
   scene.add(particles);
 
   const emberGeometry = new THREE.BufferGeometry();
-  const emberCount = 18;
+  const emberCount = steamQuality === "light" ? 8 : 14;
   const emberPositions = new Float32Array(emberCount * 3);
   const emberData = Array.from({ length: emberCount }, () => ({
     x: (Math.random() - 0.5) * 0.72,
     y: 0.48 + Math.random() * 0.18,
     z: 1.98 + Math.random() * 0.18,
-    speed: 0.002 + Math.random() * 0.003,
+    speed: 0.0016 + Math.random() * 0.0022,
   }));
 
   emberData.forEach((particle, index) => {
@@ -652,7 +671,7 @@ export async function initIntroExperience({
     grillLight.intensity = fireGroup.visible ? 1 + Math.sin(elapsed * 11) * 0.14 + Math.cos(elapsed * 6) * 0.08 : 0.08;
     emberLight.intensity = fireGroup.visible ? 1.3 + Math.sin(elapsed * 13) * 0.22 : 0.2;
     heatLayer.visible = fireGroup.visible;
-    heatLayer.material.opacity = fireGroup.visible ? 0.06 + Math.abs(Math.sin(elapsed * 2.6)) * 0.035 : 0;
+    heatLayer.material.opacity = fireGroup.visible ? 0.045 + Math.abs(Math.sin(elapsed * 2.4)) * 0.025 : 0;
     heatLayer.lookAt(camera.position);
 
     titlePlane.lookAt(camera.position);
@@ -660,19 +679,19 @@ export async function initIntroExperience({
     particles.position.y = Math.sin(elapsed * 0.3) * 0.08;
     smoke.rotation.y += 0.002;
     flames.forEach((flame, index) => {
-      flame.scale.y = 0.9 + Math.sin(elapsed * (8 + index * 2)) * 0.08;
+      flame.scale.y = 0.88 + Math.sin(elapsed * (7.2 + index * 1.8)) * 0.055;
       flame.position.x += Math.sin(elapsed * (3.5 + index)) * 0.0008;
-      flame.material.opacity = 0.22 + Math.abs(Math.sin(elapsed * (7 + index))) * 0.12;
+      flame.material.opacity = 0.16 + Math.abs(Math.sin(elapsed * (6.5 + index))) * 0.08;
       flame.lookAt(camera.position);
     });
 
     const positions = smokeGeometry.attributes.position.array;
     smokeData.forEach((particle, index) => {
-      particle.y += particle.speed * 0.82;
-      particle.x += Math.sin(elapsed * 0.8 + index) * 0.0012;
-      if (particle.y > 3.05) {
-        particle.y = 0.98 + Math.random() * 0.24;
-        particle.x = (Math.random() - 0.5) * 1.32;
+      particle.y += particle.speed;
+      particle.x += Math.sin(elapsed * particle.swirl + index * 0.16) * particle.drift;
+      if (particle.y > 2.54) {
+        particle.y = 0.96 + Math.random() * 0.16;
+        particle.x = (Math.random() - 0.5) * 0.82;
       }
       positions[index * 3] = particle.x;
       positions[index * 3 + 1] = particle.y;
@@ -683,10 +702,10 @@ export async function initIntroExperience({
     const steamPositionsArray = steamGeometry.attributes.position.array;
     steamData.forEach((particle, index) => {
       particle.y += particle.speed;
-      particle.x += Math.sin(elapsed * 0.55 + index * 0.6) * 0.0009;
-      if (particle.y > 2.34) {
-        particle.y = 0.9 + Math.random() * 0.16;
-        particle.x = (Math.random() - 0.5) * 0.92;
+      particle.x += Math.sin(elapsed * 0.48 + index * 0.42) * particle.drift;
+      if (particle.y > 2.04) {
+        particle.y = 0.9 + Math.random() * 0.12;
+        particle.x = (Math.random() - 0.5) * 1.08;
       }
       steamPositionsArray[index * 3] = particle.x;
       steamPositionsArray[index * 3 + 1] = particle.y;
