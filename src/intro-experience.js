@@ -252,8 +252,10 @@ export async function initIntroExperience({
   const narration = introScreen.querySelector("#introNarration");
   const hostCard = introScreen.querySelector("#introHostCard");
   const hostLine = introScreen.querySelector("#introHostLine");
+  const hostMural = introScreen.querySelector("#introHostMural");
+  const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const autoDismissMs = reducedMotion ? 500 : 10000;
+  const autoDismissMs = reducedMotion ? 500 : 15000;
   const speechQueue = buildSpeechQueue();
   const narrationAudio = new Audio("/audio/intro-narration-es-mx.mp3");
   const ambientAudio = new Audio("/audio/taqueria-ambient-night.wav");
@@ -431,16 +433,18 @@ export async function initIntroExperience({
       narrationAudio.currentTime = 0;
       await narrationAudio.play();
       useSpeechFallback = false;
+      introSoundBtn?.classList.add("is-hidden");
       return true;
     } catch {
       ambientAudio.pause();
       ambientAudio.currentTime = 0;
       useSpeechFallback = true;
+      introSoundBtn?.classList.remove("is-hidden");
       return false;
     }
   };
 
-  const pulseSpeaking = (duration = 1700) => {
+  const pulseSpeaking = (duration = 2200) => {
     if (!hostCard) return;
     hostCard.classList.add("is-speaking");
     if (speakingTimer) window.clearTimeout(speakingTimer);
@@ -466,6 +470,7 @@ export async function initIntroExperience({
 
     if (speakingTimer) window.clearTimeout(speakingTimer);
     hostCard?.classList.remove("is-speaking");
+    hostMural?.classList.remove("is-visible");
     ambientAudio.pause();
     ambientAudio.currentTime = 0;
     narrationAudio.pause();
@@ -494,6 +499,12 @@ export async function initIntroExperience({
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
+  introSoundBtn?.addEventListener("click", async () => {
+    const started = await tryPlayNarrationAudio();
+    if (started) {
+      pulseSpeaking(2600);
+    }
+  });
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") finishIntro();
   });
@@ -518,32 +529,33 @@ export async function initIntroExperience({
   });
 
   timeline
-    .to([spotLeft, spotRight], { intensity: 2.6, duration: 0.85 }, 0)
-    .to(signLight, { intensity: 5.6, duration: 1 }, 0.15)
-    .to(titlePlane.material, { opacity: 0.48, duration: 1 }, 0.2)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.25)
-    .to(camera.position, { z: 8.2, y: 2.28, duration: 2.05 }, 0.9)
-    .to(taqueria.scale, { x: 0.96, y: 0.96, z: 0.96, duration: 2.05 }, 0.9)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 2.15)
+    .to([spotLeft, spotRight], { intensity: 2.8, duration: 1.15 }, 0)
+    .to(signLight, { intensity: 5.9, duration: 1.35 }, 0.2)
+    .to(titlePlane.material, { opacity: 0.5, duration: 1.25 }, 0.3)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.35)
+    .to(camera.position, { z: 8.35, y: 2.3, duration: 3.1 }, 0.95)
+    .to(taqueria.scale, { x: 0.98, y: 0.98, z: 0.98, duration: 3.1 }, 0.95)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 3.4)
     .call(() => {
       fireGroup.visible = true;
       grillLight.intensity = 1.2;
-    }, null, 2.4)
-    .to(curtainLeft.position, { x: -4.4, duration: 1.15 }, 3.35)
-    .to(curtainRight.position, { x: 4.4, duration: 1.15 }, 3.35)
-    .to(doorPivotLeft.rotation, { y: -1.04, duration: 0.85 }, 3.6)
-    .to(doorPivotRight.rotation, { y: 1.04, duration: 0.85 }, 3.6)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 4.1)
+    }, null, 4.2)
+    .to(curtainLeft.position, { x: -4.4, duration: 1.35 }, 5.6)
+    .to(curtainRight.position, { x: 4.4, duration: 1.35 }, 5.6)
+    .to(doorPivotLeft.rotation, { y: -1.04, duration: 1.05 }, 5.9)
+    .to(doorPivotRight.rotation, { y: 1.04, duration: 1.05 }, 5.9)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 6.25)
     .call(() => {
       hostPlane.visible = true;
       hostCard?.classList.add("is-visible");
-    }, null, 5.25)
-    .fromTo(hostPlane.position, { y: 0.8 }, { y: 1.55, duration: 0.95, ease: "back.out(1.3)" }, 5.25)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 6.6)
-    .to(camera.position, { z: 7.75, y: 2.12, duration: 1.15 }, 8.05)
-    .to([spotLeft, spotRight], { intensity: 1.6, duration: 0.95 }, 8.35)
-    .to(signLight, { intensity: 3.8, duration: 0.95 }, 8.35)
-    .to(titlePlane.material, { opacity: 0.32, duration: 0.9 }, 8.6);
+      hostMural?.classList.add("is-visible");
+    }, null, 8.05)
+    .fromTo(hostPlane.position, { y: 0.8 }, { y: 1.55, duration: 1.15, ease: "back.out(1.3)" }, 8.05)
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 10.55)
+    .to(camera.position, { z: 7.72, y: 2.14, duration: 1.45 }, 12.25)
+    .to([spotLeft, spotRight], { intensity: 1.7, duration: 1.2 }, 12.7)
+    .to(signLight, { intensity: 3.9, duration: 1.2 }, 12.7)
+    .to(titlePlane.material, { opacity: 0.28, duration: 1.05 }, 13.1);
 
   const clock = new THREE.Clock();
   const render = () => {
