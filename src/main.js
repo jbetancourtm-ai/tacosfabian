@@ -19,6 +19,9 @@ const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
 const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
+const introScreen = document.querySelector("#intro-screen");
+const introSkipBtn = document.querySelector("#introSkipBtn");
+const introCountdown = document.querySelector("#introCountdown");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -109,6 +112,60 @@ function setupHeaderEffects() {
 function setupFloatingWhatsapp() {
   if (!floatingWhatsapp) return;
   floatingWhatsapp.classList.remove("is-hidden");
+}
+
+function setupIntroScreen() {
+  if (!introScreen) {
+    document.body.classList.remove("intro-active");
+    return;
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const autoDismissMs = reducedMotion ? 300 : 18000;
+  let closed = false;
+  let countdownInterval = null;
+  let autoDismissTimer = null;
+
+  const finishIntro = () => {
+    if (closed) return;
+    closed = true;
+
+    if (countdownInterval) window.clearInterval(countdownInterval);
+    if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
+
+    introScreen.classList.add("is-hidden");
+    introScreen.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("intro-active");
+    document.body.classList.add("intro-complete");
+
+    window.setTimeout(() => {
+      introScreen.remove();
+      if (introSkipBtn instanceof HTMLElement) introSkipBtn.blur();
+    }, reducedMotion ? 20 : 700);
+  };
+
+  if (introCountdown) {
+    const startedAt = Date.now();
+    const updateCountdown = () => {
+      const remainingMs = Math.max(0, autoDismissMs - (Date.now() - startedAt));
+      const remainingSeconds = Math.max(1, Math.ceil(remainingMs / 1000));
+      introCountdown.textContent =
+        remainingMs > 0
+          ? `La experiencia continuara automaticamente en ${remainingSeconds} segundo${remainingSeconds === 1 ? "" : "s"}.`
+          : "Abriendo Taqueria Fabian...";
+    };
+
+    updateCountdown();
+    countdownInterval = window.setInterval(updateCountdown, 1000);
+  }
+
+  introSkipBtn?.addEventListener("click", finishIntro);
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") finishIntro();
+  });
+
+  autoDismissTimer = window.setTimeout(finishIntro, autoDismissMs);
 }
 
 function setupVisitCounter() {
@@ -525,6 +582,7 @@ setupMenuCarousel();
 setupMenuSpotlightModal();
 setupRevealAnimations();
 setupHeaderEffects();
+setupIntroScreen();
 setupFloatingWhatsapp();
 setupVisitCounter();
 setupMenuDestacadoButton();
