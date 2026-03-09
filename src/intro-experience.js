@@ -256,8 +256,13 @@ export async function initIntroExperience({
   const autoDismissMs = reducedMotion ? 500 : 10000;
   const speechQueue = buildSpeechQueue();
   const narrationAudio = new Audio("/audio/intro-narration-es-mx.mp3");
+  const ambientAudio = new Audio("/audio/taqueria-ambient-night.wav");
   narrationAudio.preload = "auto";
   narrationAudio.playsInline = true;
+  ambientAudio.preload = "auto";
+  ambientAudio.playsInline = true;
+  ambientAudio.loop = true;
+  ambientAudio.volume = 0.18;
   let useSpeechFallback = true;
 
   if (!(canvas instanceof HTMLCanvasElement) || !(narration instanceof HTMLElement)) {
@@ -419,11 +424,16 @@ export async function initIntroExperience({
   const tryPlayNarrationAudio = async () => {
     if (reducedMotion) return false;
     try {
+      ambientAudio.currentTime = 0;
+      narrationAudio.currentTime = 0;
+      await ambientAudio.play();
       narrationAudio.currentTime = 0;
       await narrationAudio.play();
       useSpeechFallback = false;
       return true;
     } catch {
+      ambientAudio.pause();
+      ambientAudio.currentTime = 0;
       useSpeechFallback = true;
       return false;
     }
@@ -443,6 +453,8 @@ export async function initIntroExperience({
     if (closed) return;
     closed = true;
 
+    ambientAudio.pause();
+    ambientAudio.currentTime = 0;
     narrationAudio.pause();
     narrationAudio.currentTime = 0;
     speechQueue.stop();
