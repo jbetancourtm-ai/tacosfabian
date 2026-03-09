@@ -254,15 +254,42 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__btn {
-  min-width: 190px;
+  min-width: 180px;
+  position: relative;
   justify-content: center;
-  border: 1px solid rgba(255, 208, 174, 0.18);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 208, 174, 0.22);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px) saturate(1.1);
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease,
+    background 0.28s ease;
+}
+
+.intro-screen__btn::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 55%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.intro-screen__btn:hover,
+.intro-screen__btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(255, 197, 141, 0.12),
+    0 0 22px rgba(255, 129, 35, 0.16);
 }
 
 .intro-screen__btn--menu {
-  background: linear-gradient(135deg, rgba(255, 245, 230, 0.96), rgba(255, 199, 126, 0.96));
+  background: linear-gradient(135deg, rgba(255, 247, 234, 0.96), rgba(255, 190, 103, 0.92));
   color: #2b1708;
 }
 
@@ -279,6 +306,17 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__btn--whatsapp:hover,
 .intro-screen__btn--whatsapp:focus-visible {
   background: linear-gradient(135deg, #27d66f, #12aa53);
+}
+
+.intro-screen__btn--sound {
+  min-width: 0;
+  padding-inline: 1rem;
+  background: linear-gradient(135deg, rgba(21, 25, 31, 0.84), rgba(37, 26, 18, 0.74));
+  color: #fff3e4;
+}
+
+.intro-screen__btn--sound.is-hidden {
+  display: none;
 }
 
 .intro-screen__headline {
@@ -401,12 +439,16 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-portrait {
+  position: relative;
   aspect-ratio: 1 / 1.08;
   border-radius: 20px;
   overflow: hidden;
   background:
     radial-gradient(circle at top, rgba(255, 204, 145, 0.32), transparent 42%),
     linear-gradient(180deg, #ff8f2d 0%, #8a3000 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 12px 28px rgba(0, 0, 0, 0.24);
 }
 
 .intro-screen__host-portrait img {
@@ -415,6 +457,61 @@ body.intro-complete .floating-whatsapp {
   object-fit: contain;
   object-position: center bottom;
   padding: 0.25rem;
+  transform-origin: center 82%;
+}
+
+.intro-screen__host-glow,
+.intro-screen__host-mouth,
+.intro-screen__host-wave {
+  position: absolute;
+  pointer-events: none;
+}
+
+.intro-screen__host-glow {
+  inset: auto 18% 6% 18%;
+  height: 26%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 213, 165, 0.36), rgba(255, 130, 36, 0.08) 64%, transparent 100%);
+  filter: blur(10px);
+}
+
+.intro-screen__host-mouth {
+  left: 50%;
+  bottom: 34%;
+  width: 12%;
+  height: 2.6%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(111, 44, 34, 0.95), rgba(49, 16, 11, 0.95));
+  box-shadow: 0 0 0 1px rgba(255, 208, 176, 0.16);
+  opacity: 0;
+}
+
+.intro-screen__host-wave {
+  right: 4%;
+  top: 42%;
+  width: 22%;
+  height: 12%;
+  border-radius: 999px;
+  border: 3px solid rgba(255, 221, 186, 0.48);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  transform-origin: left center;
+  opacity: 0;
+}
+
+.intro-screen__host-card.is-speaking .intro-screen__host-portrait img {
+  animation: intro-host-head 1.45s ease-in-out infinite;
+}
+
+.intro-screen__host-card.is-speaking .intro-screen__host-mouth {
+  opacity: 0.92;
+  animation: intro-host-mouth 0.18s linear infinite alternate;
+}
+
+.intro-screen__host-card.is-speaking .intro-screen__host-wave {
+  opacity: 0.72;
+  animation: intro-host-wave 1.2s ease-in-out infinite;
 }
 
 .intro-screen__host-copy {
@@ -433,6 +530,37 @@ body.intro-complete .floating-whatsapp {
   color: rgba(255, 240, 223, 0.88);
   font-size: 0.98rem;
   line-height: 1.55;
+}
+
+@keyframes intro-host-head {
+  0%,
+  100% {
+    transform: rotate(-1.2deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.6deg) translateY(-1px);
+  }
+}
+
+@keyframes intro-host-mouth {
+  from {
+    transform: translateX(-50%) scaleY(0.75);
+    border-radius: 999px;
+  }
+  to {
+    transform: translateX(-50%) scaleY(1.9);
+    border-radius: 12px;
+  }
+}
+
+@keyframes intro-host-wave {
+  0%,
+  100% {
+    transform: rotate(-2deg) scale(0.96);
+  }
+  50% {
+    transform: rotate(14deg) scale(1.02);
+  }
 }
 
 .social-floating-links {

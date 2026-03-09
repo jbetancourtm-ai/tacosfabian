@@ -82,6 +82,13 @@
             <span>Taqueria Fabian</span>
           </div>
           <div class="intro-screen__actions">
+            <button
+              id="introSoundBtn"
+              class="btn intro-screen__btn intro-screen__btn--sound is-hidden"
+              type="button"
+            >
+              Activar sonido
+            </button>
             <button id="introSkipBtn" class="btn intro-screen__btn intro-screen__btn--menu" type="button">
               Ir al menu
             </button>
@@ -119,12 +126,15 @@
 
         <div id="introHostCard" class="intro-screen__host-card" aria-hidden="true">
           <div class="intro-screen__host-portrait">
+            <span class="intro-screen__host-glow" aria-hidden="true"></span>
             <img
               src="/brand/mascot-fabian.svg"
               alt="Mascota ilustrada del anfitrion de Taqueria Fabian"
               loading="eager"
               decoding="async"
             />
+            <span class="intro-screen__host-mouth" aria-hidden="true"></span>
+            <span class="intro-screen__host-wave" aria-hidden="true"></span>
           </div>
           <div class="intro-screen__host-copy">
             <p class="intro-screen__host-label">Anfitrion de la casa</p>

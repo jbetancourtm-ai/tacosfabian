@@ -252,6 +252,7 @@ export async function initIntroExperience({
   const narration = introScreen.querySelector("#introNarration");
   const hostCard = introScreen.querySelector("#introHostCard");
   const hostLine = introScreen.querySelector("#introHostLine");
+  const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const autoDismissMs = reducedMotion ? 500 : 10000;
   const speechQueue = buildSpeechQueue();
@@ -274,6 +275,7 @@ export async function initIntroExperience({
   let autoDismissTimer = 0;
   let countdownInterval = 0;
   let rafId = 0;
+  let speakingTimer = 0;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -430,13 +432,24 @@ export async function initIntroExperience({
       narrationAudio.currentTime = 0;
       await narrationAudio.play();
       useSpeechFallback = false;
+      introSoundBtn?.classList.add("is-hidden");
       return true;
     } catch {
       ambientAudio.pause();
       ambientAudio.currentTime = 0;
       useSpeechFallback = true;
+      introSoundBtn?.classList.remove("is-hidden");
       return false;
     }
+  };
+
+  const pulseSpeaking = (duration = 1700) => {
+    if (!hostCard) return;
+    hostCard.classList.add("is-speaking");
+    if (speakingTimer) window.clearTimeout(speakingTimer);
+    speakingTimer = window.setTimeout(() => {
+      hostCard.classList.remove("is-speaking");
+    }, duration);
   };
 
   const setNarrationLine = (text, narratorText = text) => {
@@ -446,6 +459,7 @@ export async function initIntroExperience({
     line.textContent = text;
     narration.appendChild(line);
     if (hostLine) hostLine.textContent = text;
+    pulseSpeaking();
     if (useSpeechFallback) speechQueue.speak(narratorText);
   };
 
@@ -453,6 +467,8 @@ export async function initIntroExperience({
     if (closed) return;
     closed = true;
 
+    if (speakingTimer) window.clearTimeout(speakingTimer);
+    hostCard?.classList.remove("is-speaking");
     ambientAudio.pause();
     ambientAudio.currentTime = 0;
     narrationAudio.pause();
@@ -481,6 +497,10 @@ export async function initIntroExperience({
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
+  introSoundBtn?.addEventListener("click", async () => {
+    const started = await tryPlayNarrationAudio();
+    if (started) pulseSpeaking(2200);
+  });
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") finishIntro();
   });
@@ -572,6 +592,8 @@ export async function initIntroExperience({
     smokeGeometry.attributes.position.needsUpdate = true;
 
     hostPlane.position.y = hostPlane.visible ? 1.55 + Math.sin(elapsed * 2.1) * 0.05 : 0.8;
+    hostPlane.rotation.z = hostPlane.visible ? Math.sin(elapsed * 2.4) * 0.035 : 0;
+    hostPlane.rotation.y = hostPlane.visible ? Math.sin(elapsed * 1.9) * 0.07 : 0;
     renderer.render(scene, camera);
     rafId = window.requestAnimationFrame(render);
   };
