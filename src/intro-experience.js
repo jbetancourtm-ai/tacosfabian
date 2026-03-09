@@ -382,6 +382,7 @@ export async function initIntroExperience({
 
   const textureLoader = new THREE.TextureLoader();
   const hostPlane = createHostPlane(textureLoader);
+  const hostBasePosition = { x: 3.45, y: 0.98 };
   scene.add(hostPlane);
 
   const curtainLeft = createCurtain(-1);
@@ -633,7 +634,7 @@ export async function initIntroExperience({
       hostCard?.classList.add("is-visible");
       hostMural?.classList.add("is-visible");
     }, null, 4.15)
-    .fromTo(hostPlane.position, { x: 3.45, y: 0.98 }, { x: 2.82, y: 1.28, duration: 0.92, ease: "power2.out" }, 4.15)
+    .fromTo(hostPlane.position, { x: hostBasePosition.x, y: hostBasePosition.y }, { x: 2.82, y: 1.28, duration: 0.92, ease: "power2.out" }, 4.15)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 5.15)
     .to(camera.position, { z: 7.92, y: 2.08, duration: 0.95 }, 5.8)
     .to([spotLeft, spotRight], { intensity: 1.45, duration: 0.8 }, 6.05)
@@ -711,8 +712,10 @@ export async function initIntroExperience({
     emberGeometry.attributes.position.needsUpdate = true;
     embers.visible = fireGroup.visible;
 
-    hostPlane.position.y = hostPlane.visible ? hostPlane.position.y + Math.sin(elapsed * 2.4) * 0.003 : 0.98;
-    hostPlane.position.x = hostPlane.visible ? hostPlane.position.x + Math.sin(elapsed * 1.7) * 0.0022 : 3.45;
+    const targetHostX = hostPlane.visible ? 2.82 : hostBasePosition.x;
+    const targetHostY = hostPlane.visible ? 1.28 : hostBasePosition.y;
+    hostPlane.position.y = targetHostY + Math.sin(elapsed * 2.4) * 0.028;
+    hostPlane.position.x = targetHostX + Math.sin(elapsed * 1.7) * 0.018;
     hostPlane.rotation.z = hostPlane.visible ? Math.sin(elapsed * 2.8) * 0.03 : 0;
     hostPlane.rotation.y = hostPlane.visible ? Math.sin(elapsed * 2.1) * 0.08 : 0;
     renderer.render(scene, camera);
