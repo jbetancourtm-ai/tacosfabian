@@ -588,6 +588,14 @@ body.intro-complete .floating-whatsapp {
   transform: translateY(0) scale(1);
 }
 
+.intro-screen__host-stage {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  min-height: 108px;
+  animation: intro-host-idle 3.2s ease-in-out infinite;
+}
+
 .intro-screen__host-mural {
   position: absolute;
   right: clamp(1rem, 4vw, 4rem);
@@ -634,9 +642,18 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__host-portrait--small {
   aspect-ratio: 0.92 / 1.1;
   align-self: end;
+  width: 100%;
+  max-width: 84px;
+  z-index: 2;
 }
 
-.intro-screen__host-portrait img {
+.intro-screen__host-asset {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.intro-screen__host-asset img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -647,7 +664,8 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-glow,
 .intro-screen__host-mouth,
-.intro-screen__host-wave {
+.intro-screen__host-wave,
+.intro-screen__host-arm {
   position: absolute;
   pointer-events: none;
 }
@@ -685,7 +703,43 @@ body.intro-complete .floating-whatsapp {
   opacity: 0;
 }
 
-.intro-screen__host-card.is-speaking .intro-screen__host-portrait img {
+.intro-screen__host-arm {
+  bottom: 8px;
+  width: 18px;
+  height: 48px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(37, 23, 18, 0.96), rgba(20, 11, 9, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 14px rgba(0, 0, 0, 0.16);
+  transform-origin: top center;
+  z-index: 1;
+}
+
+.intro-screen__host-arm--left {
+  left: 4px;
+  transform: rotate(12deg);
+}
+
+.intro-screen__host-arm--right {
+  right: 2px;
+  transform: rotate(-10deg);
+}
+
+.intro-screen__host-card.is-visible .intro-screen__host-arm--left {
+  animation: intro-host-arm-left-idle 2.9s ease-in-out infinite;
+}
+
+.intro-screen__host-card.is-visible .intro-screen__host-arm--right {
+  animation: intro-host-arm-right-idle 3.1s ease-in-out infinite;
+}
+
+.intro-screen__host-card.is-speaking .intro-screen__host-stage {
+  animation-duration: 1.4s;
+}
+
+.intro-screen__host-card.is-speaking .intro-screen__host-asset img {
   animation: intro-host-head 1.55s ease-in-out infinite;
 }
 
@@ -697,6 +751,14 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__host-card.is-speaking .intro-screen__host-wave {
   opacity: 0.72;
   animation: intro-host-wave 1.2s ease-in-out infinite;
+}
+
+.intro-screen__host-card.is-speaking .intro-screen__host-arm--left {
+  animation: intro-host-arm-left-talk 0.95s ease-in-out infinite;
+}
+
+.intro-screen__host-card.is-speaking .intro-screen__host-arm--right {
+  animation: intro-host-arm-right-talk 0.95s ease-in-out infinite;
 }
 
 .intro-screen__host-copy {
@@ -825,6 +887,16 @@ body.intro-complete .floating-whatsapp {
   }
 }
 
+@keyframes intro-host-idle {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-3px) translateX(-1px);
+  }
+}
+
 @keyframes intro-host-mouth {
   from {
     transform: translateX(-50%) scaleY(0.75);
@@ -843,6 +915,46 @@ body.intro-complete .floating-whatsapp {
   }
   50% {
     transform: rotate(14deg) scale(1.02);
+  }
+}
+
+@keyframes intro-host-arm-left-idle {
+  0%,
+  100% {
+    transform: rotate(12deg);
+  }
+  50% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes intro-host-arm-right-idle {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes intro-host-arm-left-talk {
+  0%,
+  100% {
+    transform: rotate(10deg) translateY(0);
+  }
+  50% {
+    transform: rotate(24deg) translateY(-2px);
+  }
+}
+
+@keyframes intro-host-arm-right-talk {
+  0%,
+  100% {
+    transform: rotate(-10deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-20deg) translateY(-2px);
   }
 }
 

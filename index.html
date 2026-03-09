@@ -145,17 +145,30 @@
           />
         </div>
 
-        <div id="introHostCard" class="intro-screen__host-card" aria-hidden="true">
-          <div class="intro-screen__host-portrait intro-screen__host-portrait--small">
-            <span class="intro-screen__host-glow" aria-hidden="true"></span>
-            <img
-              src="/images/fabian.jpg"
-              alt="Fabian saludando en el intro de Taqueria Fabian"
-              loading="eager"
-              decoding="async"
-            />
-            <span class="intro-screen__host-mouth" aria-hidden="true"></span>
-            <span class="intro-screen__host-wave" aria-hidden="true"></span>
+        <div
+          id="introHostCard"
+          class="intro-screen__host-card"
+          aria-hidden="true"
+          data-character-slot="fabian-host"
+          data-character-asset="/images/fabian.jpg"
+          data-character-replace="png|sprite|lottie|webm"
+        >
+          <div class="intro-screen__host-stage" data-character-replace-target="visual">
+            <span class="intro-screen__host-arm intro-screen__host-arm--left" aria-hidden="true"></span>
+            <div class="intro-screen__host-portrait intro-screen__host-portrait--small">
+              <span class="intro-screen__host-glow" aria-hidden="true"></span>
+              <span class="intro-screen__host-asset">
+                <img
+                  src="/images/fabian.jpg"
+                  alt="Fabian saludando en el intro de Taqueria Fabian"
+                  loading="eager"
+                  decoding="async"
+                />
+              </span>
+              <span class="intro-screen__host-mouth" aria-hidden="true"></span>
+              <span class="intro-screen__host-wave" aria-hidden="true"></span>
+            </div>
+            <span class="intro-screen__host-arm intro-screen__host-arm--right" aria-hidden="true"></span>
           </div>
           <div class="intro-screen__host-copy">
             <p class="intro-screen__host-label">Anfitrion de la casa</p>
