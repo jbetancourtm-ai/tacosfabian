@@ -3363,7 +3363,7 @@ td {
   }
 
   .hero-reviews-card {
-    padding: 0.9rem;
+    padding: 1rem;
   }
 
   .hero-reviews-card__head {
@@ -3371,15 +3371,15 @@ td {
   }
 
   .hero-reviews-card__head h3 {
-    font-size: 0.98rem;
+    font-size: 1.02rem;
   }
 
   .hero-reviews-card__item p {
-    font-size: 0.84rem;
+    font-size: 0.88rem;
   }
 
   .hero-reviews-card__list {
-    min-height: 118px;
+    min-height: 160px;
   }
 
   .hero-gallery {
@@ -3415,7 +3415,7 @@ td {
   }
 
   .hero-reviews-card__actions {
-    flex-direction: column;
+    flex-direction: row;
   }
 }
 

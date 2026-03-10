@@ -206,7 +206,7 @@ function truncateReview(text, maxLength = 96) {
 }
 
 function getHeroReviewVisibleCount() {
-  return window.innerWidth >= 900 ? 2 : 1;
+  return 2;
 }
 
 function stopHeroReviewsRotation() {
