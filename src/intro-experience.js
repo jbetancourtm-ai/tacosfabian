@@ -221,14 +221,11 @@ function inferSteamQuality(reducedMotion) {
 }
 
 function buildSpeechQueue() {
-  let active = true;
   const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
   if (!synth) {
     return {
       speak() {},
-      stop() {
-        active = false;
-      },
+      stop() {},
     };
   }
 
@@ -250,7 +247,7 @@ function buildSpeechQueue() {
 
   return {
     speak(text) {
-      if (!active || !text) return;
+      if (!text) return;
       synth.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = voice?.lang || "es-MX";
@@ -265,7 +262,6 @@ function buildSpeechQueue() {
       }
     },
     stop() {
-      active = false;
       synth.cancel();
     },
   };
@@ -294,7 +290,7 @@ export async function initIntroExperience({
   ambientAudio.playsInline = true;
   ambientAudio.loop = true;
   ambientAudio.volume = 0.18;
-  let useSpeechFallback = true;
+  let useSpeechFallback = false;
 
   if (!(canvas instanceof HTMLCanvasElement) || !(narration instanceof HTMLElement)) {
     document.body.classList.remove("intro-active");
@@ -306,6 +302,8 @@ export async function initIntroExperience({
   let rafId = 0;
   let speakingTimer = 0;
   let timeline = null;
+  let audioMode = "idle";
+  let audioToken = 0;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -384,7 +382,7 @@ export async function initIntroExperience({
   const textureLoader = new THREE.TextureLoader();
   const hostPlane = createHostPlane(textureLoader);
   const hostBasePosition = { x: 3.45, y: 0.98 };
-  hostPlane.visible = true;
+  hostPlane.visible = false;
   scene.add(hostPlane);
   hostCard?.classList.add("is-visible");
   hostMural?.classList.add("is-visible");
@@ -523,20 +521,36 @@ export async function initIntroExperience({
   };
   window.addEventListener("resize", resize);
 
-  const tryPlayNarrationAudio = async () => {
+  const tryPlayNarrationAudio = async ({ restart = false } = {}) => {
     if (reducedMotion) return false;
+    if (!restart && audioMode === "media" && !narrationAudio.paused) return true;
+
+    const token = ++audioToken;
+    speechQueue.stop();
+    useSpeechFallback = false;
+    audioMode = "starting";
+
     try {
+      ambientAudio.pause();
+      narrationAudio.pause();
       ambientAudio.currentTime = 0;
       narrationAudio.currentTime = 0;
       await ambientAudio.play();
+      if (token !== audioToken) return false;
       narrationAudio.currentTime = 0;
       await narrationAudio.play();
+      if (token !== audioToken) return false;
+      audioMode = "media";
       useSpeechFallback = false;
       introSoundBtn?.classList.add("is-hidden");
       return true;
     } catch {
+      if (token !== audioToken) return false;
       ambientAudio.pause();
+      narrationAudio.pause();
       ambientAudio.currentTime = 0;
+      narrationAudio.currentTime = 0;
+      audioMode = "speech";
       useSpeechFallback = true;
       introSoundBtn?.classList.remove("is-hidden");
       return false;
@@ -553,8 +567,9 @@ export async function initIntroExperience({
 
     timeline?.pause(0);
     timeline?.restart();
+    speechQueue.stop();
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
-    const started = await tryPlayNarrationAudio();
+    const started = await tryPlayNarrationAudio({ restart: true });
 
     if (started) {
       scheduleFinish(autoDismissMs);
@@ -581,7 +596,7 @@ export async function initIntroExperience({
     narration.appendChild(line);
     if (hostLine) hostLine.textContent = text;
     pulseSpeaking();
-    if (useSpeechFallback) speechQueue.speak(narratorText);
+    if (useSpeechFallback && audioMode !== "media") speechQueue.speak(narratorText);
   };
 
   const finishIntro = () => {
@@ -591,6 +606,8 @@ export async function initIntroExperience({
     if (speakingTimer) window.clearTimeout(speakingTimer);
     hostCard?.classList.remove("is-speaking");
     hostMural?.classList.remove("is-visible");
+    audioToken += 1;
+    audioMode = "idle";
     ambientAudio.pause();
     ambientAudio.currentTime = 0;
     narrationAudio.pause();
@@ -621,6 +638,7 @@ export async function initIntroExperience({
 
   introSkipBtn?.addEventListener("click", finishIntro);
   introSoundBtn?.addEventListener("click", () => {
+    if (audioMode === "media" && !narrationAudio.paused) return;
     void restartIntroExperience();
   });
   window.addEventListener("keydown", (event) => {
