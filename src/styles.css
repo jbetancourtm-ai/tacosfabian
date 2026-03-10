@@ -3008,112 +3008,82 @@ td {
 
 .floating-fabian-host {
   position: fixed;
-  right: 5.3rem;
-  bottom: 3.4rem;
+  right: 0.2rem;
+  bottom: 3.9rem;
   z-index: 319;
-  width: 104px;
+  width: 148px;
   display: grid;
   justify-items: center;
   pointer-events: none;
-  transform-origin: bottom right;
-  animation: floating-fabian-idle 3.4s ease-in-out infinite;
+  transform-origin: bottom center;
+  transition: opacity 0.28s ease;
 }
 
 .floating-fabian-host__shadow {
-  width: 56px;
-  height: 12px;
+  width: 68px;
+  height: 14px;
   border-radius: 999px;
-  background: rgba(74, 37, 15, 0.18);
-  filter: blur(6px);
-  transform: translateY(74px);
+  background: rgba(61, 33, 17, 0.18);
+  filter: blur(7px);
+  transform: translateY(126px);
 }
 
 .floating-fabian-host__stage {
   position: relative;
-  width: 104px;
-  height: 112px;
+  width: 148px;
+  height: 196px;
   display: grid;
   place-items: end center;
 }
 
-.floating-fabian-host__portrait {
-  position: relative;
-  width: 84px;
-  height: 104px;
-  border-radius: 28px 28px 22px 22px;
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 247, 239, 0.98), rgba(255, 224, 194, 0.95));
-  border: 1px solid rgba(245, 199, 165, 0.95);
-  box-shadow:
-    0 16px 24px rgba(99, 58, 27, 0.18),
-    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-}
-
-.floating-fabian-host__portrait img {
+.floating-fabian-host__figure {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  transform-origin: center 24%;
-  animation: floating-fabian-head 2.8s ease-in-out infinite;
-}
-
-.floating-fabian-host__arm {
-  position: absolute;
-  bottom: 18px;
-  width: 15px;
-  height: 42px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(87, 52, 31, 0.92), rgba(43, 23, 12, 0.95));
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
-  transform-origin: top center;
-}
-
-.floating-fabian-host__arm--left {
-  left: 8px;
-  transform: rotate(16deg);
-  animation: floating-fabian-arm-left 2.8s ease-in-out infinite;
-}
-
-.floating-fabian-host__arm--right {
-  right: 5px;
-  transform: rotate(-10deg);
-  animation: floating-fabian-arm-right 2.8s ease-in-out infinite;
+  object-fit: contain;
+  object-position: center bottom;
+  filter:
+    drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22))
+    brightness(1.01)
+    contrast(1.02);
+  transform-origin: center 26%;
+  animation:
+    floating-fabian-idle 3.4s ease-in-out infinite,
+    floating-fabian-head 2.8s ease-in-out infinite;
 }
 
 .floating-fabian-host__mouth {
   position: absolute;
   left: 50%;
-  bottom: 17px;
-  width: 16px;
-  height: 6px;
+  top: 58px;
+  width: 18px;
+  height: 7px;
   border-radius: 999px;
-  background: rgba(112, 37, 30, 0.58);
+  background: rgba(112, 37, 30, 0.3);
   transform: translateX(-50%);
-  opacity: 0.82;
+  opacity: 0.42;
 }
 
 .floating-fabian-host__wave {
   position: absolute;
-  right: -4px;
-  top: 38px;
-  width: 24px;
-  height: 24px;
+  right: 16px;
+  top: 44px;
+  width: 28px;
+  height: 28px;
   border-radius: 999px;
   border: 2px solid rgba(255, 191, 143, 0.58);
   border-left-color: transparent;
   border-bottom-color: transparent;
   transform: rotate(18deg);
-  opacity: 0.42;
+  opacity: 0.26;
   animation: floating-fabian-wave 1.6s ease-in-out infinite;
+}
+
+.floating-fabian-host.is-walking {
+  animation: floating-fabian-patrol 8.8s cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
 }
 
 .floating-fabian-host.is-celebrating {
   animation: floating-fabian-celebrate 0.95s ease-in-out;
-}
-
-.floating-fabian-host.is-celebrating .floating-fabian-host__arm--right {
-  animation: floating-fabian-highfive 0.95s ease-in-out;
 }
 
 .floating-fabian-host.is-celebrating .floating-fabian-host__mouth {
@@ -3122,6 +3092,14 @@ td {
 
 .floating-fabian-host.is-celebrating .floating-fabian-host__wave {
   animation: floating-fabian-wave-burst 0.95s ease-out;
+}
+
+.floating-fabian-host.is-talking .floating-fabian-host__mouth {
+  animation: floating-fabian-talk 0.2s linear infinite alternate;
+}
+
+.floating-fabian-host.is-talking .floating-fabian-host__wave {
+  opacity: 0.58;
 }
 
 .floating-whatsapp {
@@ -3192,26 +3170,6 @@ td {
   }
 }
 
-@keyframes floating-fabian-arm-left {
-  0%,
-  100% {
-    transform: rotate(16deg);
-  }
-  50% {
-    transform: rotate(22deg);
-  }
-}
-
-@keyframes floating-fabian-arm-right {
-  0%,
-  100% {
-    transform: rotate(-10deg);
-  }
-  50% {
-    transform: rotate(-18deg);
-  }
-}
-
 @keyframes floating-fabian-wave {
   0%,
   100% {
@@ -3221,6 +3179,27 @@ td {
   50% {
     transform: rotate(26deg) scale(1.06);
     opacity: 0.58;
+  }
+}
+
+@keyframes floating-fabian-patrol {
+  0% {
+    transform: translate(0, 0);
+  }
+  18% {
+    transform: translate(-10px, -14px);
+  }
+  42% {
+    transform: translate(-68px, -20px);
+  }
+  58% {
+    transform: translate(-88px, -10px);
+  }
+  76% {
+    transform: translate(-42px, -16px);
+  }
+  100% {
+    transform: translate(0, 0);
   }
 }
 
@@ -3236,21 +3215,6 @@ td {
   }
   100% {
     transform: translate(0, 0) scale(1);
-  }
-}
-
-@keyframes floating-fabian-highfive {
-  0% {
-    transform: rotate(-10deg) translate(0, 0);
-  }
-  38% {
-    transform: rotate(-38deg) translate(8px, -12px);
-  }
-  60% {
-    transform: rotate(-48deg) translate(16px, -18px);
-  }
-  100% {
-    transform: rotate(-10deg) translate(0, 0);
   }
 }
 
@@ -3464,33 +3428,33 @@ td {
   }
 
   .floating-fabian-host {
-    right: 4.45rem;
-    bottom: 3rem;
-    width: 76px;
+    right: 0.15rem;
+    bottom: 3.25rem;
+    width: 104px;
   }
 
   .floating-fabian-host__stage {
-    width: 76px;
-    height: 84px;
+    width: 104px;
+    height: 134px;
   }
 
-  .floating-fabian-host__portrait {
-    width: 62px;
-    height: 78px;
-    border-radius: 22px 22px 18px 18px;
-  }
-
-  .floating-fabian-host__arm {
-    width: 11px;
-    height: 31px;
-    bottom: 14px;
+  .floating-fabian-host__shadow {
+    width: 46px;
+    height: 10px;
+    transform: translateY(88px);
   }
 
   .floating-fabian-host__wave {
-    width: 18px;
-    height: 18px;
-    right: -2px;
-    top: 30px;
+    width: 22px;
+    height: 22px;
+    right: 10px;
+    top: 34px;
+  }
+
+  .floating-fabian-host__mouth {
+    top: 44px;
+    width: 14px;
+    height: 5px;
   }
 
   .social-floating-links a {
