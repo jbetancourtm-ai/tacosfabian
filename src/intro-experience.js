@@ -140,7 +140,7 @@ function createTaqueriaGroup() {
 }
 
 function createHostPlane(textureLoader) {
-  const texture = textureLoader.load("/images/fabian2.jpg");
+  const texture = textureLoader.load("/images/fabian.jpg");
   texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.MeshBasicMaterial({
     map: texture,
@@ -384,7 +384,10 @@ export async function initIntroExperience({
   const textureLoader = new THREE.TextureLoader();
   const hostPlane = createHostPlane(textureLoader);
   const hostBasePosition = { x: 3.45, y: 0.98 };
+  hostPlane.visible = true;
   scene.add(hostPlane);
+  hostCard?.classList.add("is-visible");
+  hostMural?.classList.add("is-visible");
 
   const curtainLeft = createCurtain(-1);
   const curtainRight = createCurtain(1);
@@ -648,11 +651,6 @@ export async function initIntroExperience({
     .to(doorPivotLeft.rotation, { y: -1.04, duration: 0.9 }, 5.8)
     .to(doorPivotRight.rotation, { y: 1.04, duration: 0.9 }, 5.8)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 6.15)
-    .call(() => {
-      hostPlane.visible = true;
-      hostCard?.classList.add("is-visible");
-      hostMural?.classList.add("is-visible");
-    }, null, 8.2)
     .fromTo(hostPlane.position, { x: hostBasePosition.x, y: hostBasePosition.y }, { x: 2.82, y: 1.28, duration: 1.05, ease: "power2.out" }, 8.2)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 10.55)
     .to(camera.position, { z: 7.88, y: 2.1, duration: 1.15 }, 12.25)
