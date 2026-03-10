@@ -1,3 +1,5 @@
+import { gsap } from "gsap";
+
 const menuBtn = document.querySelector("#menuBtn");
 const navMenu = document.querySelector("#navMenu");
 const navOverlay = document.querySelector("#navOverlay");
@@ -121,25 +123,28 @@ function setupFloatingWhatsapp() {
   floatingWhatsapp.classList.remove("is-hidden");
   floatingFabianHost?.classList.remove("is-hidden");
 
-  if (floatingFabianHost && window.innerWidth >= 900) {
-    const startPatrol = () => {
-      floatingFabianHost.classList.remove("is-walking", "is-talking");
-      window.requestAnimationFrame(() => {
-        floatingFabianHost.classList.add("is-walking");
-        window.setTimeout(() => {
-          floatingFabianHost.classList.add("is-talking");
-        }, 2500);
-        window.setTimeout(() => {
-          floatingFabianHost.classList.remove("is-talking");
-        }, 5400);
-        window.setTimeout(() => {
-          floatingFabianHost.classList.remove("is-walking");
-        }, 9000);
-      });
-    };
+  if (floatingFabianHost) {
+    gsap.set(floatingFabianHost, { x: 0, y: 0, opacity: 1 });
 
-    window.setTimeout(startPatrol, 2600);
-    window.setInterval(startPatrol, 22000);
+    if (window.innerWidth >= 900) {
+      const patrol = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 11,
+        delay: 2.4,
+        defaults: { ease: "sine.inOut" },
+      });
+
+      patrol
+        .call(() => floatingFabianHost.classList.remove("is-talking"))
+        .to(floatingFabianHost, { x: -14, y: -10, duration: 1.2 })
+        .to(floatingFabianHost, { x: -72, y: -18, duration: 2.2, ease: "power1.inOut" })
+        .call(() => floatingFabianHost.classList.add("is-talking"))
+        .to(floatingFabianHost, { x: -84, y: -12, duration: 1.2 })
+        .to({}, { duration: 1.4 })
+        .call(() => floatingFabianHost.classList.remove("is-talking"))
+        .to(floatingFabianHost, { x: -36, y: -14, duration: 1.6, ease: "power1.inOut" })
+        .to(floatingFabianHost, { x: 0, y: 0, duration: 2.1, ease: "power1.inOut" });
+    }
   }
 
   let celebrateTimer = 0;
@@ -147,12 +152,24 @@ function setupFloatingWhatsapp() {
     if (!floatingFabianHost) return;
     floatingFabianHost.classList.remove("is-celebrating", "is-talking");
     window.clearTimeout(celebrateTimer);
-    window.requestAnimationFrame(() => {
-      floatingFabianHost.classList.add("is-celebrating");
-      celebrateTimer = window.setTimeout(() => {
-        floatingFabianHost.classList.remove("is-celebrating");
-      }, 980);
-    });
+    floatingFabianHost.classList.add("is-celebrating");
+    gsap.fromTo(
+      floatingFabianHost,
+      { x: 0, y: 0, scale: 1, rotate: 0 },
+      {
+        keyframes: [
+          { x: -6, y: -14, scale: 1.02, duration: 0.2 },
+          { x: 12, y: -24, scale: 1.03, duration: 0.28 },
+          { x: 18, y: -10, scale: 1.02, duration: 0.2 },
+          { x: 0, y: 0, scale: 1, rotate: 0, duration: 0.28 },
+        ],
+        ease: "power2.out",
+        overwrite: true,
+      }
+    );
+    celebrateTimer = window.setTimeout(() => {
+      floatingFabianHost.classList.remove("is-celebrating");
+    }, 980);
   });
 }
 

@@ -3116,6 +3116,19 @@ td {
   place-items: end center;
 }
 
+.floating-fabian-host__sprite {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: calc(var(--fabian-sprite-frames, 6) * 100%) 100%;
+  filter:
+    drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22))
+    brightness(1.01)
+    contrast(1.02);
+}
+
 .floating-fabian-host__figure {
   width: 100%;
   height: 100%;
@@ -3129,6 +3142,14 @@ td {
   animation:
     floating-fabian-idle 3.4s ease-in-out infinite,
     floating-fabian-head 2.8s ease-in-out infinite;
+}
+
+.floating-fabian-host.has-sprite .floating-fabian-host__sprite {
+  display: block;
+}
+
+.floating-fabian-host.has-sprite .floating-fabian-host__figure {
+  opacity: 0;
 }
 
 .floating-fabian-host__mouth {
@@ -3158,8 +3179,8 @@ td {
   animation: floating-fabian-wave 1.6s ease-in-out infinite;
 }
 
-.floating-fabian-host.is-walking {
-  animation: floating-fabian-patrol 8.8s cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
+.floating-fabian-host.is-walking .floating-fabian-host__sprite {
+  animation: floating-fabian-sprite-walk 0.82s steps(6) infinite;
 }
 
 .floating-fabian-host.is-celebrating {
@@ -3262,24 +3283,12 @@ td {
   }
 }
 
-@keyframes floating-fabian-patrol {
-  0% {
-    transform: translate(0, 0);
+@keyframes floating-fabian-sprite-walk {
+  from {
+    background-position: 0 0;
   }
-  18% {
-    transform: translate(-10px, -14px);
-  }
-  42% {
-    transform: translate(-68px, -20px);
-  }
-  58% {
-    transform: translate(-88px, -10px);
-  }
-  76% {
-    transform: translate(-42px, -16px);
-  }
-  100% {
-    transform: translate(0, 0);
+  to {
+    background-position: 100% 0;
   }
 }
 
