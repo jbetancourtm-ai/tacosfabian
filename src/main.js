@@ -19,6 +19,7 @@ const formStatus = document.querySelector("#formStatus");
 const commentInput = document.querySelector("#comment");
 const commentCounter = document.querySelector("#commentCounter");
 const toastRegion = document.querySelector("#toastRegion");
+const floatingFabianHost = document.querySelector("#floatingFabianHost");
 const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
@@ -118,6 +119,20 @@ function setupHeaderEffects() {
 function setupFloatingWhatsapp() {
   if (!floatingWhatsapp) return;
   floatingWhatsapp.classList.remove("is-hidden");
+  floatingFabianHost?.classList.remove("is-hidden");
+
+  let celebrateTimer = 0;
+  floatingWhatsapp.addEventListener("click", () => {
+    if (!floatingFabianHost) return;
+    floatingFabianHost.classList.remove("is-celebrating");
+    window.clearTimeout(celebrateTimer);
+    window.requestAnimationFrame(() => {
+      floatingFabianHost.classList.add("is-celebrating");
+      celebrateTimer = window.setTimeout(() => {
+        floatingFabianHost.classList.remove("is-celebrating");
+      }, 980);
+    });
+  });
 }
 
 function setupIntroScreen() {

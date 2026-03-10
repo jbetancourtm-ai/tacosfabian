@@ -133,6 +133,7 @@ body.intro-active .site-header,
 body.intro-active main,
 body.intro-active .site-footer,
 body.intro-active .social-floating-links,
+body.intro-active .floating-fabian-host,
 body.intro-active .floating-whatsapp {
   opacity: 0;
   transform: scale(1.02);
@@ -142,6 +143,7 @@ body.intro-complete .site-header,
 body.intro-complete main,
 body.intro-complete .site-footer,
 body.intro-complete .social-floating-links,
+body.intro-complete .floating-fabian-host,
 body.intro-complete .floating-whatsapp {
   animation: site-intro-reveal 780ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -3004,6 +3006,124 @@ td {
   transform: translateY(0);
 }
 
+.floating-fabian-host {
+  position: fixed;
+  right: 5.3rem;
+  bottom: 3.4rem;
+  z-index: 319;
+  width: 104px;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+  transform-origin: bottom right;
+  animation: floating-fabian-idle 3.4s ease-in-out infinite;
+}
+
+.floating-fabian-host__shadow {
+  width: 56px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(74, 37, 15, 0.18);
+  filter: blur(6px);
+  transform: translateY(74px);
+}
+
+.floating-fabian-host__stage {
+  position: relative;
+  width: 104px;
+  height: 112px;
+  display: grid;
+  place-items: end center;
+}
+
+.floating-fabian-host__portrait {
+  position: relative;
+  width: 84px;
+  height: 104px;
+  border-radius: 28px 28px 22px 22px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 247, 239, 0.98), rgba(255, 224, 194, 0.95));
+  border: 1px solid rgba(245, 199, 165, 0.95);
+  box-shadow:
+    0 16px 24px rgba(99, 58, 27, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
+.floating-fabian-host__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transform-origin: center 24%;
+  animation: floating-fabian-head 2.8s ease-in-out infinite;
+}
+
+.floating-fabian-host__arm {
+  position: absolute;
+  bottom: 18px;
+  width: 15px;
+  height: 42px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(87, 52, 31, 0.92), rgba(43, 23, 12, 0.95));
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
+  transform-origin: top center;
+}
+
+.floating-fabian-host__arm--left {
+  left: 8px;
+  transform: rotate(16deg);
+  animation: floating-fabian-arm-left 2.8s ease-in-out infinite;
+}
+
+.floating-fabian-host__arm--right {
+  right: 5px;
+  transform: rotate(-10deg);
+  animation: floating-fabian-arm-right 2.8s ease-in-out infinite;
+}
+
+.floating-fabian-host__mouth {
+  position: absolute;
+  left: 50%;
+  bottom: 17px;
+  width: 16px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(112, 37, 30, 0.58);
+  transform: translateX(-50%);
+  opacity: 0.82;
+}
+
+.floating-fabian-host__wave {
+  position: absolute;
+  right: -4px;
+  top: 38px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 191, 143, 0.58);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  transform: rotate(18deg);
+  opacity: 0.42;
+  animation: floating-fabian-wave 1.6s ease-in-out infinite;
+}
+
+.floating-fabian-host.is-celebrating {
+  animation: floating-fabian-celebrate 0.95s ease-in-out;
+}
+
+.floating-fabian-host.is-celebrating .floating-fabian-host__arm--right {
+  animation: floating-fabian-highfive 0.95s ease-in-out;
+}
+
+.floating-fabian-host.is-celebrating .floating-fabian-host__mouth {
+  animation: floating-fabian-talk 0.22s linear 4 alternate;
+}
+
+.floating-fabian-host.is-celebrating .floating-fabian-host__wave {
+  animation: floating-fabian-wave-burst 0.95s ease-out;
+}
+
 .floating-whatsapp {
   position: fixed;
   right: 1rem;
@@ -3050,6 +3170,112 @@ td {
 .floating-whatsapp.is-hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+@keyframes floating-fabian-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes floating-fabian-head {
+  0%,
+  100% {
+    transform: rotate(-1deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.8deg) translateY(-1px);
+  }
+}
+
+@keyframes floating-fabian-arm-left {
+  0%,
+  100% {
+    transform: rotate(16deg);
+  }
+  50% {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes floating-fabian-arm-right {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes floating-fabian-wave {
+  0%,
+  100% {
+    transform: rotate(18deg) scale(0.92);
+    opacity: 0.28;
+  }
+  50% {
+    transform: rotate(26deg) scale(1.06);
+    opacity: 0.58;
+  }
+}
+
+@keyframes floating-fabian-celebrate {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  35% {
+    transform: translate(12px, -18px) scale(1.02);
+  }
+  65% {
+    transform: translate(18px, -10px) scale(1.03);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes floating-fabian-highfive {
+  0% {
+    transform: rotate(-10deg) translate(0, 0);
+  }
+  38% {
+    transform: rotate(-38deg) translate(8px, -12px);
+  }
+  60% {
+    transform: rotate(-48deg) translate(16px, -18px);
+  }
+  100% {
+    transform: rotate(-10deg) translate(0, 0);
+  }
+}
+
+@keyframes floating-fabian-talk {
+  from {
+    transform: translateX(-50%) scaleY(0.75);
+  }
+  to {
+    transform: translateX(-50%) scaleY(1.85);
+  }
+}
+
+@keyframes floating-fabian-wave-burst {
+  0% {
+    transform: rotate(18deg) scale(0.84);
+    opacity: 0.2;
+  }
+  45% {
+    transform: rotate(24deg) scale(1.34);
+    opacity: 0.86;
+  }
+  100% {
+    transform: rotate(26deg) scale(1.52);
+    opacity: 0;
+  }
 }
 
 @keyframes float-pulse {
@@ -3235,6 +3461,36 @@ td {
     bottom: 12px;
     gap: 0.34rem;
     padding: 0.34rem;
+  }
+
+  .floating-fabian-host {
+    right: 4.45rem;
+    bottom: 3rem;
+    width: 76px;
+  }
+
+  .floating-fabian-host__stage {
+    width: 76px;
+    height: 84px;
+  }
+
+  .floating-fabian-host__portrait {
+    width: 62px;
+    height: 78px;
+    border-radius: 22px 22px 18px 18px;
+  }
+
+  .floating-fabian-host__arm {
+    width: 11px;
+    height: 31px;
+    bottom: 14px;
+  }
+
+  .floating-fabian-host__wave {
+    width: 18px;
+    height: 18px;
+    right: -2px;
+    top: 30px;
   }
 
   .social-floating-links a {
@@ -3449,11 +3705,13 @@ td {
   body.intro-active main,
   body.intro-active .site-footer,
   body.intro-active .social-floating-links,
+  body.intro-active .floating-fabian-host,
   body.intro-active .floating-whatsapp,
   body.intro-complete .site-header,
   body.intro-complete main,
   body.intro-complete .site-footer,
   body.intro-complete .social-floating-links,
+  body.intro-complete .floating-fabian-host,
   body.intro-complete .floating-whatsapp {
     opacity: 1 !important;
     transform: none !important;
