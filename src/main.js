@@ -147,9 +147,84 @@ function setupFloatingWhatsapp() {
   }
 
   let celebrateTimer = 0;
-  floatingWhatsapp.addEventListener("click", () => {
+  let idleTimer = 0;
+
+  const clearFabianState = () => {
     if (!floatingFabianHost) return;
     floatingFabianHost.classList.remove("is-celebrating", "is-talking", "is-walking");
+    gsap.killTweensOf(floatingFabianHost);
+    gsap.set(floatingFabianHost, { clearProps: "x,y,scale,rotate" });
+  };
+
+  const playHoverReaction = () => {
+    if (!floatingFabianHost || floatingFabianHost.classList.contains("is-celebrating")) return;
+    window.clearTimeout(celebrateTimer);
+    gsap.killTweensOf(floatingFabianHost);
+    floatingFabianHost.classList.remove("is-celebrating", "is-walking");
+    floatingFabianHost.classList.add("is-talking");
+    gsap.fromTo(
+      floatingFabianHost,
+      { x: 0, y: 0, rotate: 0, scale: 1 },
+      {
+        keyframes: [
+          { y: -7, rotate: -4, duration: 0.16 },
+          { x: -3, y: -10, rotate: 4, duration: 0.14 },
+          { x: 0, y: -4, rotate: -2, duration: 0.14 },
+          { x: 0, y: 0, rotate: 0, scale: 1, duration: 0.16 },
+        ],
+        ease: "power2.out",
+        overwrite: true,
+        onComplete: () => {
+          floatingFabianHost.classList.remove("is-talking");
+        },
+      }
+    );
+  };
+
+  const playIdleReaction = () => {
+    if (!floatingFabianHost || floatingFabianHost.classList.contains("is-celebrating")) return;
+    gsap.killTweensOf(floatingFabianHost);
+    floatingFabianHost.classList.add("is-talking");
+    gsap.fromTo(
+      floatingFabianHost,
+      { x: 0, y: 0, rotate: 0, scale: 1 },
+      {
+        keyframes: [
+          { y: -5, rotate: -2, duration: 0.2 },
+          { x: -5, y: -8, rotate: 3, duration: 0.24 },
+          { x: 0, y: -3, rotate: -1, duration: 0.18 },
+          { x: 0, y: 0, rotate: 0, duration: 0.22 },
+        ],
+        ease: "sine.inOut",
+        overwrite: true,
+        onComplete: () => {
+          floatingFabianHost.classList.remove("is-talking");
+        },
+      }
+    );
+  };
+
+  const scheduleIdleReaction = () => {
+    window.clearTimeout(idleTimer);
+    idleTimer = window.setTimeout(() => {
+      playIdleReaction();
+      scheduleIdleReaction();
+    }, window.innerWidth >= 900 ? 13000 : 15000);
+  };
+
+  floatingWhatsapp.addEventListener("pointerenter", playHoverReaction);
+  floatingWhatsapp.addEventListener(
+    "touchstart",
+    () => {
+      playHoverReaction();
+    },
+    { passive: true }
+  );
+
+  floatingWhatsapp.addEventListener("click", () => {
+    if (!floatingFabianHost) return;
+    window.clearTimeout(idleTimer);
+    clearFabianState();
     window.clearTimeout(celebrateTimer);
     floatingFabianHost.classList.add("is-celebrating");
     gsap.fromTo(
@@ -168,8 +243,11 @@ function setupFloatingWhatsapp() {
     );
     celebrateTimer = window.setTimeout(() => {
       floatingFabianHost.classList.remove("is-celebrating");
+      scheduleIdleReaction();
     }, 980);
   });
+
+  scheduleIdleReaction();
 }
 
 function setupIntroScreen() {
