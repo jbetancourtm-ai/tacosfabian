@@ -305,6 +305,7 @@ export async function initIntroExperience({
   let autoDismissTimer = 0;
   let rafId = 0;
   let speakingTimer = 0;
+  let timeline = null;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -539,6 +540,27 @@ export async function initIntroExperience({
     }
   };
 
+  const scheduleFinish = (delay = autoDismissMs) => {
+    if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
+    autoDismissTimer = window.setTimeout(finishIntro, delay);
+  };
+
+  const restartIntroExperience = async () => {
+    if (closed) return false;
+
+    timeline?.pause(0);
+    timeline?.restart();
+    setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
+    const started = await tryPlayNarrationAudio();
+
+    if (started) {
+      scheduleFinish(autoDismissMs);
+      pulseSpeaking(2600);
+    }
+
+    return started;
+  };
+
   const pulseSpeaking = (duration = 2500) => {
     if (!hostCard) return;
     hostCard.classList.add("is-speaking");
@@ -595,17 +617,14 @@ export async function initIntroExperience({
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
-  introSoundBtn?.addEventListener("click", async () => {
-    const started = await tryPlayNarrationAudio();
-    if (started) {
-      pulseSpeaking(2600);
-    }
+  introSoundBtn?.addEventListener("click", () => {
+    void restartIntroExperience();
   });
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") finishIntro();
   });
 
-  const timeline = gsap.timeline({
+  timeline = gsap.timeline({
     defaults: { ease: "power2.inOut" },
     onComplete: finishIntro,
   });
@@ -727,6 +746,6 @@ export async function initIntroExperience({
   }
 
   void tryPlayNarrationAudio();
-  autoDismissTimer = window.setTimeout(finishIntro, autoDismissMs);
+  scheduleFinish(autoDismissMs);
   render();
 }
