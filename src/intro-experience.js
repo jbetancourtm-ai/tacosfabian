@@ -140,7 +140,7 @@ function createTaqueriaGroup() {
 }
 
 function createHostPlane(textureLoader) {
-  const texture = textureLoader.load("/images/fabian.jpg");
+  const texture = textureLoader.load("/images/fabian2.jpg");
   texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.MeshBasicMaterial({
     map: texture,
