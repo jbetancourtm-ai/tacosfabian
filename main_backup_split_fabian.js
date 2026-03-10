@@ -21,8 +21,8 @@ const formStatus = document.querySelector("#formStatus");
 const commentInput = document.querySelector("#comment");
 const commentCounter = document.querySelector("#commentCounter");
 const toastRegion = document.querySelector("#toastRegion");
-const floatingFabianHost = document.querySelector("#fabianMain");
-const floatingFabianSprite = floatingFabianHost?.querySelector(".floating-fabian-host__sprite");
+const floatingFabianHost = document.querySelector("#floatingFabianHost");
+const floatingFabianSprite = document.querySelector(".floating-fabian-host__sprite");
 const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
@@ -144,6 +144,30 @@ function setupFloatingWhatsapp() {
         probe.src = spriteSrc;
       }
     }
+
+    const travelX = window.innerWidth >= 900 ? -84 : -28;
+    const travelY = window.innerWidth >= 900 ? -18 : -10;
+    const patrol = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 11,
+        delay: 2.4,
+        defaults: { ease: "sine.inOut" },
+      });
+
+    patrol
+        .call(() => floatingFabianHost.classList.remove("is-talking"))
+        .call(() => floatingFabianHost.classList.add("is-walking"))
+        .to(floatingFabianHost, { x: travelX * 0.18, y: travelY * 0.56, duration: 1.2 })
+        .to(floatingFabianHost, { x: travelX * 0.86, y: travelY, duration: 2.2, ease: "power1.inOut" })
+        .call(() => floatingFabianHost.classList.remove("is-walking"))
+        .call(() => floatingFabianHost.classList.add("is-talking"))
+        .to(floatingFabianHost, { x: travelX, y: travelY * 0.72, duration: 1.2 })
+        .to({}, { duration: 1.4 })
+        .call(() => floatingFabianHost.classList.remove("is-talking"))
+        .call(() => floatingFabianHost.classList.add("is-walking"))
+        .to(floatingFabianHost, { x: travelX * 0.44, y: travelY * 0.78, duration: 1.6, ease: "power1.inOut" })
+        .call(() => floatingFabianHost.classList.remove("is-walking"))
+        .to(floatingFabianHost, { x: 0, y: 0, duration: 2.1, ease: "power1.inOut" });
   }
 
   let celebrateTimer = 0;

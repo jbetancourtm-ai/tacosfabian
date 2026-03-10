@@ -273,7 +273,7 @@ export async function initIntroExperience({
 }) {
   const canvas = introScreen.querySelector("#introCanvas");
   const narration = introScreen.querySelector("#introNarration");
-  const hostCard = introScreen.querySelector("#introHostCard");
+  const hostCard = introScreen.querySelector("#fabianIntro");
   const hostSprite = introScreen.querySelector(".intro-screen__host-sprite");
   const hostLine = introScreen.querySelector("#introHostLine");
   const hostMural = introScreen.querySelector("#introHostMural");

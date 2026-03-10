@@ -662,11 +662,7 @@ body.intro-complete .floating-whatsapp {
   z-index: 4;
 }
 
-.fabian-intro {
-  width: min(520px, calc(100vw - 2rem));
-}
-
-.fabian-intro.is-visible {
+.intro-screen__host-card.is-visible {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
@@ -734,11 +730,11 @@ body.intro-complete .floating-whatsapp {
   z-index: 2;
 }
 
-.fabian-intro.has-sprite .intro-screen__host-sprite {
+.intro-screen__host-card.has-sprite .intro-screen__host-sprite {
   display: block;
 }
 
-.fabian-intro.has-sprite .intro-screen__host-asset {
+.intro-screen__host-card.has-sprite .intro-screen__host-asset {
   opacity: 0;
 }
 
@@ -822,41 +818,41 @@ body.intro-complete .floating-whatsapp {
   transform: rotate(-10deg);
 }
 
-.fabian-intro.is-visible .intro-screen__host-arm--left {
+.intro-screen__host-card.is-visible .intro-screen__host-arm--left {
   animation: intro-host-arm-left-idle 2.9s ease-in-out infinite;
 }
 
-.fabian-intro.is-visible .intro-screen__host-arm--right {
+.intro-screen__host-card.is-visible .intro-screen__host-arm--right {
   animation: intro-host-arm-right-idle 3.1s ease-in-out infinite;
 }
 
-.fabian-intro.is-walking .intro-screen__host-sprite {
+.intro-screen__host-card.is-walking .intro-screen__host-sprite {
   animation: intro-host-sprite-walk 0.82s steps(6) infinite;
 }
 
-.fabian-intro.is-speaking .intro-screen__host-stage {
+.intro-screen__host-card.is-speaking .intro-screen__host-stage {
   animation-duration: 1.4s;
 }
 
-.fabian-intro.is-speaking .intro-screen__host-asset img {
+.intro-screen__host-card.is-speaking .intro-screen__host-asset img {
   animation: intro-host-head 1.55s ease-in-out infinite;
 }
 
-.fabian-intro.is-speaking .intro-screen__host-mouth {
+.intro-screen__host-card.is-speaking .intro-screen__host-mouth {
   opacity: 0.92;
   animation: intro-host-mouth 0.18s linear infinite alternate;
 }
 
-.fabian-intro.is-speaking .intro-screen__host-wave {
+.intro-screen__host-card.is-speaking .intro-screen__host-wave {
   opacity: 0.72;
   animation: intro-host-wave 1.2s ease-in-out infinite;
 }
 
-.fabian-intro.is-speaking .intro-screen__host-arm--left {
+.intro-screen__host-card.is-speaking .intro-screen__host-arm--left {
   animation: intro-host-arm-left-talk 0.95s ease-in-out infinite;
 }
 
-.fabian-intro.is-speaking .intro-screen__host-arm--right {
+.intro-screen__host-card.is-speaking .intro-screen__host-arm--right {
   animation: intro-host-arm-right-talk 0.95s ease-in-out infinite;
 }
 
@@ -3131,12 +3127,6 @@ td {
   transition: opacity 0.28s ease;
 }
 
-.fabian-main {
-  right: 0.2rem;
-  bottom: 3.25rem;
-  width: 104px;
-}
-
 .floating-fabian-host__shadow {
   width: 48px;
   height: 10px;
@@ -3182,11 +3172,11 @@ td {
     floating-fabian-head 2.8s ease-in-out infinite;
 }
 
-.fabian-main.has-sprite .floating-fabian-host__sprite {
+.floating-fabian-host.has-sprite .floating-fabian-host__sprite {
   display: block;
 }
 
-.fabian-main.has-sprite .floating-fabian-host__figure {
+.floating-fabian-host.has-sprite .floating-fabian-host__figure {
   opacity: 0;
 }
 
@@ -3217,27 +3207,27 @@ td {
   animation: floating-fabian-wave 1.6s ease-in-out infinite;
 }
 
-.fabian-main.is-walking .floating-fabian-host__sprite {
+.floating-fabian-host.is-walking .floating-fabian-host__sprite {
   animation: floating-fabian-sprite-walk 0.82s steps(6) infinite;
 }
 
-.fabian-main.is-celebrating {
+.floating-fabian-host.is-celebrating {
   animation: floating-fabian-celebrate 0.95s ease-in-out;
 }
 
-.fabian-main.is-celebrating .floating-fabian-host__mouth {
+.floating-fabian-host.is-celebrating .floating-fabian-host__mouth {
   animation: floating-fabian-talk 0.22s linear 4 alternate;
 }
 
-.fabian-main.is-celebrating .floating-fabian-host__wave {
+.floating-fabian-host.is-celebrating .floating-fabian-host__wave {
   animation: floating-fabian-wave-burst 0.95s ease-out;
 }
 
-.fabian-main.is-talking .floating-fabian-host__mouth {
+.floating-fabian-host.is-talking .floating-fabian-host__mouth {
   animation: floating-fabian-talk 0.2s linear infinite alternate;
 }
 
-.fabian-main.is-talking .floating-fabian-host__wave {
+.floating-fabian-host.is-talking .floating-fabian-host__wave {
   opacity: 0.58;
 }
 
@@ -3554,18 +3544,18 @@ td {
     padding: 0.34rem;
   }
 
-  .fabian-main {
+  .floating-fabian-host {
     right: 0.15rem;
     bottom: 2.95rem;
     width: 78px;
   }
 
-  .fabian-main .floating-fabian-host__stage {
+  .floating-fabian-host__stage {
     width: 78px;
     height: 94px;
   }
 
-  .fabian-main .floating-fabian-host__shadow {
+  .floating-fabian-host__shadow {
     width: 34px;
     height: 8px;
     transform: translateY(68px);
@@ -3593,7 +3583,7 @@ td {
     padding: 0;
   }
 
-  .fabian-intro {
+  .intro-screen__host-card {
     grid-template-columns: 1fr;
     right: 0.85rem;
     left: 0.85rem;
@@ -3608,7 +3598,7 @@ td {
     margin: 0 auto;
   }
 
-  .fabian-intro .intro-screen__host-stage {
+  .intro-screen__host-stage {
     min-height: 168px;
   }
 
