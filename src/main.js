@@ -9,6 +9,10 @@ const reviewsAverageBadge = document.querySelector("#reviewsAverageBadge");
 const reviewsSatisfied = document.querySelector("#reviewsSatisfied");
 const heroProofAvg = document.querySelector("#heroProofAvg");
 const heroProofCount = document.querySelector("#heroProofCount");
+const heroReviewsCard = document.querySelector("#heroReviewsCard");
+const heroReviewsAvg = document.querySelector("#heroReviewsAvg");
+const heroReviewsCount = document.querySelector("#heroReviewsCount");
+const heroReviewsPreview = document.querySelector("#heroReviewsPreview");
 const reviewsList = document.querySelector("#reviewsList");
 const reviewForm = document.querySelector("#reviewForm");
 const formStatus = document.querySelector("#formStatus");
@@ -192,6 +196,51 @@ function formatDate(dateValue) {
   return new Intl.DateTimeFormat("es-MX", { dateStyle: "medium" }).format(date);
 }
 
+function truncateReview(text, maxLength = 96) {
+  const cleanText = String(text || "").trim();
+  if (cleanText.length <= maxLength) return cleanText;
+  return `${cleanText.slice(0, maxLength).trimEnd()}...`;
+}
+
+function paintHeroReviews(items) {
+  if (!heroReviewsCard || !heroReviewsAvg || !heroReviewsCount || !heroReviewsPreview) return;
+
+  if (!Array.isArray(items) || items.length === 0) {
+    heroReviewsAvg.textContent = "★ --";
+    heroReviewsCount.textContent = "Sin resenas aun";
+    heroReviewsPreview.innerHTML = `
+      <article class="hero-reviews-card__item hero-reviews-card__item--empty">
+        <p>Se la primera persona en dejar una resena.</p>
+      </article>
+    `;
+    return;
+  }
+
+  const avg = items.reduce((sum, item) => sum + (Number(item.stars) || 0), 0) / items.length;
+  const featuredItems = [...items]
+    .sort((a, b) => (Number(b.stars) || 0) - (Number(a.stars) || 0))
+    .slice(0, 3);
+
+  heroReviewsAvg.textContent = `★ ${avg.toFixed(1)}`;
+  heroReviewsCount.textContent = `${items.length} resena${items.length === 1 ? "" : "s"}`;
+  heroReviewsPreview.innerHTML = featuredItems
+    .map((item) => {
+      const name = escapeHtml(item.name || "Anonimo");
+      const stars = Math.max(1, Math.min(5, Number(item.stars) || 0));
+      const comment = escapeHtml(truncateReview(item.comment || "", 88));
+      return `
+        <article class="hero-reviews-card__item">
+          <div class="hero-reviews-card__item-head">
+            <strong>${name}</strong>
+            <span aria-label="${stars} de 5 estrellas">${"★".repeat(stars)}${"☆".repeat(5 - stars)}</span>
+          </div>
+          <p>${comment}</p>
+        </article>
+      `;
+    })
+    .join("");
+}
+
 function paintReviews(items) {
   if (!Array.isArray(items) || items.length === 0) {
     reviewsStatus.textContent = "Aun no hay resenas. Se la primera persona en opinar.";
@@ -200,6 +249,7 @@ function paintReviews(items) {
     if (reviewsSatisfied) reviewsSatisfied.textContent = "+0 clientes satisfechos";
     if (heroProofAvg) heroProofAvg.textContent = "\u2605 4.8 calificacion promedio";
     if (heroProofCount) heroProofCount.textContent = "+120 clientes satisfechos";
+    paintHeroReviews([]);
     reviewsList.innerHTML = "";
     return;
   }
@@ -212,6 +262,7 @@ function paintReviews(items) {
   if (reviewsSatisfied) reviewsSatisfied.textContent = `+${satisfied} clientes satisfechos`;
   if (heroProofAvg) heroProofAvg.textContent = `\u2605 ${avg.toFixed(1)} calificacion promedio`;
   if (heroProofCount) heroProofCount.textContent = `+${satisfied} clientes satisfechos`;
+  paintHeroReviews(items);
 
   [reviewsAverageBadge, reviewsSatisfied, heroProofAvg, heroProofCount].forEach((node) => {
     if (!node) return;
@@ -254,6 +305,14 @@ async function loadReviews() {
   if (reviewsAverage) reviewsAverage.textContent = "Promedio: calculando...";
   if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 Calculando promedio...";
   if (reviewsSatisfied) reviewsSatisfied.textContent = "Cargando clientes satisfechos...";
+  if (heroReviewsAvg) heroReviewsAvg.textContent = "★ --";
+  if (heroReviewsCount) heroReviewsCount.textContent = "Cargando...";
+  if (heroReviewsPreview) {
+    heroReviewsPreview.innerHTML = `
+      <article class="hero-reviews-card__item is-loading"></article>
+      <article class="hero-reviews-card__item is-loading"></article>
+    `;
+  }
   reviewsList.innerHTML = `
     <li class="review-item review-skeleton"></li>
     <li class="review-item review-skeleton"></li>
@@ -273,6 +332,7 @@ async function loadReviews() {
     paintReviews(payload.items || []);
   } catch {
     reviewsStatus.textContent = "No fue posible cargar resenas. Intenta mas tarde.";
+    paintHeroReviews([]);
     showToast("No pudimos cargar resenas por el momento.", "error");
   }
 }

@@ -274,10 +274,35 @@
             </div>
           </div>
 
-          <aside class="hero-side hero-side--spotlight" aria-label="Recomendacion">
-            <span class="hero-badge">Recomendacion</span>
-            <h2>Taco de trocitos</h2>
-            <p>Especialidad de la casa con salsa roja, receta secreta.</p>
+          <aside class="hero-side-stack" aria-label="Informacion destacada">
+            <div class="hero-side hero-side--spotlight" aria-label="Recomendacion">
+              <span class="hero-badge">Recomendacion</span>
+              <h2>Taco de trocitos</h2>
+              <p>Especialidad de la casa con salsa roja, receta secreta.</p>
+            </div>
+
+            <article id="heroReviewsCard" class="hero-reviews-card" aria-live="polite">
+              <div class="hero-reviews-card__head">
+                <div>
+                  <p class="hero-reviews-card__eyebrow">Resenas destacadas</p>
+                  <h3>Lo que dicen nuestros clientes</h3>
+                </div>
+                <div class="hero-reviews-card__rating">
+                  <strong id="heroReviewsAvg">★ --</strong>
+                  <span id="heroReviewsCount">Cargando...</span>
+                </div>
+              </div>
+
+              <div id="heroReviewsPreview" class="hero-reviews-card__list">
+                <article class="hero-reviews-card__item is-loading"></article>
+                <article class="hero-reviews-card__item is-loading"></article>
+              </div>
+
+              <div class="hero-reviews-card__actions">
+                <a class="btn btn-secondary hero-reviews-card__btn" href="#resenas">Ver todas</a>
+                <a class="btn btn-primary hero-reviews-card__btn" href="#reviewForm">Dejar resena</a>
+              </div>
+            </article>
           </aside>
         </div>
         <div class="container hero-proof" aria-live="polite">
