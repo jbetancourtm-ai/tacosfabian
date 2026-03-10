@@ -1738,6 +1738,17 @@ button:focus-visible,
   padding: 1rem;
   display: grid;
   gap: 0.85rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  animation: hero-reviews-float 5.4s ease-in-out infinite;
+}
+
+.hero-reviews-card:hover,
+.hero-reviews-card:focus-within {
+  transform: translateY(-2px);
+  border-color: #efc5aa;
+  box-shadow:
+    0 22px 38px rgba(112, 70, 38, 0.14),
+    0 0 0 1px rgba(255, 193, 150, 0.12);
 }
 
 .hero-reviews-card__head {
@@ -1779,6 +1790,13 @@ button:focus-visible,
 .hero-reviews-card__list {
   display: grid;
   gap: 0.6rem;
+  min-height: 160px;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.hero-reviews-card__list.is-switching {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 .hero-reviews-card__item {
@@ -1846,6 +1864,16 @@ button:focus-visible,
 .hero-reviews-card__btn {
   flex: 1 1 120px;
   min-height: 2.6rem;
+}
+
+@keyframes hero-reviews-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .section {
@@ -3348,6 +3376,10 @@ td {
 
   .hero-reviews-card__item p {
     font-size: 0.84rem;
+  }
+
+  .hero-reviews-card__list {
+    min-height: 118px;
   }
 
   .hero-gallery {

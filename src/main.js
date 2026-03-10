@@ -39,6 +39,9 @@ const menuModalTitle = document.querySelector("#menuModalTitle");
 const menuModalDescription = document.querySelector("#menuModalDescription");
 const menuModalPrice = document.querySelector("#menuModalPrice");
 const menuCards = Array.from(document.querySelectorAll(".menu-item"));
+let heroReviewsRotationTimer = 0;
+let heroReviewsCache = [];
+let heroReviewsStartIndex = 0;
 
 function showToast(message, type = "info") {
   if (!toastRegion) return;
@@ -202,12 +205,23 @@ function truncateReview(text, maxLength = 96) {
   return `${cleanText.slice(0, maxLength).trimEnd()}...`;
 }
 
-function paintHeroReviews(items) {
-  if (!heroReviewsCard || !heroReviewsAvg || !heroReviewsCount || !heroReviewsPreview) return;
+function getHeroReviewVisibleCount() {
+  return window.innerWidth >= 900 ? 2 : 1;
+}
 
-  if (!Array.isArray(items) || items.length === 0) {
-    heroReviewsAvg.textContent = "★ --";
-    heroReviewsCount.textContent = "Sin resenas aun";
+function stopHeroReviewsRotation() {
+  if (!heroReviewsRotationTimer) return;
+  window.clearInterval(heroReviewsRotationTimer);
+  heroReviewsRotationTimer = 0;
+}
+
+function renderHeroReviewSlice(items) {
+  if (!heroReviewsPreview) return;
+
+  const visibleCount = getHeroReviewVisibleCount();
+  const safeItems = Array.isArray(items) ? items : [];
+
+  if (!safeItems.length) {
     heroReviewsPreview.innerHTML = `
       <article class="hero-reviews-card__item hero-reviews-card__item--empty">
         <p>Se la primera persona en dejar una resena.</p>
@@ -216,14 +230,12 @@ function paintHeroReviews(items) {
     return;
   }
 
-  const avg = items.reduce((sum, item) => sum + (Number(item.stars) || 0), 0) / items.length;
-  const featuredItems = [...items]
-    .sort((a, b) => (Number(b.stars) || 0) - (Number(a.stars) || 0))
-    .slice(0, 3);
+  const currentItems = Array.from({ length: Math.min(visibleCount, safeItems.length) }, (_, offset) => {
+    const index = (heroReviewsStartIndex + offset) % safeItems.length;
+    return safeItems[index];
+  });
 
-  heroReviewsAvg.textContent = `★ ${avg.toFixed(1)}`;
-  heroReviewsCount.textContent = `${items.length} resena${items.length === 1 ? "" : "s"}`;
-  heroReviewsPreview.innerHTML = featuredItems
+  heroReviewsPreview.innerHTML = currentItems
     .map((item) => {
       const name = escapeHtml(item.name || "Anonimo");
       const stars = Math.max(1, Math.min(5, Number(item.stars) || 0));
@@ -232,13 +244,57 @@ function paintHeroReviews(items) {
         <article class="hero-reviews-card__item">
           <div class="hero-reviews-card__item-head">
             <strong>${name}</strong>
-            <span aria-label="${stars} de 5 estrellas">${"★".repeat(stars)}${"☆".repeat(5 - stars)}</span>
+            <span aria-label="${stars} de 5 estrellas">${"&#9733;".repeat(stars)}${"&#9734;".repeat(5 - stars)}</span>
           </div>
           <p>${comment}</p>
         </article>
       `;
     })
     .join("");
+}
+
+function syncHeroReviewsRotation() {
+  if (!heroReviewsPreview) return;
+
+  stopHeroReviewsRotation();
+  renderHeroReviewSlice(heroReviewsCache);
+
+  const visibleCount = getHeroReviewVisibleCount();
+  if (heroReviewsCache.length <= visibleCount) return;
+
+  heroReviewsRotationTimer = window.setInterval(() => {
+    heroReviewsPreview.classList.add("is-switching");
+
+    window.setTimeout(() => {
+      heroReviewsStartIndex = (heroReviewsStartIndex + visibleCount) % heroReviewsCache.length;
+      renderHeroReviewSlice(heroReviewsCache);
+      heroReviewsPreview.classList.remove("is-switching");
+    }, 220);
+  }, 5000);
+}
+
+function paintHeroReviews(items) {
+  if (!heroReviewsCard || !heroReviewsAvg || !heroReviewsCount || !heroReviewsPreview) return;
+
+  if (!Array.isArray(items) || items.length === 0) {
+    stopHeroReviewsRotation();
+    heroReviewsCache = [];
+    heroReviewsStartIndex = 0;
+    heroReviewsAvg.innerHTML = "&#9733; --";
+    heroReviewsCount.textContent = "Sin resenas aun";
+    renderHeroReviewSlice([]);
+    return;
+  }
+
+  const avg = items.reduce((sum, item) => sum + (Number(item.stars) || 0), 0) / items.length;
+  heroReviewsCache = [...items]
+    .sort((a, b) => (Number(b.stars) || 0) - (Number(a.stars) || 0))
+    .slice(0, 6);
+  heroReviewsStartIndex = 0;
+
+  heroReviewsAvg.innerHTML = `&#9733; ${avg.toFixed(1)}`;
+  heroReviewsCount.textContent = `${items.length} resena${items.length === 1 ? "" : "s"}`;
+  syncHeroReviewsRotation();
 }
 
 function paintReviews(items) {
@@ -305,7 +361,8 @@ async function loadReviews() {
   if (reviewsAverage) reviewsAverage.textContent = "Promedio: calculando...";
   if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 Calculando promedio...";
   if (reviewsSatisfied) reviewsSatisfied.textContent = "Cargando clientes satisfechos...";
-  if (heroReviewsAvg) heroReviewsAvg.textContent = "★ --";
+  stopHeroReviewsRotation();
+  if (heroReviewsAvg) heroReviewsAvg.innerHTML = "&#9733; --";
   if (heroReviewsCount) heroReviewsCount.textContent = "Cargando...";
   if (heroReviewsPreview) {
     heroReviewsPreview.innerHTML = `
@@ -381,7 +438,6 @@ function setupReviewsForm() {
 
       reviewForm.reset();
       formStatus.textContent = "Resena enviada. Gracias por compartir tu opinion.";
-      setupCommentCounter();
       showToast("Resena enviada con exito.", "ok");
       await loadReviews();
     } catch (error) {
@@ -602,6 +658,17 @@ function setupRevealAnimations() {
     item.style.setProperty("--reveal-delay", `${delay}ms`);
     item.classList.add("reveal-item");
     observer.observe(item);
+  });
+}
+
+if (heroReviewsCard) {
+  let resizeTimer = 0;
+  window.addEventListener("resize", () => {
+    if (!heroReviewsCache.length) return;
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      syncHeroReviewsRotation();
+    }, 120);
   });
 }
 
