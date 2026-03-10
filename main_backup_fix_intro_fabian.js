@@ -126,8 +126,24 @@ function setupFloatingWhatsapp() {
 
   if (floatingFabianHost) {
     gsap.set(floatingFabianHost, { x: 0, y: 0, opacity: 1 });
-    floatingFabianHost.classList.remove("has-sprite", "is-walking");
-    if (floatingFabianSprite instanceof HTMLElement) floatingFabianSprite.style.backgroundImage = "";
+
+    if (floatingFabianSprite instanceof HTMLElement) {
+      const spriteSrc = floatingFabianSprite.dataset.spriteSrc;
+      const spriteFrames = Number.parseInt(floatingFabianSprite.dataset.spriteFrames || "6", 10);
+      if (spriteSrc) {
+        const probe = new Image();
+        probe.onload = () => {
+          floatingFabianHost.classList.add("has-sprite");
+          floatingFabianHost.style.setProperty("--fabian-sprite-frames", String(Math.max(1, spriteFrames || 6)));
+          floatingFabianSprite.style.backgroundImage = `url("${spriteSrc}")`;
+        };
+        probe.onerror = () => {
+          floatingFabianHost.classList.remove("has-sprite");
+          floatingFabianSprite.style.backgroundImage = "";
+        };
+        probe.src = spriteSrc;
+      }
+    }
   }
 
   let celebrateTimer = 0;
