@@ -21,8 +21,6 @@ const visitCounter = document.querySelector("#visitCounter");
 const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
-const heroGallery = document.querySelector("#heroGallery");
-const heroGalleryItems = Array.from(document.querySelectorAll("#heroGallery .hero-gallery-item"));
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -165,52 +163,6 @@ function setupMenuDestacadoButton() {
     event.preventDefault();
     menuCarousel.scrollIntoView({ behavior: "smooth", block: "start" });
   });
-}
-
-function setupHeroGalleryCarousel() {
-  if (!heroGallery || heroGalleryItems.length <= 1) return;
-
-  let currentIndex = heroGalleryItems.findIndex((item) => item.classList.contains("is-active"));
-  if (currentIndex < 0) currentIndex = 0;
-  let intervalId = 0;
-
-  const setActiveSlide = (nextIndex) => {
-    heroGalleryItems.forEach((item, index) => {
-      const isActive = index === nextIndex;
-      item.classList.toggle("is-active", isActive);
-      item.setAttribute("aria-hidden", isActive ? "false" : "true");
-    });
-    currentIndex = nextIndex;
-  };
-
-  const advance = () => {
-    const nextIndex = (currentIndex + 1) % heroGalleryItems.length;
-    setActiveSlide(nextIndex);
-  };
-
-  const start = () => {
-    if (intervalId) window.clearInterval(intervalId);
-    intervalId = window.setInterval(advance, 2000);
-  };
-
-  const stop = () => {
-    if (!intervalId) return;
-    window.clearInterval(intervalId);
-    intervalId = 0;
-  };
-
-  heroGallery.addEventListener("mouseenter", stop);
-  heroGallery.addEventListener("mouseleave", start);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      stop();
-    } else {
-      start();
-    }
-  });
-
-  setActiveSlide(currentIndex);
-  start();
 }
 
 function escapeHtml(text) {
@@ -603,6 +555,5 @@ setupIntroScreen();
 setupFloatingWhatsapp();
 setupVisitCounter();
 setupMenuDestacadoButton();
-setupHeroGalleryCarousel();
 loadReviews();
 
