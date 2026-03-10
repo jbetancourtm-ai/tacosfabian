@@ -3089,9 +3089,9 @@ td {
 .floating-fabian-host {
   position: fixed;
   right: 0.2rem;
-  bottom: 3.9rem;
+  bottom: 3.55rem;
   z-index: 319;
-  width: 148px;
+  width: 136px;
   display: grid;
   justify-items: center;
   pointer-events: none;
@@ -3100,20 +3100,33 @@ td {
 }
 
 .floating-fabian-host__shadow {
-  width: 68px;
-  height: 14px;
+  width: 62px;
+  height: 12px;
   border-radius: 999px;
   background: rgba(61, 33, 17, 0.18);
   filter: blur(7px);
-  transform: translateY(126px);
+  transform: translateY(114px);
 }
 
 .floating-fabian-host__stage {
   position: relative;
-  width: 148px;
-  height: 196px;
+  width: 136px;
+  height: 176px;
   display: grid;
   place-items: end center;
+}
+
+.floating-fabian-host__sprite {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: calc(var(--fabian-sprite-frames, 6) * 100%) 100%;
+  filter:
+    drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22))
+    brightness(1.01)
+    contrast(1.02);
 }
 
 .floating-fabian-host__figure {
@@ -3129,6 +3142,14 @@ td {
   animation:
     floating-fabian-idle 3.4s ease-in-out infinite,
     floating-fabian-head 2.8s ease-in-out infinite;
+}
+
+.floating-fabian-host.has-sprite .floating-fabian-host__sprite {
+  display: block;
+}
+
+.floating-fabian-host.has-sprite .floating-fabian-host__figure {
+  opacity: 0;
 }
 
 .floating-fabian-host__mouth {
@@ -3158,8 +3179,8 @@ td {
   animation: floating-fabian-wave 1.6s ease-in-out infinite;
 }
 
-.floating-fabian-host.is-walking {
-  animation: floating-fabian-patrol 8.8s cubic-bezier(0.2, 0.72, 0.2, 1) forwards;
+.floating-fabian-host.is-walking .floating-fabian-host__sprite {
+  animation: floating-fabian-sprite-walk 0.82s steps(6) infinite;
 }
 
 .floating-fabian-host.is-celebrating {
@@ -3262,24 +3283,12 @@ td {
   }
 }
 
-@keyframes floating-fabian-patrol {
-  0% {
-    transform: translate(0, 0);
+@keyframes floating-fabian-sprite-walk {
+  from {
+    background-position: 0 0;
   }
-  18% {
-    transform: translate(-10px, -14px);
-  }
-  42% {
-    transform: translate(-68px, -20px);
-  }
-  58% {
-    transform: translate(-88px, -10px);
-  }
-  76% {
-    transform: translate(-42px, -16px);
-  }
-  100% {
-    transform: translate(0, 0);
+  to {
+    background-position: 100% 0;
   }
 }
 
@@ -3509,32 +3518,32 @@ td {
 
   .floating-fabian-host {
     right: 0.15rem;
-    bottom: 3.25rem;
-    width: 104px;
+    bottom: 3.1rem;
+    width: 92px;
   }
 
   .floating-fabian-host__stage {
-    width: 104px;
-    height: 134px;
+    width: 92px;
+    height: 112px;
   }
 
   .floating-fabian-host__shadow {
-    width: 46px;
-    height: 10px;
-    transform: translateY(88px);
+    width: 42px;
+    height: 9px;
+    transform: translateY(82px);
   }
 
   .floating-fabian-host__wave {
-    width: 22px;
-    height: 22px;
-    right: 10px;
-    top: 34px;
+    width: 18px;
+    height: 18px;
+    right: 8px;
+    top: 26px;
   }
 
   .floating-fabian-host__mouth {
-    top: 44px;
-    width: 14px;
-    height: 5px;
+    top: 36px;
+    width: 12px;
+    height: 4px;
   }
 
   .social-floating-links a {

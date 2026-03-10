@@ -651,13 +651,14 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-card {
   position: absolute;
-  right: clamp(1rem, 2vw, 1.5rem);
-  bottom: 5.6rem;
+  left: clamp(1rem, 4vw, 3rem);
+  right: auto;
+  bottom: 5.2rem;
   display: grid;
-  grid-template-columns: 88px minmax(0, 220px);
-  gap: 0.9rem;
+  grid-template-columns: 236px minmax(0, 248px);
+  gap: 1rem;
   align-items: center;
-  width: min(348px, calc(100vw - 2rem));
+  width: min(520px, calc(100vw - 2rem));
   padding: 0;
   opacity: 0;
   transform: translateY(22px) scale(0.96);
@@ -674,7 +675,7 @@ body.intro-complete .floating-whatsapp {
   position: relative;
   display: grid;
   place-items: end center;
-  min-height: 108px;
+  min-height: 246px;
   animation: intro-host-idle 3.2s ease-in-out infinite;
 }
 
@@ -707,6 +708,16 @@ body.intro-complete .floating-whatsapp {
   filter: saturate(1.02) contrast(1.03) brightness(0.96);
 }
 
+.intro-screen__host-sprite {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: calc(var(--intro-fabian-sprite-frames, 6) * 100%) 100%;
+  filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.24));
+}
+
 .intro-screen__host-portrait {
   position: relative;
   aspect-ratio: 1 / 1.08;
@@ -716,11 +727,19 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-portrait--small {
-  aspect-ratio: 0.92 / 1.1;
+  aspect-ratio: 0.92 / 1.18;
   align-self: end;
   width: 100%;
-  max-width: 84px;
+  max-width: 236px;
   z-index: 2;
+}
+
+.intro-screen__host-card.has-sprite .intro-screen__host-sprite {
+  display: block;
+}
+
+.intro-screen__host-card.has-sprite .intro-screen__host-asset {
+  opacity: 0;
 }
 
 .intro-screen__host-asset {
@@ -811,6 +830,10 @@ body.intro-complete .floating-whatsapp {
   animation: intro-host-arm-right-idle 3.1s ease-in-out infinite;
 }
 
+.intro-screen__host-card.is-walking .intro-screen__host-sprite {
+  animation: intro-host-sprite-walk 0.82s steps(6) infinite;
+}
+
 .intro-screen__host-card.is-speaking .intro-screen__host-stage {
   animation-duration: 1.4s;
 }
@@ -859,6 +882,15 @@ body.intro-complete .floating-whatsapp {
   color: rgba(255, 240, 223, 0.88);
   font-size: 0.92rem;
   line-height: 1.45;
+}
+
+@keyframes intro-host-sprite-walk {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
 }
 
 @keyframes intro-host-head {
@@ -3566,8 +3598,12 @@ td {
   }
 
   .intro-screen__host-portrait {
-    max-width: 180px;
+    max-width: 158px;
     margin: 0 auto;
+  }
+
+  .intro-screen__host-stage {
+    min-height: 168px;
   }
 
   .intro-screen__actions {

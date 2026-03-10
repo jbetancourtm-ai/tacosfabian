@@ -22,6 +22,7 @@ const commentInput = document.querySelector("#comment");
 const commentCounter = document.querySelector("#commentCounter");
 const toastRegion = document.querySelector("#toastRegion");
 const floatingFabianHost = document.querySelector("#floatingFabianHost");
+const floatingFabianSprite = document.querySelector(".floating-fabian-host__sprite");
 const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
@@ -126,31 +127,53 @@ function setupFloatingWhatsapp() {
   if (floatingFabianHost) {
     gsap.set(floatingFabianHost, { x: 0, y: 0, opacity: 1 });
 
-    if (window.innerWidth >= 900) {
-      const patrol = gsap.timeline({
+    if (floatingFabianSprite instanceof HTMLElement) {
+      const spriteSrc = floatingFabianSprite.dataset.spriteSrc;
+      const spriteFrames = Number.parseInt(floatingFabianSprite.dataset.spriteFrames || "6", 10);
+      if (spriteSrc) {
+        const probe = new Image();
+        probe.onload = () => {
+          floatingFabianHost.classList.add("has-sprite");
+          floatingFabianHost.style.setProperty("--fabian-sprite-frames", String(Math.max(1, spriteFrames || 6)));
+          floatingFabianSprite.style.backgroundImage = `url("${spriteSrc}")`;
+        };
+        probe.onerror = () => {
+          floatingFabianHost.classList.remove("has-sprite");
+          floatingFabianSprite.style.backgroundImage = "";
+        };
+        probe.src = spriteSrc;
+      }
+    }
+
+    const travelX = window.innerWidth >= 900 ? -84 : -28;
+    const travelY = window.innerWidth >= 900 ? -18 : -10;
+    const patrol = gsap.timeline({
         repeat: -1,
         repeatDelay: 11,
         delay: 2.4,
         defaults: { ease: "sine.inOut" },
       });
 
-      patrol
+    patrol
         .call(() => floatingFabianHost.classList.remove("is-talking"))
-        .to(floatingFabianHost, { x: -14, y: -10, duration: 1.2 })
-        .to(floatingFabianHost, { x: -72, y: -18, duration: 2.2, ease: "power1.inOut" })
+        .call(() => floatingFabianHost.classList.add("is-walking"))
+        .to(floatingFabianHost, { x: travelX * 0.18, y: travelY * 0.56, duration: 1.2 })
+        .to(floatingFabianHost, { x: travelX * 0.86, y: travelY, duration: 2.2, ease: "power1.inOut" })
+        .call(() => floatingFabianHost.classList.remove("is-walking"))
         .call(() => floatingFabianHost.classList.add("is-talking"))
-        .to(floatingFabianHost, { x: -84, y: -12, duration: 1.2 })
+        .to(floatingFabianHost, { x: travelX, y: travelY * 0.72, duration: 1.2 })
         .to({}, { duration: 1.4 })
         .call(() => floatingFabianHost.classList.remove("is-talking"))
-        .to(floatingFabianHost, { x: -36, y: -14, duration: 1.6, ease: "power1.inOut" })
+        .call(() => floatingFabianHost.classList.add("is-walking"))
+        .to(floatingFabianHost, { x: travelX * 0.44, y: travelY * 0.78, duration: 1.6, ease: "power1.inOut" })
+        .call(() => floatingFabianHost.classList.remove("is-walking"))
         .to(floatingFabianHost, { x: 0, y: 0, duration: 2.1, ease: "power1.inOut" });
-    }
   }
 
   let celebrateTimer = 0;
   floatingWhatsapp.addEventListener("click", () => {
     if (!floatingFabianHost) return;
-    floatingFabianHost.classList.remove("is-celebrating", "is-talking");
+    floatingFabianHost.classList.remove("is-celebrating", "is-talking", "is-walking");
     window.clearTimeout(celebrateTimer);
     floatingFabianHost.classList.add("is-celebrating");
     gsap.fromTo(

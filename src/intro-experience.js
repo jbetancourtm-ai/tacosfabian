@@ -274,6 +274,7 @@ export async function initIntroExperience({
   const canvas = introScreen.querySelector("#introCanvas");
   const narration = introScreen.querySelector("#introNarration");
   const hostCard = introScreen.querySelector("#introHostCard");
+  const hostSprite = introScreen.querySelector(".intro-screen__host-sprite");
   const hostLine = introScreen.querySelector("#introHostLine");
   const hostMural = introScreen.querySelector("#introHostMural");
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
@@ -386,6 +387,24 @@ export async function initIntroExperience({
   scene.add(hostPlane);
   hostCard?.classList.add("is-visible");
   hostMural?.classList.add("is-visible");
+
+  if (hostCard && hostSprite instanceof HTMLElement) {
+    const spriteSrc = hostSprite.dataset.spriteSrc;
+    const spriteFrames = Number.parseInt(hostSprite.dataset.spriteFrames || "6", 10);
+    if (spriteSrc) {
+      const probe = new Image();
+      probe.onload = () => {
+        hostCard.classList.add("has-sprite");
+        hostCard.style.setProperty("--intro-fabian-sprite-frames", String(Math.max(1, spriteFrames || 6)));
+        hostSprite.style.backgroundImage = `url("${spriteSrc}")`;
+      };
+      probe.onerror = () => {
+        hostCard.classList.remove("has-sprite");
+        hostSprite.style.backgroundImage = "";
+      };
+      probe.src = spriteSrc;
+    }
+  }
 
   const curtainLeft = createCurtain(-1);
   const curtainRight = createCurtain(1);
@@ -654,7 +673,10 @@ export async function initIntroExperience({
     .to([spotLeft, spotRight], { intensity: 2.65, duration: 1.05 }, 0)
     .to(signLight, { intensity: 5.8, duration: 1.2 }, 0.12)
     .to(titlePlane.material, { opacity: 0.5, duration: 1.12 }, 0.2)
+    .call(() => hostCard?.classList.add("is-walking"), null, 0.18)
+    .fromTo(hostCard, { x: -320 }, { x: 0, duration: 3.8, ease: "power2.out" }, 0.18)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.28)
+    .call(() => hostCard?.classList.remove("is-walking"), null, 3.95)
     .to(camera.position, { z: 8.45, y: 2.28, duration: 2.9 }, 0.9)
     .to(taqueria.scale, { x: 0.96, y: 0.96, z: 0.96, duration: 2.9 }, 0.9)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 3.2)
