@@ -655,7 +655,7 @@ body.intro-complete .floating-whatsapp {
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: clamp(220px, 24vw, 260px);
+  width: clamp(250px, 28vw, 320px);
   max-width: calc(100vw - 1.5rem);
   padding: 0;
   opacity: 0;
@@ -665,7 +665,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro {
-  width: clamp(220px, 24vw, 260px);
+  width: clamp(250px, 28vw, 320px);
   max-width: calc(100vw - 1.5rem);
   transform: translateY(22px) scale(0.96);
 }
@@ -689,7 +689,7 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-stage--hero {
   width: 100%;
-  min-height: clamp(220px, 26vw, 260px);
+  min-height: clamp(250px, 30vw, 320px);
 }
 
 .intro-screen__host-mural {
@@ -3125,10 +3125,10 @@ td {
 
 .floating-fabian-host {
   position: fixed;
-  right: 0.2rem;
-  bottom: 3.25rem;
+  right: 0.05rem;
+  bottom: 4.65rem;
   z-index: 319;
-  width: 104px;
+  width: 124px;
   display: grid;
   justify-items: center;
   pointer-events: none;
@@ -3137,24 +3137,24 @@ td {
 }
 
 .fabian-main {
-  right: 0.2rem;
-  bottom: 3.25rem;
-  width: 104px;
+  right: 0.05rem;
+  bottom: 4.65rem;
+  width: 124px;
 }
 
 .floating-fabian-host__shadow {
-  width: 48px;
-  height: 10px;
+  width: 58px;
+  height: 12px;
   border-radius: 999px;
   background: rgba(61, 33, 17, 0.18);
   filter: blur(7px);
-  transform: translateY(86px);
+  transform: translateY(104px);
 }
 
 .floating-fabian-host__stage {
   position: relative;
-  width: 104px;
-  height: 128px;
+  width: 124px;
+  height: 152px;
   display: grid;
   place-items: end center;
 }
@@ -3181,10 +3181,10 @@ td {
     drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22))
     brightness(1.01)
     contrast(1.02);
-  transform-origin: center 26%;
+  transform-origin: center 22%;
   animation:
-    floating-fabian-idle 3.4s ease-in-out infinite,
-    floating-fabian-head 2.8s ease-in-out infinite;
+    floating-fabian-idle 3s ease-in-out infinite,
+    floating-fabian-head 2.5s ease-in-out infinite;
 }
 
 .fabian-main.has-sprite .floating-fabian-host__sprite {
@@ -3198,9 +3198,9 @@ td {
 .floating-fabian-host__mouth {
   position: absolute;
   left: 50%;
-  top: 58px;
-  width: 18px;
-  height: 7px;
+  top: 69px;
+  width: 20px;
+  height: 8px;
   border-radius: 999px;
   background: rgba(112, 37, 30, 0.3);
   transform: translateX(-50%);
@@ -3209,10 +3209,10 @@ td {
 
 .floating-fabian-host__wave {
   position: absolute;
-  right: 16px;
-  top: 44px;
-  width: 28px;
-  height: 28px;
+  right: 19px;
+  top: 52px;
+  width: 30px;
+  height: 30px;
   border-radius: 999px;
   border: 2px solid rgba(255, 191, 143, 0.58);
   border-left-color: transparent;
@@ -3300,17 +3300,17 @@ td {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
   }
 }
 
 @keyframes floating-fabian-head {
   0%,
   100% {
-    transform: rotate(-1deg) translateY(0);
+    transform: rotate(-1.4deg) translateY(0);
   }
   50% {
-    transform: rotate(1.8deg) translateY(-1px);
+    transform: rotate(2.4deg) translateY(-2px);
   }
 }
 
@@ -3560,32 +3560,32 @@ td {
   }
 
   .fabian-main {
-    right: 0.15rem;
-    bottom: 2.95rem;
-    width: 78px;
+    right: 0.05rem;
+    bottom: 4.15rem;
+    width: 92px;
   }
 
   .fabian-main .floating-fabian-host__stage {
-    width: 78px;
-    height: 94px;
+    width: 92px;
+    height: 112px;
   }
 
   .fabian-main .floating-fabian-host__shadow {
-    width: 34px;
+    width: 40px;
     height: 8px;
-    transform: translateY(68px);
+    transform: translateY(80px);
   }
 
   .floating-fabian-host__wave {
-    width: 18px;
-    height: 18px;
-    right: 8px;
-    top: 26px;
+    width: 20px;
+    height: 20px;
+    right: 10px;
+    top: 32px;
   }
 
   .floating-fabian-host__mouth {
-    top: 36px;
-    width: 12px;
+    top: 42px;
+    width: 13px;
     height: 4px;
   }
 
@@ -3603,7 +3603,7 @@ td {
     right: 0.5rem;
     left: auto;
     bottom: 5.5rem;
-    width: clamp(150px, 42vw, 190px);
+    width: clamp(180px, 48vw, 220px);
     max-width: none;
     text-align: center;
   }
@@ -3621,7 +3621,7 @@ td {
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(150px, 42vw, 190px);
+    min-height: clamp(180px, 48vw, 220px);
   }
 
   .intro-screen__actions {
