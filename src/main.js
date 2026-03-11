@@ -29,6 +29,7 @@ const visitCounter = document.querySelector("#visitCounter");
 const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
+const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -46,6 +47,11 @@ const menuCards = Array.from(document.querySelectorAll(".menu-item"));
 let heroReviewsRotationTimer = 0;
 let heroReviewsCache = [];
 let heroReviewsStartIndex = 0;
+let siteAmbientAudio = null;
+let siteAmbientReady = false;
+let siteAmbientObserver = null;
+let siteAmbientUnlockBound = false;
+let whatsappAudioContext = null;
 
 function showToast(message, type = "info") {
   if (!toastRegion) return;
@@ -117,6 +123,124 @@ function setupHeaderEffects() {
   );
 
   sections.forEach((section) => observer.observe(section));
+}
+
+function setupSiteAmbientAudio() {
+  if (siteAmbientReady) return;
+
+  siteAmbientAudio = new Audio("/audio/taqueria-ambient-night.wav");
+  siteAmbientAudio.preload = "auto";
+  siteAmbientAudio.playsInline = true;
+  siteAmbientAudio.loop = true;
+  siteAmbientAudio.volume = 0;
+
+  const targetVolume = 0.038;
+
+  const fadeAmbientTo = (volume, duration = 1.4) => {
+    if (!siteAmbientAudio) return;
+    gsap.killTweensOf(siteAmbientAudio);
+    gsap.to(siteAmbientAudio, {
+      volume,
+      duration,
+      ease: "sine.inOut",
+      overwrite: true,
+    });
+  };
+
+  const removeUnlockListeners = () => {
+    if (!siteAmbientUnlockBound) return;
+    siteAmbientUnlockBound = false;
+    window.removeEventListener("pointerdown", unlockAmbientOnInteraction, true);
+    window.removeEventListener("keydown", unlockAmbientOnInteraction, true);
+    window.removeEventListener("touchstart", unlockAmbientOnInteraction, true);
+  };
+
+  const playAmbient = async () => {
+    if (!siteAmbientAudio || document.body.classList.contains("intro-active")) return false;
+
+    try {
+      await siteAmbientAudio.play();
+      siteAmbientReady = true;
+      fadeAmbientTo(targetVolume);
+      removeUnlockListeners();
+      if (siteAmbientObserver) {
+        siteAmbientObserver.disconnect();
+        siteAmbientObserver = null;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const unlockAmbientOnInteraction = () => {
+    void playAmbient();
+  };
+
+  const armUnlockListeners = () => {
+    if (siteAmbientUnlockBound) return;
+    siteAmbientUnlockBound = true;
+    window.addEventListener("pointerdown", unlockAmbientOnInteraction, true);
+    window.addEventListener("keydown", unlockAmbientOnInteraction, true);
+    window.addEventListener("touchstart", unlockAmbientOnInteraction, true);
+  };
+
+  if (document.body.classList.contains("intro-active")) {
+    siteAmbientObserver = new MutationObserver(() => {
+      if (document.body.classList.contains("intro-active")) return;
+      void playAmbient();
+    });
+    siteAmbientObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    armUnlockListeners();
+    return;
+  }
+
+  void playAmbient().then((started) => {
+    if (!started) armUnlockListeners();
+  });
+}
+
+function setupWhatsappAudio() {
+  if (!whatsappLinks.length) return;
+
+  const playWhatsappChime = () => {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) return;
+
+    if (!whatsappAudioContext) whatsappAudioContext = new AudioContextCtor();
+    const context = whatsappAudioContext;
+    if (context.state === "suspended") {
+      void context.resume();
+    }
+
+    const now = context.currentTime + 0.01;
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.045, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.018, now + 0.16);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
+    gain.connect(context.destination);
+
+    const toneA = context.createOscillator();
+    toneA.type = "triangle";
+    toneA.frequency.setValueAtTime(740, now);
+    toneA.frequency.exponentialRampToValueAtTime(988, now + 0.18);
+    toneA.connect(gain);
+
+    const toneB = context.createOscillator();
+    toneB.type = "sine";
+    toneB.frequency.setValueAtTime(1110, now + 0.08);
+    toneB.connect(gain);
+
+    toneA.start(now);
+    toneB.start(now + 0.08);
+    toneA.stop(now + 0.38);
+    toneB.stop(now + 0.62);
+  };
+
+  whatsappLinks.forEach((link) => {
+    link.addEventListener("click", playWhatsappChime, { passive: true });
+  });
 }
 
 function setupFloatingWhatsapp() {
@@ -794,7 +918,9 @@ setupMenuSpotlightModal();
 setupRevealAnimations();
 setupHeaderEffects();
 setupIntroScreen();
+setupSiteAmbientAudio();
 setupFloatingWhatsapp();
+setupWhatsappAudio();
 setupVisitCounter();
 setupMenuDestacadoButton();
 loadReviews();
