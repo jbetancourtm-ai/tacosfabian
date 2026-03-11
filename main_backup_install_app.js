@@ -30,7 +30,6 @@ const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
-const installAppBtn = document.querySelector("#installAppBtn");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -234,58 +233,14 @@ function setupSiteAmbientAudio() {
 }
 
 function setupPwaSupport() {
-  const isStandaloneMode = () =>
-    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-
-  const syncInstallButton = (visible) => {
-    if (!(installAppBtn instanceof HTMLButtonElement)) return;
-    installAppBtn.hidden = !visible;
-    installAppBtn.setAttribute("aria-hidden", visible ? "false" : "true");
-    installAppBtn.disabled = !visible;
-  };
-
-  syncInstallButton(false);
-
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
-    if (isStandaloneMode()) return;
     deferredInstallPrompt = event;
-    syncInstallButton(true);
     window.dispatchEvent(new CustomEvent("app-installable"));
   });
 
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
-    syncInstallButton(false);
-  });
-
-  window.matchMedia("(display-mode: standalone)").addEventListener?.("change", (event) => {
-    if (!event.matches) return;
-    deferredInstallPrompt = null;
-    syncInstallButton(false);
-  });
-
-  installAppBtn?.addEventListener("click", async () => {
-    if (!deferredInstallPrompt || isStandaloneMode()) {
-      syncInstallButton(false);
-      return;
-    }
-
-    installAppBtn.disabled = true;
-
-    try {
-      await deferredInstallPrompt.prompt();
-      const { outcome } = await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      syncInstallButton(false);
-
-      if (outcome !== "accepted") {
-        showToast("Puedes instalar la app mas tarde desde el navegador.", "info");
-      }
-    } catch {
-      installAppBtn.disabled = false;
-      syncInstallButton(Boolean(deferredInstallPrompt));
-    }
   });
 
   if (!("serviceWorker" in navigator)) return;
