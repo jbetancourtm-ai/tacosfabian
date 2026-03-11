@@ -167,13 +167,55 @@ body.intro-complete .floating-whatsapp {
   z-index: 2200;
   background: radial-gradient(circle at top, rgba(255, 143, 44, 0.08), transparent 28%), #050608;
   overflow: hidden;
+  clip-path: inset(0 0 0 0);
+  will-change: clip-path, opacity, transform;
   transition: opacity 0.65s ease, visibility 0.65s ease;
+}
+
+.intro-screen.is-exiting {
+  animation: intro-curtain-lift 0.98s cubic-bezier(0.22, 0.8, 0.2, 1) forwards;
+}
+
+.intro-screen.is-exiting .intro-screen__render,
+.intro-screen.is-exiting .intro-screen__ui {
+  animation: intro-curtain-soften 0.82s ease forwards;
 }
 
 .intro-screen.is-hidden {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+@keyframes intro-curtain-lift {
+  0% {
+    clip-path: inset(0 0 0 0 round 0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+  32% {
+    clip-path: inset(0 0 2% 0 round 0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    clip-path: inset(0 0 100% 0 round 0);
+    opacity: 0.96;
+    transform: translateY(-1.8%);
+  }
+}
+
+@keyframes intro-curtain-soften {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0.68;
+    transform: scale(0.985);
+    filter: blur(4px);
+  }
 }
 
 .intro-screen__render,

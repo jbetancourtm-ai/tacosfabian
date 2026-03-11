@@ -286,10 +286,11 @@ export async function initIntroExperience({
   narrationAudio.preload = "auto";
   narrationAudio.playsInline = true;
   narrationAudio.playbackRate = 1.04;
+  narrationAudio.volume = 1;
   ambientAudio.preload = "auto";
   ambientAudio.playsInline = true;
   ambientAudio.loop = true;
-  ambientAudio.volume = 0.18;
+  ambientAudio.volume = 0;
   let useSpeechFallback = false;
 
   if (!(canvas instanceof HTMLCanvasElement) || !(narration instanceof HTMLElement)) {
@@ -304,6 +305,8 @@ export async function initIntroExperience({
   let timeline = null;
   let audioMode = "idle";
   let audioToken = 0;
+  const exitDurationMs = reducedMotion ? 120 : 980;
+  const ambientTargetVolume = 0.055;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -522,6 +525,16 @@ export async function initIntroExperience({
   };
   window.addEventListener("resize", resize);
 
+  const fadeAmbientTo = (volume, duration = 0.7) => {
+    gsap.killTweensOf(ambientAudio);
+    gsap.to(ambientAudio, {
+      volume,
+      duration,
+      ease: "sine.inOut",
+      overwrite: true,
+    });
+  };
+
   const tryPlayNarrationAudio = async ({ restart = false } = {}) => {
     if (reducedMotion) return false;
     if (!restart && audioMode === "media" && !narrationAudio.paused) return true;
@@ -536,8 +549,10 @@ export async function initIntroExperience({
       narrationAudio.pause();
       ambientAudio.currentTime = 0;
       narrationAudio.currentTime = 0;
+      ambientAudio.volume = 0;
       await ambientAudio.play();
       if (token !== audioToken) return false;
+      fadeAmbientTo(ambientTargetVolume, 1.4);
       narrationAudio.currentTime = 0;
       await narrationAudio.play();
       if (token !== audioToken) return false;
@@ -608,13 +623,16 @@ export async function initIntroExperience({
     hostCard?.classList.remove("is-speaking");
     audioToken += 1;
     audioMode = "idle";
-    ambientAudio.pause();
-    ambientAudio.currentTime = 0;
+    fadeAmbientTo(0, 0.45);
+    window.setTimeout(() => {
+      ambientAudio.pause();
+      ambientAudio.currentTime = 0;
+    }, 460);
     narrationAudio.pause();
     narrationAudio.currentTime = 0;
     speechQueue.stop();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
-    introScreen.classList.add("is-hidden");
+    introScreen.classList.add("is-exiting");
     introScreen.setAttribute("aria-hidden", "true");
     document.body.classList.remove("intro-active");
     document.body.classList.add("intro-complete");
@@ -631,9 +649,10 @@ export async function initIntroExperience({
     emberGeometry.dispose();
 
     window.setTimeout(() => {
+      introScreen.classList.add("is-hidden");
       introScreen.remove();
       if (introSkipBtn instanceof HTMLElement) introSkipBtn.blur();
-    }, reducedMotion ? 40 : 720);
+    }, exitDurationMs);
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
