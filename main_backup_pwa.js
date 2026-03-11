@@ -52,7 +52,6 @@ let siteAmbientReady = false;
 let siteAmbientObserver = null;
 let siteAmbientUnlockBound = false;
 let whatsappAudioContext = null;
-let deferredInstallPrompt = null;
 
 function showToast(message, type = "info") {
   if (!toastRegion) return;
@@ -198,28 +197,6 @@ function setupSiteAmbientAudio() {
 
   void playAmbient().then((started) => {
     if (!started) armUnlockListeners();
-  });
-}
-
-function setupPwaSupport() {
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    window.dispatchEvent(new CustomEvent("app-installable"));
-  });
-
-  window.addEventListener("appinstalled", () => {
-    deferredInstallPrompt = null;
-  });
-
-  if (!("serviceWorker" in navigator)) return;
-
-  window.addEventListener("load", async () => {
-    try {
-      await navigator.serviceWorker.register("/sw.js", { scope: "/" });
-    } catch (error) {
-      console.error("No se pudo registrar el service worker", error);
-    }
   });
 }
 
@@ -949,7 +926,6 @@ setupMenuSpotlightModal();
 setupRevealAnimations();
 setupHeaderEffects();
 setupIntroScreen();
-setupPwaSupport();
 setupSiteAmbientAudio();
 setupFloatingWhatsapp();
 setupWhatsappAudio();
