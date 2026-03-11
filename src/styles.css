@@ -218,28 +218,32 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
   gap: 1rem;
   z-index: 4;
 }
 
 .intro-screen__corner-lights {
   position: absolute;
-  inset: 0;
+  top: clamp(0.45rem, 1.6vw, 0.9rem);
+  left: 50%;
+  width: min(28rem, 72vw);
+  height: 8.5rem;
+  transform: translateX(-50%);
   pointer-events: none;
-  z-index: 1;
+  z-index: 3;
 }
 
 .intro-screen__corner-light {
   position: absolute;
-  width: 44vmin;
-  height: 44vmin;
-  opacity: 0.72;
+  width: 7.2rem;
+  height: 7.2rem;
+  opacity: 0.56;
   mix-blend-mode: screen;
-  filter: blur(4px);
-  transform-origin: 50% 0;
+  filter: blur(2px);
+  transform-origin: 50% 50%;
   animation: intro-corner-beam 6.8s ease-in-out infinite;
 }
 
@@ -251,58 +255,58 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__corner-light::before {
   inset: 0;
-  clip-path: polygon(50% 100%, 18% 0, 82% 0);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.1) 44%, transparent 88%);
+  clip-path: ellipse(44% 18% at 50% 50%);
+  background: radial-gradient(circle, rgba(255, 245, 229, 0.9), rgba(255, 213, 164, 0.26) 45%, transparent 76%);
 }
 
 .intro-screen__corner-light::after {
   left: 50%;
-  top: -10px;
-  width: 34px;
-  height: 34px;
-  transform: translateX(-50%);
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 1), rgba(255, 241, 221, 0.28) 58%, transparent 76%);
-  box-shadow: 0 0 34px rgba(255, 255, 255, 0.48);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(255, 241, 221, 0.3) 58%, transparent 76%);
+  box-shadow: 0 0 18px rgba(255, 246, 233, 0.38);
 }
 
 .intro-screen__corner-light--top-left {
-  left: -6vmin;
-  top: -6vmin;
-  transform: rotate(-32deg);
+  left: calc(50% - 5.9rem);
+  top: 1.4rem;
+  transform: translateX(-50%);
   animation-delay: -0.4s;
 }
 
 .intro-screen__corner-light--top-right {
-  right: -6vmin;
-  top: -6vmin;
-  transform: rotate(62deg);
+  left: calc(50% + 5.9rem);
+  top: 1.4rem;
+  transform: translateX(-50%);
   animation-delay: -1.1s;
 }
 
 .intro-screen__corner-light--bottom-left {
-  left: -6vmin;
-  bottom: -10vmin;
-  transform: rotate(-118deg);
+  left: calc(50% - 3.2rem);
+  top: 4.3rem;
+  transform: translateX(-50%);
   animation-delay: -2s;
 }
 
 .intro-screen__corner-light--bottom-right {
-  right: -6vmin;
-  bottom: -10vmin;
-  transform: rotate(118deg);
+  left: calc(50% + 3.2rem);
+  top: 4.3rem;
+  transform: translateX(-50%);
   animation-delay: -2.7s;
 }
 
 @keyframes intro-corner-beam {
   0%,
   100% {
-    opacity: 0.58;
-    filter: blur(4px);
+    opacity: 0.34;
+    filter: blur(2px);
   }
   50% {
-    opacity: 0.82;
-    filter: blur(2px);
+    opacity: 0.62;
+    filter: blur(1px);
   }
 }
 
@@ -325,6 +329,8 @@ body.intro-complete .floating-whatsapp {
     0 22px 48px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     0 0 42px rgba(255, 255, 255, 0.05);
+  grid-column: 2;
+  justify-self: center;
 }
 
 .intro-screen__brand-mark,
@@ -403,6 +409,8 @@ body.intro-complete .floating-whatsapp {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.75rem;
+  grid-column: 3;
+  justify-self: end;
 }
 
 .intro-screen__brand-beam {
@@ -3228,7 +3236,7 @@ td {
 
 .fabian-main {
   right: 0.05rem;
-  bottom: 4.65rem;
+  bottom: 5rem;
   width: 124px;
 }
 
@@ -3651,7 +3659,7 @@ td {
 
   .fabian-main {
     right: 0.05rem;
-    bottom: 4.4rem;
+    bottom: 4.75rem;
     width: 108px;
   }
 
@@ -3718,8 +3726,8 @@ td {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-start;
-    width: auto;
+    justify-content: center;
+    width: 100%;
     max-width: 100%;
     gap: 0.45rem;
   }
@@ -3753,18 +3761,20 @@ td {
   }
 
   .intro-screen__topbar {
-    align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    justify-items: center;
     gap: 0.7rem;
   }
 
   .intro-screen__brandlock {
     width: min(100%, 320px);
+    grid-column: 1;
+    justify-self: center;
   }
 
   .intro-screen__actions {
-    justify-content: flex-start;
-    justify-self: auto;
+    justify-content: center;
+    justify-self: center;
   }
 
   .intro-screen__brand-mark {
@@ -3787,9 +3797,40 @@ td {
   }
 
   .intro-screen__media-reserve {
-    width: min(58vw, 320px);
-    min-width: 220px;
-    transform: translate(-50%, -34%);
+    width: min(54vw, 280px);
+    min-width: 190px;
+    transform: translate(-50%, -30%);
+  }
+
+  .intro-screen__corner-lights {
+    width: min(19rem, 86vw);
+    height: 6rem;
+    top: 0.6rem;
+  }
+
+  .intro-screen__corner-light {
+    width: 4.6rem;
+    height: 4.6rem;
+  }
+
+  .intro-screen__corner-light--top-left {
+    left: calc(50% - 4.1rem);
+    top: 1rem;
+  }
+
+  .intro-screen__corner-light--top-right {
+    left: calc(50% + 4.1rem);
+    top: 1rem;
+  }
+
+  .intro-screen__corner-light--bottom-left {
+    left: calc(50% - 2.2rem);
+    top: 2.95rem;
+  }
+
+  .intro-screen__corner-light--bottom-right {
+    left: calc(50% + 2.2rem);
+    top: 2.95rem;
   }
 
   .intro-screen__title {
@@ -3798,7 +3839,7 @@ td {
 
   .intro-screen__story {
     width: 100%;
-    padding-right: min(44vw, 13rem);
+    padding-right: min(40vw, 10rem);
   }
 
   .intro-screen__narration {
