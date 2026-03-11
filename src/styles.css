@@ -647,46 +647,46 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-card {
   position: absolute;
-  left: clamp(15rem, 38vw, 30rem);
-  right: auto;
-  bottom: 5rem;
+  left: auto;
+  right: clamp(1.4rem, 5vw, 4rem);
+  bottom: 4.35rem;
   display: grid;
   grid-template-columns: minmax(0, 250px);
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: min(280px, calc(100vw - 2rem));
+  width: min(300px, calc(100vw - 2rem));
   padding: 0;
   opacity: 0;
   transform: translateY(22px) scale(0.96);
   transition: opacity 0.55s ease, transform 0.55s ease;
-  z-index: 4;
+  z-index: 5;
 }
 
 .fabian-intro {
-  width: min(280px, calc(100vw - 2rem));
-  transform: translateX(-50%) translateY(22px) scale(0.96);
+  width: min(300px, calc(100vw - 2rem));
+  transform: translateY(22px) scale(0.96);
 }
 
 .fabian-intro.is-visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateY(0) scale(1);
 }
 
 .intro-screen__host-stage {
   position: relative;
   display: grid;
   place-items: end center;
-  min-height: 254px;
+  min-height: 262px;
   animation: intro-host-idle 3.2s ease-in-out infinite;
 }
 
 .intro-screen__host-mural {
   position: absolute;
-  right: clamp(1rem, 3vw, 2.8rem);
-  bottom: 3.1rem;
-  width: min(25vw, 220px);
-  opacity: 0.16;
+  right: clamp(0.5rem, 2.4vw, 1.9rem);
+  bottom: 2.7rem;
+  width: min(28vw, 248px);
+  opacity: 0.12;
   transform: translateY(0) scale(1);
   filter:
     saturate(0.94)
@@ -730,7 +730,7 @@ body.intro-complete .floating-whatsapp {
   aspect-ratio: 0.92 / 1.18;
   align-self: end;
   width: 100%;
-  max-width: 250px;
+  max-width: 258px;
   z-index: 2;
 }
 
@@ -3585,28 +3585,28 @@ td {
 
   .fabian-intro {
     grid-template-columns: 1fr;
-    right: auto;
-    left: 50%;
-    bottom: 6.55rem;
-    width: min(180px, calc(100vw - 2rem));
+    right: 0.9rem;
+    left: auto;
+    bottom: 6.2rem;
+    width: min(190px, calc(100vw - 2rem));
     max-width: none;
     text-align: center;
   }
 
   .intro-screen__host-mural {
-    right: 0.75rem;
-    bottom: 4.8rem;
-    width: min(33vw, 118px);
-    opacity: 0.1;
+    right: 0.4rem;
+    bottom: 5rem;
+    width: min(30vw, 104px);
+    opacity: 0.08;
   }
 
   .intro-screen__host-portrait {
-    max-width: 170px;
+    max-width: 182px;
     margin: 0 auto;
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: 182px;
+    min-height: 194px;
   }
 
   .intro-screen__actions {
