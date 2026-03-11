@@ -307,6 +307,7 @@ export async function initIntroExperience({
   let audioToken = 0;
   const exitDurationMs = reducedMotion ? 120 : 980;
   const ambientTargetVolume = 0.055;
+  let hostSideSwapped = false;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -535,6 +536,28 @@ export async function initIntroExperience({
     });
   };
 
+  const moveHostToOppositeSide = () => {
+    if (!hostCard || hostSideSwapped || closed) return;
+    hostSideSwapped = true;
+
+    const startRect = hostCard.getBoundingClientRect();
+    hostCard.classList.add("is-swapped");
+    const endRect = hostCard.getBoundingClientRect();
+    const deltaX = startRect.left - endRect.left;
+
+    gsap.fromTo(
+      hostCard,
+      { x: deltaX },
+      {
+        x: 0,
+        duration: reducedMotion ? 0.28 : 1.05,
+        ease: "power2.inOut",
+        overwrite: true,
+        clearProps: "x",
+      }
+    );
+  };
+
   const tryPlayNarrationAudio = async ({ restart = false } = {}) => {
     if (reducedMotion) return false;
     if (!restart && audioMode === "media" && !narrationAudio.paused) return true;
@@ -678,6 +701,7 @@ export async function initIntroExperience({
     .to(camera.position, { z: 8.45, y: 2.28, duration: 2.9 }, 0.9)
     .to(taqueria.scale, { x: 0.96, y: 0.96, z: 0.96, duration: 2.9 }, 0.9)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 3.2)
+    .call(moveHostToOppositeSide, null, 5)
     .call(() => {
       fireGroup.visible = true;
       grillLight.intensity = 1.2;

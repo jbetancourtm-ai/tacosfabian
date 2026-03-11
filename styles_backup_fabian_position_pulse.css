@@ -798,11 +798,6 @@ body.intro-complete .floating-whatsapp {
   transform: translateY(22px) scale(0.96);
 }
 
-.fabian-intro.is-swapped {
-  left: clamp(1rem, 4vw, 3.4rem);
-  right: auto;
-}
-
 .intro-screen__host-card--hero {
   filter: drop-shadow(0 22px 42px rgba(0, 0, 0, 0.36));
 }
@@ -3408,13 +3403,13 @@ td {
     transform: scale(1) translateY(0);
   }
   89% {
-    transform: scale(1.12) translateY(-5px);
+    transform: scale(1.08) translateY(-4px);
   }
   93% {
-    transform: scale(1.22) translateY(-9px);
+    transform: scale(1.14) translateY(-8px);
   }
   97% {
-    transform: scale(1.08) translateY(-3px);
+    transform: scale(1.05) translateY(-2px);
   }
 }
 
@@ -3425,13 +3420,13 @@ td {
     transform: scale(1) translateY(0);
   }
   89% {
-    transform: scale(1.08) translateY(-3px);
+    transform: scale(1.05) translateY(-3px);
   }
   93% {
-    transform: scale(1.14) translateY(-6px);
+    transform: scale(1.09) translateY(-5px);
   }
   97% {
-    transform: scale(1.05) translateY(-2px);
+    transform: scale(1.03) translateY(-1px);
   }
 }
 
@@ -3737,11 +3732,6 @@ td {
     width: clamp(235px, 58vw, 280px);
     max-width: none;
     text-align: center;
-  }
-
-  .fabian-intro.is-swapped {
-    left: 0.35rem;
-    right: auto;
   }
 
   .intro-screen__host-mural {
