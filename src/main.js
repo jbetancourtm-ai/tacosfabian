@@ -313,6 +313,35 @@ function setupPwaSupport() {
   });
 }
 
+function setupFabianVideos() {
+  const fabianVideos = Array.from(document.querySelectorAll(".intro-screen__host-video, .floating-fabian-host__video"));
+  if (!fabianVideos.length) return;
+
+  const playVideo = (video) => {
+    if (!(video instanceof HTMLVideoElement)) return;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.loop = true;
+
+    const playAttempt = video.play();
+    if (playAttempt?.catch) {
+      playAttempt.catch(() => {});
+    }
+  };
+
+  fabianVideos.forEach((video) => {
+    if (!(video instanceof HTMLVideoElement)) return;
+    video.addEventListener("loadeddata", () => playVideo(video), { once: true });
+    playVideo(video);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    fabianVideos.forEach((video) => playVideo(video));
+  });
+}
+
 function setupWhatsappAudio() {
   if (!whatsappLinks.length) return;
 
@@ -1040,6 +1069,7 @@ setupRevealAnimations();
 setupHeaderEffects();
 setupIntroScreen();
 setupPwaSupport();
+setupFabianVideos();
 setupSiteAmbientAudio();
 setupFloatingWhatsapp();
 setupWhatsappAudio();

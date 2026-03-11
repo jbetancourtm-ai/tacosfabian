@@ -552,6 +552,14 @@ body.intro-complete .floating-whatsapp {
   animation: intro-premium-button-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+.intro-screen__btn--icon-only {
+  width: 3.85rem;
+  min-width: 3.85rem;
+  min-height: 3.85rem;
+  padding: 0;
+  border-radius: 50%;
+}
+
 .intro-screen__btn::after {
   content: "";
   position: absolute;
@@ -589,6 +597,18 @@ body.intro-complete .floating-whatsapp {
   position: relative;
   z-index: 1;
   white-space: nowrap;
+}
+
+.intro-screen__btn--icon-only .intro-screen__btn-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .intro-screen__btn-icon svg {
@@ -857,7 +877,8 @@ body.intro-complete .floating-whatsapp {
   z-index: 2;
 }
 
-.intro-screen__host-mural img {
+.intro-screen__host-mural img,
+.intro-screen__host-mural video {
   width: 100%;
   height: auto;
   display: block;
@@ -918,16 +939,19 @@ body.intro-complete .floating-whatsapp {
   overflow: hidden;
 }
 
-.intro-screen__host-asset img {
+.intro-screen__host-asset img,
+.intro-screen__host-asset video {
   width: 100%;
   height: 100%;
+  display: block;
   object-fit: contain;
   object-position: center bottom;
   transform-origin: center 78%;
   filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.2)) saturate(1.03) contrast(1.01) brightness(1);
 }
 
-.fabian-intro .intro-screen__host-asset img {
+.fabian-intro .intro-screen__host-asset img,
+.fabian-intro .intro-screen__host-asset video {
   transform: none;
   mix-blend-mode: normal;
   filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.22)) saturate(1.01) contrast(1.01) brightness(1);
@@ -1017,7 +1041,8 @@ body.intro-complete .floating-whatsapp {
   animation-duration: 1.4s;
 }
 
-.fabian-intro.is-speaking .intro-screen__host-asset img {
+.fabian-intro.is-speaking .intro-screen__host-asset img,
+.fabian-intro.is-speaking .intro-screen__host-asset video {
   animation: intro-host-head 1.55s ease-in-out infinite;
 }
 
@@ -3427,9 +3452,11 @@ td {
     contrast(1.02);
 }
 
-.floating-fabian-host__figure {
+.floating-fabian-host__figure,
+.floating-fabian-host__video {
   width: 100%;
   height: 100%;
+  display: block;
   object-fit: contain;
   object-position: center bottom;
   filter:
@@ -3440,6 +3467,10 @@ td {
   animation:
     floating-fabian-idle 3s ease-in-out infinite,
     floating-fabian-head 2.5s ease-in-out infinite;
+}
+
+.floating-fabian-host__figure.is-hidden {
+  display: none;
 }
 
 .fabian-main:hover .floating-fabian-host__stage,
@@ -3989,6 +4020,13 @@ td {
     box-shadow:
       0 10px 20px rgba(0, 0, 0, 0.24),
       inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .intro-screen__btn--icon-only {
+    width: 3.18rem;
+    min-width: 3.18rem;
+    min-height: 3.18rem;
+    padding: 0;
   }
 
   .intro-screen__btn--sound {

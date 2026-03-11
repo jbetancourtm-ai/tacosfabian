@@ -112,11 +112,12 @@
             </button>
             <button
               id="introInstallAppBtn"
-              class="btn intro-screen__btn intro-screen__btn--install"
+              class="btn intro-screen__btn intro-screen__btn--install intro-screen__btn--icon-only"
               type="button"
               hidden
               aria-hidden="true"
               aria-label="Instalar app Taqueria Fabian"
+              title="Instalar app"
             >
               <span class="intro-screen__btn-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
@@ -125,7 +126,13 @@
               </span>
               <span class="intro-screen__btn-text">Instalar app</span>
             </button>
-            <button id="introSkipBtn" class="btn intro-screen__btn intro-screen__btn--menu" type="button" aria-label="Ir al menu">
+            <button
+              id="introSkipBtn"
+              class="btn intro-screen__btn intro-screen__btn--menu intro-screen__btn--icon-only"
+              type="button"
+              aria-label="Ir al menu"
+              title="Ir al menu"
+            >
               <span class="intro-screen__btn-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                   <path d="M4 6.8A2.8 2.8 0 0 1 6.8 4h10.4A2.8 2.8 0 0 1 20 6.8v10.4A2.8 2.8 0 0 1 17.2 20H6.8A2.8 2.8 0 0 1 4 17.2V6.8zm4.3.2v2h7.4V7H8.3zm0 4v2h7.4v-2H8.3zm0 4v2h4.6v-2H8.3z"></path>
@@ -135,11 +142,12 @@
             </button>
             <a
               id="introWhatsappBtn"
-              class="btn intro-screen__btn intro-screen__btn--whatsapp"
+              class="btn intro-screen__btn intro-screen__btn--whatsapp intro-screen__btn--icon-only"
               href="https://wa.me/525615496107?text=Hola%20Tacos%20Fabian%2C%20quiero%20hacer%20un%20pedido."
               target="_blank"
               rel="noreferrer noopener"
               aria-label="Pedir por WhatsApp"
+              title="Pedir por WhatsApp"
             >
               <span class="intro-screen__btn-icon inline-icon inline-icon--whatsapp" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
@@ -170,12 +178,17 @@
         </div>
 
         <div id="introHostMural" class="intro-screen__host-mural" aria-hidden="true">
-          <img
-            src="/images/fabian.png"
-            alt=""
-            loading="eager"
-            decoding="async"
-          />
+          <video
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="auto"
+            poster="/images/fabian.png"
+            aria-hidden="true"
+          >
+            <source src="/images/fabian.mp4" type="video/mp4" />
+          </video>
         </div>
 
         <div
@@ -197,12 +210,17 @@
             <div class="intro-screen__host-portrait intro-screen__host-portrait--small intro-screen__host-portrait--hero">
               <span class="intro-screen__host-glow" aria-hidden="true"></span>
               <span class="intro-screen__host-asset">
-                <img
-                  src="/images/fabian.png"
-                  alt="Fabian saludando en el intro de Taqueria Fabian"
-                  loading="eager"
-                  decoding="async"
-                />
+                <video
+                  class="intro-screen__host-video"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="auto"
+                  poster="/images/fabian.png"
+                >
+                  <source src="/images/fabian.mp4" type="video/mp4" />
+                </video>
               </span>
               <span class="intro-screen__host-mouth" aria-hidden="true"></span>
               <span class="intro-screen__host-wave" aria-hidden="true"></span>
@@ -851,12 +869,24 @@
           aria-hidden="true"
         ></span>
         <img
-          class="floating-fabian-host__figure"
+          class="floating-fabian-host__figure is-hidden"
           src="/images/fabian.png"
           alt=""
           loading="lazy"
           decoding="async"
         />
+        <video
+          class="floating-fabian-host__video"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="auto"
+          poster="/images/fabian.png"
+          aria-hidden="true"
+        >
+          <source src="/images/fabian.mp4" type="video/mp4" />
+        </video>
         <span class="floating-fabian-host__mouth"></span>
         <span class="floating-fabian-host__wave"></span>
       </div>
