@@ -242,7 +242,6 @@ function setupPwaSupport() {
     installAppBtn.hidden = !visible;
     installAppBtn.setAttribute("aria-hidden", visible ? "false" : "true");
     installAppBtn.disabled = !visible;
-    installAppBtn.classList.toggle("is-ready", visible);
   };
 
   syncInstallButton(false);
