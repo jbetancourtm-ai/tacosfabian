@@ -216,9 +216,10 @@ function setupFloatingWhatsapp() {
       { x: 0, y: 0, scale: 1, rotate: 0 },
       {
         keyframes: [
-          { x: -6, y: -14, scale: 1.02, duration: 0.2 },
-          { x: 12, y: -24, scale: 1.03, duration: 0.28 },
-          { x: 18, y: -10, scale: 1.02, duration: 0.2 },
+          { y: -10, scale: 1.02, rotate: -4, duration: 0.16 },
+          { y: -24, scale: 1.04, rotate: 5, duration: 0.18 },
+          { y: -12, x: 6, scale: 1.03, rotate: -3, duration: 0.18 },
+          { y: -3, x: 0, scale: 1.01, rotate: 2, duration: 0.18 },
           { x: 0, y: 0, scale: 1, rotate: 0, duration: 0.28 },
         ],
         ease: "power2.out",
@@ -228,7 +229,7 @@ function setupFloatingWhatsapp() {
     celebrateTimer = window.setTimeout(() => {
       floatingFabianHost.classList.remove("is-celebrating");
       scheduleIdleReaction();
-    }, 980);
+    }, 1020);
   });
 
   scheduleIdleReaction();
