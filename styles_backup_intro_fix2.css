@@ -686,30 +686,21 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-mural {
-  position: absolute;
-  right: clamp(1rem, 3vw, 2.8rem);
-  bottom: 3.1rem;
-  width: min(25vw, 220px);
-  opacity: 0.16;
+  display: none;
+}
+
+.intro-screen__host-mural.is-visible {
+  opacity: 0.26;
   transform: translateY(0) scale(1);
-  filter:
-    saturate(0.94)
-    contrast(1)
-    brightness(0.82)
-    drop-shadow(0 20px 32px rgba(0, 0, 0, 0.22));
-  transition: opacity 0.7s ease, transform 0.7s ease;
-  pointer-events: none;
-  z-index: 2;
 }
 
 .intro-screen__host-mural img {
   width: 100%;
   height: auto;
   display: block;
-  opacity: 0.92;
+  opacity: 0.94;
   object-fit: contain;
-  object-position: center bottom;
-  filter: grayscale(0.08);
+  filter: saturate(1.02) contrast(1.03) brightness(0.96);
 }
 
 .intro-screen__host-sprite {
@@ -3595,13 +3586,6 @@ td {
     width: min(180px, calc(100vw - 2rem));
     max-width: none;
     text-align: center;
-  }
-
-  .intro-screen__host-mural {
-    right: 0.75rem;
-    bottom: 4.8rem;
-    width: min(33vw, 118px);
-    opacity: 0.1;
   }
 
   .intro-screen__host-portrait {
