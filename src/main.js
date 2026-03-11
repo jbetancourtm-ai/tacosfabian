@@ -236,6 +236,10 @@ function setupSiteAmbientAudio() {
 function setupPwaSupport() {
   const isStandaloneMode = () =>
     window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const userAgent = window.navigator.userAgent || "";
+  const isIos = /iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isMobileViewport = window.matchMedia("(max-width: 899px)");
+  const hasIosInstallPath = isIos && !isStandaloneMode();
 
   const syncInstallButton = (visible) => {
     installAppButtons.forEach((button) => {
@@ -262,6 +266,10 @@ function setupPwaSupport() {
     syncInstallButton(false);
   });
 
+  if (hasIosInstallPath) {
+    syncInstallButton(true);
+  }
+
   window.matchMedia("(display-mode: standalone)").addEventListener?.("change", (event) => {
     if (!event.matches) return;
     deferredInstallPrompt = null;
@@ -272,7 +280,16 @@ function setupPwaSupport() {
     const button = event.currentTarget;
     if (!(button instanceof HTMLButtonElement)) return;
 
+    if (isIos && !deferredInstallPrompt && !isStandaloneMode()) {
+      showToast("En iPhone o iPad: toca Compartir y luego Agregar a pantalla de inicio.", "info");
+      syncInstallButton(true);
+      return;
+    }
+
     if (!deferredInstallPrompt || isStandaloneMode()) {
+      if (isMobileViewport.matches && !isStandaloneMode()) {
+        showToast("Si tu navegador lo permite, usa el menu y toca Instalar app o Agregar a pantalla de inicio.", "info");
+      }
       syncInstallButton(false);
       return;
     }
@@ -301,6 +318,12 @@ function setupPwaSupport() {
   installAppButtons.forEach((button) => {
     button.addEventListener("click", handleInstallClick);
   });
+
+  if (!deferredInstallPrompt && hasIosInstallPath) {
+    syncInstallButton(true);
+  } else if (!deferredInstallPrompt && !hasIosInstallPath) {
+    syncInstallButton(false);
+  }
 
   if (!("serviceWorker" in navigator)) return;
 
