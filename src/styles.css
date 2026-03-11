@@ -3561,32 +3561,32 @@ td {
 
   .fabian-main {
     right: 0.05rem;
-    bottom: 4.15rem;
-    width: 92px;
+    bottom: 4.4rem;
+    width: 108px;
   }
 
   .fabian-main .floating-fabian-host__stage {
-    width: 92px;
-    height: 112px;
+    width: 108px;
+    height: 132px;
   }
 
   .fabian-main .floating-fabian-host__shadow {
-    width: 40px;
-    height: 8px;
-    transform: translateY(80px);
+    width: 48px;
+    height: 10px;
+    transform: translateY(94px);
   }
 
   .floating-fabian-host__wave {
-    width: 20px;
-    height: 20px;
-    right: 10px;
-    top: 32px;
+    width: 24px;
+    height: 24px;
+    right: 12px;
+    top: 38px;
   }
 
   .floating-fabian-host__mouth {
-    top: 42px;
-    width: 13px;
-    height: 4px;
+    top: 50px;
+    width: 16px;
+    height: 5px;
   }
 
   .social-floating-links a {
@@ -3600,10 +3600,10 @@ td {
 
   .fabian-intro {
     grid-template-columns: 1fr;
-    right: 0.5rem;
+    right: 0.35rem;
     left: auto;
-    bottom: 5.5rem;
-    width: clamp(180px, 48vw, 220px);
+    bottom: 5.1rem;
+    width: clamp(210px, 52vw, 250px);
     max-width: none;
     text-align: center;
   }
@@ -3621,7 +3621,7 @@ td {
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(180px, 48vw, 220px);
+    min-height: clamp(210px, 52vw, 250px);
   }
 
   .intro-screen__actions {
@@ -3702,7 +3702,7 @@ td {
 
   .intro-screen__story {
     width: 100%;
-    padding-right: min(39vw, 11rem);
+    padding-right: min(44vw, 13rem);
   }
 
   .intro-screen__narration {
