@@ -320,14 +320,6 @@ function setupFloatingWhatsapp() {
     }, window.innerWidth >= 900 ? 13000 : 15000);
   };
 
-  floatingFabianHost?.addEventListener("pointerenter", () => {
-    floatingFabianHost.classList.add("is-hovered");
-  });
-
-  floatingFabianHost?.addEventListener("pointerleave", () => {
-    floatingFabianHost.classList.remove("is-hovered");
-  });
-
   floatingWhatsapp.addEventListener("pointerenter", playHoverReaction);
   floatingWhatsapp.addEventListener(
     "touchstart",
