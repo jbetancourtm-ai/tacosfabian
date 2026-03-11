@@ -617,8 +617,8 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__story {
   align-self: end;
   display: grid;
-  width: min(760px, calc(100% - clamp(12rem, 26vw, 18rem)));
-  margin: 0 auto 0 0;
+  width: min(760px, 100%);
+  margin: 0 auto;
   z-index: 4;
 }
 
@@ -648,30 +648,24 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__host-card {
   position: absolute;
   left: auto;
-  right: clamp(1rem, 4vw, 3.4rem);
-  bottom: clamp(3.25rem, 7vh, 4.6rem);
+  right: clamp(1.4rem, 5vw, 4rem);
+  bottom: 4.35rem;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 250px);
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: clamp(220px, 24vw, 260px);
-  max-width: calc(100vw - 1.5rem);
+  width: min(300px, calc(100vw - 2rem));
   padding: 0;
   opacity: 0;
   transform: translateY(22px) scale(0.96);
   transition: opacity 0.55s ease, transform 0.55s ease;
-  z-index: 6;
+  z-index: 5;
 }
 
 .fabian-intro {
-  width: clamp(220px, 24vw, 260px);
-  max-width: calc(100vw - 1.5rem);
+  width: min(300px, calc(100vw - 2rem));
   transform: translateY(22px) scale(0.96);
-}
-
-.intro-screen__host-card--hero {
-  filter: drop-shadow(0 22px 42px rgba(0, 0, 0, 0.36));
 }
 
 .fabian-intro.is-visible {
@@ -687,17 +681,12 @@ body.intro-complete .floating-whatsapp {
   animation: intro-host-idle 3.2s ease-in-out infinite;
 }
 
-.intro-screen__host-stage--hero {
-  width: 100%;
-  min-height: clamp(220px, 26vw, 260px);
-}
-
 .intro-screen__host-mural {
   position: absolute;
   right: clamp(0.5rem, 2.4vw, 1.9rem);
-  bottom: clamp(2.3rem, 5.6vh, 3rem);
-  width: clamp(140px, 18vw, 210px);
-  opacity: 0.09;
+  bottom: 2.7rem;
+  width: min(28vw, 248px);
+  opacity: 0.12;
   transform: translateY(0) scale(1);
   filter:
     saturate(0.94)
@@ -738,15 +727,11 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-portrait--small {
-  aspect-ratio: 0.88 / 1.16;
+  aspect-ratio: 0.92 / 1.18;
   align-self: end;
   width: 100%;
-  max-width: 100%;
+  max-width: 258px;
   z-index: 2;
-}
-
-.intro-screen__host-portrait--hero {
-  width: 100%;
 }
 
 .fabian-intro.has-sprite .intro-screen__host-sprite,
@@ -771,7 +756,7 @@ body.intro-complete .floating-whatsapp {
   object-fit: contain;
   object-position: center bottom;
   transform-origin: center 78%;
-  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.2)) saturate(1.03) contrast(1.01) brightness(1);
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.22)) saturate(1.04) contrast(1.02) brightness(0.98);
 }
 
 .fabian-intro .intro-screen__host-asset img {
@@ -787,16 +772,16 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-glow {
-  inset: auto 16% 5% 16%;
-  height: 22%;
+  inset: auto 18% 6% 18%;
+  height: 26%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 213, 165, 0.22), rgba(255, 130, 36, 0.04) 64%, transparent 100%);
-  filter: blur(12px);
+  background: radial-gradient(circle, rgba(255, 213, 165, 0.26), rgba(255, 130, 36, 0.05) 64%, transparent 100%);
+  filter: blur(10px);
 }
 
 .intro-screen__host-mouth {
   left: 50%;
-  bottom: 35%;
+  bottom: 34%;
   width: 12%;
   height: 2.6%;
   transform: translateX(-50%);
@@ -807,8 +792,8 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-wave {
-  right: 6%;
-  top: 40%;
+  right: 4%;
+  top: 42%;
   width: 22%;
   height: 12%;
   border-radius: 999px;
@@ -820,9 +805,9 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-arm {
-  bottom: 10px;
-  width: 16px;
-  height: 44px;
+  bottom: 8px;
+  width: 18px;
+  height: 48px;
   border-radius: 999px;
   background:
     linear-gradient(180deg, rgba(37, 23, 18, 0.96), rgba(20, 11, 9, 0.96));
@@ -834,12 +819,12 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-arm--left {
-  left: 8%;
+  left: 4px;
   transform: rotate(12deg);
 }
 
 .intro-screen__host-arm--right {
-  right: 6%;
+  right: 2px;
   transform: rotate(-10deg);
 }
 
@@ -3600,28 +3585,28 @@ td {
 
   .fabian-intro {
     grid-template-columns: 1fr;
-    right: 0.5rem;
+    right: 0.9rem;
     left: auto;
-    bottom: 5.5rem;
-    width: clamp(150px, 42vw, 190px);
+    bottom: 6.2rem;
+    width: min(190px, calc(100vw - 2rem));
     max-width: none;
     text-align: center;
   }
 
   .intro-screen__host-mural {
-    right: 0.15rem;
-    bottom: 4.45rem;
-    width: clamp(88px, 24vw, 116px);
-    opacity: 0.07;
+    right: 0.4rem;
+    bottom: 5rem;
+    width: min(30vw, 104px);
+    opacity: 0.08;
   }
 
   .intro-screen__host-portrait {
-    max-width: 100%;
+    max-width: 182px;
     margin: 0 auto;
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(150px, 42vw, 190px);
+    min-height: 194px;
   }
 
   .intro-screen__actions {
@@ -3702,7 +3687,6 @@ td {
 
   .intro-screen__story {
     width: 100%;
-    padding-right: min(39vw, 11rem);
   }
 
   .intro-screen__narration {
