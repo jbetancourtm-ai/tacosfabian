@@ -1,4 +1,4 @@
-const CACHE_NAME = "tfabian-pwa-v1";
+const CACHE_NAME = "tfabian-pwa-v2";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",

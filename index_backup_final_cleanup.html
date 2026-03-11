@@ -183,12 +183,17 @@
         </div>
 
         <div id="introHostMural" class="intro-screen__host-mural" aria-hidden="true">
-          <img
-            src="/images/fabian.png"
-            alt=""
-            loading="eager"
-            decoding="async"
-          />
+          <video
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="auto"
+            poster="/images/fabian.png"
+            aria-hidden="true"
+          >
+            <source src="/images/fabian.mp4" type="video/mp4" />
+          </video>
         </div>
 
         <div
@@ -214,6 +219,7 @@
                   class="intro-screen__host-video"
                   autoplay
                   loop
+                  muted
                   playsinline
                   preload="auto"
                   poster="/images/fabian.png"

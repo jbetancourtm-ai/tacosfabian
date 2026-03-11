@@ -277,21 +277,18 @@ export async function initIntroExperience({
   const hostSprite = introScreen.querySelector(".intro-screen__host-sprite");
   const hostLine = introScreen.querySelector("#introHostLine");
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
+  const hostVideo = introScreen.querySelector(".intro-screen__host-video");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
-  const speechQueue = buildSpeechQueue();
-  const narrationAudio = new Audio("/audio/intro-narration-es-mx.mp3");
-  const ambientAudio = new Audio("/audio/taqueria-ambient-night.wav");
-  narrationAudio.preload = "auto";
-  narrationAudio.playsInline = true;
-  narrationAudio.playbackRate = 1.04;
-  narrationAudio.volume = 1;
-  ambientAudio.preload = "auto";
-  ambientAudio.playsInline = true;
-  ambientAudio.loop = true;
-  ambientAudio.volume = 0;
-  let useSpeechFallback = false;
+  if (hostVideo instanceof HTMLVideoElement) {
+    hostVideo.preload = "auto";
+    hostVideo.playsInline = true;
+    hostVideo.loop = true;
+    hostVideo.muted = false;
+    hostVideo.defaultMuted = false;
+    hostVideo.volume = 0.88;
+  }
 
   if (!(canvas instanceof HTMLCanvasElement) || !(narration instanceof HTMLElement)) {
     document.body.classList.remove("intro-active");
@@ -306,7 +303,6 @@ export async function initIntroExperience({
   let audioMode = "idle";
   let audioToken = 0;
   const exitDurationMs = reducedMotion ? 120 : 980;
-  const ambientTargetVolume = 0.07;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
 
@@ -527,9 +523,10 @@ export async function initIntroExperience({
   };
   window.addEventListener("resize", resize);
 
-  const fadeAmbientTo = (volume, duration = 0.7) => {
-    gsap.killTweensOf(ambientAudio);
-    gsap.to(ambientAudio, {
+  const fadeHostVideoTo = (volume, duration = 0.45) => {
+    if (!(hostVideo instanceof HTMLVideoElement)) return;
+    gsap.killTweensOf(hostVideo);
+    gsap.to(hostVideo, {
       volume,
       duration,
       ease: "sine.inOut",
@@ -586,39 +583,31 @@ export async function initIntroExperience({
   };
 
   const tryPlayNarrationAudio = async ({ restart = false } = {}) => {
-    if (reducedMotion) return false;
-    if (!restart && audioMode === "media" && !narrationAudio.paused) return true;
+    if (!(hostVideo instanceof HTMLVideoElement)) return false;
+    if (!restart && audioMode === "media" && !hostVideo.paused) return true;
 
     const token = ++audioToken;
-    speechQueue.stop();
-    useSpeechFallback = false;
     audioMode = "starting";
 
     try {
-      ambientAudio.pause();
-      narrationAudio.pause();
-      ambientAudio.currentTime = 0;
-      narrationAudio.currentTime = 0;
-      ambientAudio.volume = 0;
-      await ambientAudio.play();
+      hostVideo.pause();
+      hostVideo.currentTime = 0;
+      hostVideo.muted = false;
+      hostVideo.defaultMuted = false;
+      hostVideo.volume = 0;
+      await hostVideo.play();
       if (token !== audioToken) return false;
-      fadeAmbientTo(ambientTargetVolume, 1.4);
-      narrationAudio.currentTime = 0;
-      await narrationAudio.play();
-      if (token !== audioToken) return false;
+      fadeHostVideoTo(0.88, 0.55);
       audioMode = "media";
-      useSpeechFallback = false;
       introSoundBtn?.classList.add("is-hidden");
       removeIntroAudioUnlockListeners();
       return true;
     } catch {
       if (token !== audioToken) return false;
-      ambientAudio.pause();
-      narrationAudio.pause();
-      ambientAudio.currentTime = 0;
-      narrationAudio.currentTime = 0;
-      audioMode = "speech";
-      useSpeechFallback = true;
+      hostVideo.pause();
+      hostVideo.currentTime = 0;
+      hostVideo.volume = 0.88;
+      audioMode = "idle";
       introSoundBtn?.classList.remove("is-hidden");
       armIntroAudioUnlockListeners();
       return false;
@@ -635,7 +624,6 @@ export async function initIntroExperience({
 
     timeline?.pause(0);
     timeline?.restart();
-    speechQueue.stop();
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
     const started = await tryPlayNarrationAudio({ restart: true });
 
@@ -664,7 +652,6 @@ export async function initIntroExperience({
     narration.appendChild(line);
     if (hostLine) hostLine.textContent = text;
     pulseSpeaking();
-    if (useSpeechFallback && audioMode !== "media") speechQueue.speak(narratorText);
   };
 
   const finishIntro = () => {
@@ -675,15 +662,14 @@ export async function initIntroExperience({
     hostCard?.classList.remove("is-speaking");
     audioToken += 1;
     audioMode = "idle";
-    fadeAmbientTo(0, 0.45);
+    fadeHostVideoTo(0, 0.35);
     window.setTimeout(() => {
-      ambientAudio.pause();
-      ambientAudio.currentTime = 0;
-    }, 460);
+      if (!(hostVideo instanceof HTMLVideoElement)) return;
+      hostVideo.pause();
+      hostVideo.currentTime = 0;
+      hostVideo.volume = 0.88;
+    }, 360);
     removeIntroAudioUnlockListeners();
-    narrationAudio.pause();
-    narrationAudio.currentTime = 0;
-    speechQueue.stop();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
     introScreen.classList.add("is-exiting");
     introScreen.setAttribute("aria-hidden", "true");
@@ -710,7 +696,7 @@ export async function initIntroExperience({
 
   introSkipBtn?.addEventListener("click", finishIntro);
   introSoundBtn?.addEventListener("click", () => {
-    if (audioMode === "media" && !narrationAudio.paused) return;
+    if (audioMode === "media" && hostVideo instanceof HTMLVideoElement && !hostVideo.paused) return;
     void restartIntroExperience();
   });
   window.addEventListener("keydown", (event) => {

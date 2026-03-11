@@ -715,7 +715,6 @@ body.intro-complete .floating-whatsapp {
   place-items: center;
   pointer-events: none;
   z-index: 4;
-  opacity: 0.72;
 }
 
 .intro-screen__media-shell {
@@ -737,7 +736,7 @@ body.intro-complete .floating-whatsapp {
   inset: 6%;
   background:
     radial-gradient(circle at 50% 50%, rgba(255, 170, 87, 0.06), rgba(255, 128, 36, 0.02) 48%, transparent 78%);
-  filter: blur(16px);
+  filter: blur(20px);
 }
 
 .intro-screen__media-frame {
@@ -762,9 +761,9 @@ body.intro-complete .floating-whatsapp {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   text-shadow:
-    0 0 12px rgba(255, 194, 135, 0.36),
-    0 0 30px rgba(255, 112, 28, 0.18),
-    0 18px 58px rgba(0, 0, 0, 0.46);
+    0 0 18px rgba(255, 194, 135, 0.48),
+    0 0 42px rgba(255, 112, 28, 0.26),
+    0 22px 80px rgba(0, 0, 0, 0.56);
 }
 
 .intro-screen__subtitle {
@@ -772,7 +771,7 @@ body.intro-complete .floating-whatsapp {
   font-size: clamp(0.95rem, 1.9vw, 1.15rem);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  text-shadow: 0 0 16px rgba(255, 124, 26, 0.12);
+  text-shadow: 0 0 24px rgba(255, 124, 26, 0.18);
 }
 
 .intro-screen__story {
@@ -787,10 +786,10 @@ body.intro-complete .floating-whatsapp {
   min-height: 5.8rem;
   padding: 0.95rem 1.15rem;
   border-radius: 28px;
-  background: linear-gradient(135deg, rgba(8, 10, 14, 0.66), rgba(24, 16, 14, 0.46));
-  border: 1px solid rgba(255, 198, 147, 0.12);
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.24);
-  backdrop-filter: blur(12px);
+  background: linear-gradient(135deg, rgba(8, 10, 14, 0.75), rgba(24, 16, 14, 0.56));
+  border: 1px solid rgba(255, 198, 147, 0.16);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(16px);
 }
 
 .intro-screen__narration-line {
@@ -949,35 +948,6 @@ body.intro-complete .floating-whatsapp {
   filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.2)) saturate(1.03) contrast(1.01) brightness(1);
 }
 
-.intro-screen__host-video,
-.floating-fabian-host__video {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.fabian-video-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  pointer-events: none;
-}
-
-.fabian-video-canvas--intro {
-  filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.22));
-}
-
-.fabian-video-canvas--floating {
-  filter: drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22));
-  transform-origin: center 22%;
-  animation:
-    floating-fabian-idle 3s ease-in-out infinite,
-    floating-fabian-head 2.5s ease-in-out infinite;
-}
-
 .fabian-intro .intro-screen__host-asset img,
 .fabian-intro .intro-screen__host-asset video {
   transform: none;
@@ -1071,10 +1041,6 @@ body.intro-complete .floating-whatsapp {
 
 .fabian-intro.is-speaking .intro-screen__host-asset img,
 .fabian-intro.is-speaking .intro-screen__host-asset video {
-  animation: intro-host-head 1.55s ease-in-out infinite;
-}
-
-.fabian-intro.is-speaking .fabian-video-canvas--intro {
   animation: intro-host-head 1.55s ease-in-out infinite;
 }
 
@@ -4020,7 +3986,7 @@ td {
     right: 0.15rem;
     bottom: 4.45rem;
     width: clamp(88px, 24vw, 116px);
-    opacity: 0.04;
+    opacity: 0.07;
   }
 
   .intro-screen__host-portrait {
@@ -4109,27 +4075,25 @@ td {
 
   .intro-screen__headline {
     left: 50%;
-    top: 6.65rem;
-    max-width: min(84vw, 21rem);
+    top: 7.4rem;
+    max-width: min(88vw, 24rem);
     transform: translateX(-50%);
     text-align: center;
   }
 
   .intro-screen__media-reserve {
-    top: clamp(12.4rem, 30vh, 14.8rem);
+    top: clamp(13.4rem, 32vh, 16rem);
     left: 50%;
     right: auto;
-    width: min(54vw, 244px);
-    min-width: 170px;
+    width: min(62vw, 290px);
+    min-width: 200px;
     transform: translateX(-50%);
-    opacity: 0.48;
   }
 
   .intro-screen__corner-lights {
     width: min(19rem, 86vw);
     height: 6rem;
     top: 0.6rem;
-    opacity: 0.56;
   }
 
   .intro-screen__corner-light {
@@ -4158,21 +4122,13 @@ td {
   }
 
   .intro-screen__title {
-    font-size: clamp(1.75rem, 8.8vw, 2.65rem);
-    letter-spacing: 0.1em;
-    line-height: 0.96;
-  }
-
-  .intro-screen__subtitle {
-    margin-top: 0.55rem;
-    font-size: clamp(0.68rem, 2.7vw, 0.84rem);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
   }
 
   .intro-screen__story {
     width: 100%;
     padding-right: 0;
-    padding-top: min(34vw, 7.4rem);
+    padding-top: min(42vw, 10rem);
   }
 
   .floating-fabian-host__stage {
@@ -4190,11 +4146,8 @@ td {
   }
 
   .intro-screen__narration {
-    min-height: 7.5rem;
-    max-width: min(92vw, 26rem);
-    margin: 0 auto;
-    padding: 0.82rem 0.92rem;
-    border-radius: 22px;
+    min-height: 9.2rem;
+    padding: 1rem;
   }
 
   .intro-screen__meta {
@@ -4272,38 +4225,6 @@ td {
 
   .hero-reviews-card__actions {
     flex-direction: row;
-  }
-}
-
-@media (max-width: 599px) {
-  .intro-screen__headline {
-    top: 6.1rem;
-    max-width: min(86vw, 18rem);
-  }
-
-  .intro-screen__title {
-    font-size: clamp(1.48rem, 8.2vw, 2.15rem);
-    letter-spacing: 0.08em;
-  }
-
-  .intro-screen__subtitle {
-    font-size: 0.66rem;
-    letter-spacing: 0.06em;
-  }
-
-  .intro-screen__media-reserve {
-    top: 11.75rem;
-    width: min(48vw, 208px);
-    min-width: 150px;
-    opacity: 0.36;
-  }
-
-  .intro-screen__corner-lights {
-    opacity: 0.4;
-  }
-
-  .intro-screen__story {
-    padding-top: min(28vw, 5.8rem);
   }
 }
 

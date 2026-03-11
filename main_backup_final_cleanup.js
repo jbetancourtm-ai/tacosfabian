@@ -329,7 +329,7 @@ function setupPwaSupport() {
 
   window.addEventListener("load", async () => {
     try {
-      await navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" });
+      await navigator.serviceWorker.register("/sw.js", { scope: "/" });
     } catch (error) {
       console.error("No se pudo registrar el service worker", error);
     }
@@ -340,19 +340,12 @@ function setupFabianVideos() {
   const fabianVideos = Array.from(document.querySelectorAll(".intro-screen__host-video, .floating-fabian-host__video"));
   if (!fabianVideos.length) return;
 
-  const renderers = [];
-
-  const ensurePlayback = (video) => {
+  const playVideo = (video) => {
     if (!(video instanceof HTMLVideoElement)) return;
-    const isIntroVideo = video.classList.contains("intro-screen__host-video");
+    video.muted = true;
+    video.defaultMuted = true;
     video.playsInline = true;
     video.loop = true;
-    video.preload = "auto";
-
-    if (!(isIntroVideo && document.body.classList.contains("intro-active") && !video.paused && !video.muted)) {
-      video.muted = true;
-      video.defaultMuted = true;
-    }
 
     const playAttempt = video.play();
     if (playAttempt?.catch) {
@@ -362,87 +355,13 @@ function setupFabianVideos() {
 
   fabianVideos.forEach((video) => {
     if (!(video instanceof HTMLVideoElement)) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.className = `fabian-video-canvas ${video.classList.contains("intro-screen__host-video") ? "fabian-video-canvas--intro" : "fabian-video-canvas--floating"}`;
-    canvas.setAttribute("aria-hidden", "true");
-    video.after(canvas);
-
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-    const offscreen = document.createElement("canvas");
-    const offscreenContext = offscreen.getContext("2d", { willReadFrequently: true });
-    if (!context || !offscreenContext) return;
-
-    let rafId = 0;
-
-    // Best-effort matte removal for the current MP4. For true transparency,
-    // swap this source later for a WEBM/alpha asset without changing layout code.
-    const processFrame = () => {
-      if (!video.isConnected || !canvas.isConnected) return;
-
-      const width = Math.max(2, Math.round(video.clientWidth * Math.min(window.devicePixelRatio || 1, 1.35)));
-      const height = Math.max(2, Math.round(video.clientHeight * Math.min(window.devicePixelRatio || 1, 1.35)));
-
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
-        offscreen.width = width;
-        offscreen.height = height;
-      }
-
-      if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
-        offscreenContext.clearRect(0, 0, width, height);
-        offscreenContext.drawImage(video, 0, 0, width, height);
-        const frame = offscreenContext.getImageData(0, 0, width, height);
-        const { data } = frame;
-
-        for (let index = 0; index < data.length; index += 4) {
-          const red = data[index];
-          const green = data[index + 1];
-          const blue = data[index + 2];
-          const alpha = data[index + 3];
-          const max = Math.max(red, green, blue);
-          const min = Math.min(red, green, blue);
-          const luminance = (red + green + blue) / 3;
-          const chroma = max - min;
-
-          if (luminance < 28 && chroma < 26) {
-            data[index + 3] = 0;
-          } else if (luminance < 58 && chroma < 34) {
-            data[index + 3] = Math.round(alpha * Math.max(0, (luminance - 18) / 40));
-          }
-        }
-
-        context.clearRect(0, 0, width, height);
-        context.putImageData(frame, 0, 0);
-      }
-
-      rafId = window.requestAnimationFrame(processFrame);
-    };
-
-    const startRenderer = () => {
-      window.cancelAnimationFrame(rafId);
-      processFrame();
-    };
-
-    video.addEventListener("loadeddata", () => {
-      ensurePlayback(video);
-      startRenderer();
-    });
-    video.addEventListener("play", startRenderer);
-
-    renderers.push(() => {
-      ensurePlayback(video);
-      startRenderer();
-    });
-
-    ensurePlayback(video);
-    startRenderer();
+    video.addEventListener("loadeddata", () => playVideo(video), { once: true });
+    playVideo(video);
   });
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible") return;
-    renderers.forEach((restart) => restart());
+    fabianVideos.forEach((video) => playVideo(video));
   });
 }
 
