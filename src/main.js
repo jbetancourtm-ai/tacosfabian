@@ -30,7 +30,7 @@ const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
-const installAppBtn = document.querySelector("#installAppBtn");
+const installAppButtons = Array.from(document.querySelectorAll("#installAppBtn, #introInstallAppBtn"));
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -238,11 +238,13 @@ function setupPwaSupport() {
     window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 
   const syncInstallButton = (visible) => {
-    if (!(installAppBtn instanceof HTMLButtonElement)) return;
-    installAppBtn.hidden = !visible;
-    installAppBtn.setAttribute("aria-hidden", visible ? "false" : "true");
-    installAppBtn.disabled = !visible;
-    installAppBtn.classList.toggle("is-ready", visible);
+    installAppButtons.forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      button.hidden = !visible;
+      button.setAttribute("aria-hidden", visible ? "false" : "true");
+      button.disabled = !visible;
+      button.classList.toggle("is-ready", visible);
+    });
   };
 
   syncInstallButton(false);
@@ -266,13 +268,18 @@ function setupPwaSupport() {
     syncInstallButton(false);
   });
 
-  installAppBtn?.addEventListener("click", async () => {
+  const handleInstallClick = async (event) => {
+    const button = event.currentTarget;
+    if (!(button instanceof HTMLButtonElement)) return;
+
     if (!deferredInstallPrompt || isStandaloneMode()) {
       syncInstallButton(false);
       return;
     }
 
-    installAppBtn.disabled = true;
+    installAppButtons.forEach((item) => {
+      if (item instanceof HTMLButtonElement) item.disabled = true;
+    });
 
     try {
       await deferredInstallPrompt.prompt();
@@ -284,9 +291,15 @@ function setupPwaSupport() {
         showToast("Puedes instalar la app mas tarde desde el navegador.", "info");
       }
     } catch {
-      installAppBtn.disabled = false;
+      installAppButtons.forEach((item) => {
+        if (item instanceof HTMLButtonElement) item.disabled = false;
+      });
       syncInstallButton(Boolean(deferredInstallPrompt));
     }
+  };
+
+  installAppButtons.forEach((button) => {
+    button.addEventListener("click", handleInstallClick);
   });
 
   if (!("serviceWorker" in navigator)) return;
