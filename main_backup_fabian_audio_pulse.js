@@ -49,10 +49,8 @@ let heroReviewsCache = [];
 let heroReviewsStartIndex = 0;
 let siteAmbientAudio = null;
 let siteAmbientReady = false;
-let siteAmbientStarting = false;
 let siteAmbientObserver = null;
 let siteAmbientUnlockBound = false;
-let siteAmbientPendingTimer = 0;
 let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 
@@ -129,7 +127,7 @@ function setupHeaderEffects() {
 }
 
 function setupSiteAmbientAudio() {
-  if (siteAmbientAudio) return;
+  if (siteAmbientReady) return;
 
   siteAmbientAudio = new Audio("/audio/taqueria-ambient-night.wav");
   siteAmbientAudio.preload = "auto";
@@ -137,8 +135,7 @@ function setupSiteAmbientAudio() {
   siteAmbientAudio.loop = true;
   siteAmbientAudio.volume = 0;
 
-  const targetVolume = 0.055;
-  const introExitDelayMs = 520;
+  const targetVolume = 0.038;
 
   const fadeAmbientTo = (volume, duration = 1.4) => {
     if (!siteAmbientAudio) return;
@@ -151,34 +148,21 @@ function setupSiteAmbientAudio() {
     });
   };
 
-  const clearPendingStart = () => {
-    if (!siteAmbientPendingTimer) return;
-    window.clearTimeout(siteAmbientPendingTimer);
-    siteAmbientPendingTimer = 0;
-  };
-
   const removeUnlockListeners = () => {
     if (!siteAmbientUnlockBound) return;
     siteAmbientUnlockBound = false;
     window.removeEventListener("pointerdown", unlockAmbientOnInteraction, true);
+    window.removeEventListener("keydown", unlockAmbientOnInteraction, true);
     window.removeEventListener("touchstart", unlockAmbientOnInteraction, true);
   };
 
   const playAmbient = async () => {
     if (!siteAmbientAudio || document.body.classList.contains("intro-active")) return false;
-    if (siteAmbientStarting) return false;
-    if (!siteAmbientAudio.paused) {
-      siteAmbientReady = true;
-      fadeAmbientTo(targetVolume, 1.2);
-      removeUnlockListeners();
-      return true;
-    }
 
-    siteAmbientStarting = true;
     try {
       await siteAmbientAudio.play();
       siteAmbientReady = true;
-      fadeAmbientTo(targetVolume, 1.8);
+      fadeAmbientTo(targetVolume);
       removeUnlockListeners();
       if (siteAmbientObserver) {
         siteAmbientObserver.disconnect();
@@ -187,8 +171,6 @@ function setupSiteAmbientAudio() {
       return true;
     } catch {
       return false;
-    } finally {
-      siteAmbientStarting = false;
     }
   };
 
@@ -200,36 +182,23 @@ function setupSiteAmbientAudio() {
     if (siteAmbientUnlockBound) return;
     siteAmbientUnlockBound = true;
     window.addEventListener("pointerdown", unlockAmbientOnInteraction, true);
+    window.addEventListener("keydown", unlockAmbientOnInteraction, true);
     window.addEventListener("touchstart", unlockAmbientOnInteraction, true);
-  };
-
-  const queueAmbientStart = (delay = 0) => {
-    clearPendingStart();
-    siteAmbientPendingTimer = window.setTimeout(() => {
-      siteAmbientPendingTimer = 0;
-      void playAmbient().then((started) => {
-        if (!started) armUnlockListeners();
-      });
-    }, delay);
   };
 
   if (document.body.classList.contains("intro-active")) {
     siteAmbientObserver = new MutationObserver(() => {
       if (document.body.classList.contains("intro-active")) return;
-      queueAmbientStart(introExitDelayMs);
+      void playAmbient();
     });
     siteAmbientObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
     armUnlockListeners();
     return;
   }
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState !== "visible") return;
-    if (document.body.classList.contains("intro-active")) return;
-    queueAmbientStart(80);
+  void playAmbient().then((started) => {
+    if (!started) armUnlockListeners();
   });
-
-  queueAmbientStart(120);
 }
 
 function setupPwaSupport() {

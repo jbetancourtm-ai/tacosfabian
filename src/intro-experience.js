@@ -306,8 +306,9 @@ export async function initIntroExperience({
   let audioMode = "idle";
   let audioToken = 0;
   const exitDurationMs = reducedMotion ? 120 : 980;
-  const ambientTargetVolume = 0.055;
+  const ambientTargetVolume = 0.07;
   let hostSideSwapped = false;
+  let introAudioUnlockBound = false;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -536,6 +537,32 @@ export async function initIntroExperience({
     });
   };
 
+  const unlockIntroAudioOnInteraction = (event) => {
+    if (closed || audioMode === "media" || audioMode === "starting") return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest("a, button, input, textarea, select, label, [role='button']")
+    ) {
+      return;
+    }
+    void restartIntroExperience();
+  };
+
+  const removeIntroAudioUnlockListeners = () => {
+    if (!introAudioUnlockBound) return;
+    introAudioUnlockBound = false;
+    window.removeEventListener("pointerdown", unlockIntroAudioOnInteraction, true);
+    window.removeEventListener("touchstart", unlockIntroAudioOnInteraction, true);
+  };
+
+  const armIntroAudioUnlockListeners = () => {
+    if (introAudioUnlockBound) return;
+    introAudioUnlockBound = true;
+    window.addEventListener("pointerdown", unlockIntroAudioOnInteraction, true);
+    window.addEventListener("touchstart", unlockIntroAudioOnInteraction, true);
+  };
+
   const moveHostToOppositeSide = () => {
     if (!hostCard || hostSideSwapped || closed) return;
     hostSideSwapped = true;
@@ -582,6 +609,7 @@ export async function initIntroExperience({
       audioMode = "media";
       useSpeechFallback = false;
       introSoundBtn?.classList.add("is-hidden");
+      removeIntroAudioUnlockListeners();
       return true;
     } catch {
       if (token !== audioToken) return false;
@@ -592,6 +620,7 @@ export async function initIntroExperience({
       audioMode = "speech";
       useSpeechFallback = true;
       introSoundBtn?.classList.remove("is-hidden");
+      armIntroAudioUnlockListeners();
       return false;
     }
   };
@@ -651,6 +680,7 @@ export async function initIntroExperience({
       ambientAudio.pause();
       ambientAudio.currentTime = 0;
     }, 460);
+    removeIntroAudioUnlockListeners();
     narrationAudio.pause();
     narrationAudio.currentTime = 0;
     speechQueue.stop();
