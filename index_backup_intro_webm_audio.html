@@ -92,12 +92,13 @@
         <div class="intro-screen__topbar">
           <div class="intro-screen__brandlock">
             <span class="intro-screen__brand-halo" aria-hidden="true"></span>
-            <span class="intro-screen__brand-beam intro-screen__brand-beam--left" aria-hidden="true"></span>
-            <span class="intro-screen__brand-beam intro-screen__brand-beam--right" aria-hidden="true"></span>
             <span class="intro-screen__brand-mark" aria-hidden="true">
               <img src="/logo-tacos-fabian.svg" alt="" loading="eager" decoding="async" />
             </span>
-            <span class="intro-screen__brand-sr-only">Tacos Fabian</span>
+            <span class="intro-screen__brand-copy">
+              <strong>Tacos Fabian</strong>
+              <small>Texcoco de Mora</small>
+            </span>
           </div>
           <div class="intro-screen__actions">
             <button
@@ -186,7 +187,7 @@
           class="intro-screen__host-card intro-screen__host-card--hero fabian-intro"
           aria-hidden="true"
           data-character-slot="fabian-host"
-          data-character-asset="/images/fabian.webm"
+          data-character-asset="/images/fabian.png"
           data-character-replace="png|sprite|lottie|webm"
         >
           <div class="intro-screen__host-stage intro-screen__host-stage--hero" data-character-replace-target="visual">
@@ -206,12 +207,12 @@
                   loop
                   playsinline
                   preload="auto"
-                  data-preferred-visual="/images/fabian.webm"
-                  data-audio-fallback="/images/fabian.mp4"
+                  poster="/images/fabian.png"
                 >
-                  <source src="/images/fabian.webm" type='video/webm; codecs="vp9,opus"' />
-                  <source src="/images/fabian.mp4" type="video/mp4" />
+                  <!-- Preferred future source if a transparent web build is exported. -->
+                  <!-- <source src="/images/fabian.webm" type='video/webm; codecs="vp9,opus"' /> -->
                   <source src="/images/fabian.mov" type='video/quicktime; codecs="hvc1"' />
+                  <source src="/images/fabian.mp4" type="video/mp4" />
                 </video>
               </span>
               <span class="intro-screen__host-mouth" aria-hidden="true"></span>
