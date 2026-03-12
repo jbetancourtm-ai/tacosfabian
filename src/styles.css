@@ -769,10 +769,12 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__story {
-  align-self: end;
+  position: absolute;
+  right: clamp(1rem, 4vw, 3.2rem);
+  bottom: calc(var(--intro-actions-space) + clamp(0.4rem, 1.2vh, 0.9rem));
   display: grid;
-  width: min(42rem, calc(100% - 2rem));
-  margin: 0 auto var(--intro-actions-space);
+  width: min(22rem, calc(100% - 2rem));
+  margin: 0;
   z-index: 4;
 }
 
@@ -784,7 +786,7 @@ body.intro-complete .floating-whatsapp {
   border: 1px solid rgba(255, 198, 147, 0.12);
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.24);
   backdrop-filter: blur(12px);
-  text-align: center;
+  text-align: left;
 }
 
 .intro-screen__narration-line {
@@ -802,10 +804,10 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-card {
   position: absolute;
-  left: 50%;
-  right: auto;
-  top: clamp(10.6rem, 29vh, 13.8rem);
-  bottom: auto;
+  left: auto;
+  right: clamp(1rem, 4vw, 3.2rem);
+  top: auto;
+  bottom: calc(var(--intro-actions-space) + clamp(6rem, 14vh, 7.6rem));
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
@@ -815,7 +817,7 @@ body.intro-complete .floating-whatsapp {
   max-width: calc(100vw - 1.5rem);
   padding: 0;
   opacity: 0;
-  transform: translate(-50%, 22px) scale(0.96);
+  transform: translateY(22px) scale(0.96);
   transition: opacity 0.55s ease, transform 0.55s ease;
   z-index: 6;
 }
@@ -823,12 +825,12 @@ body.intro-complete .floating-whatsapp {
 .fabian-intro {
   width: clamp(220px, 24vw, 280px);
   max-width: calc(100vw - 1.5rem);
-  transform: translate(-50%, 22px) scale(0.96);
+  transform: translateY(22px) scale(0.96);
 }
 
 .fabian-intro.is-swapped {
-  left: 50%;
-  right: auto;
+  left: auto;
+  right: clamp(1rem, 4vw, 3.2rem);
 }
 
 .intro-screen__host-card--hero {
@@ -837,7 +839,7 @@ body.intro-complete .floating-whatsapp {
 
 .fabian-intro.is-visible {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+  transform: translateY(0) scale(1);
 }
 
 .intro-screen__host-stage {
@@ -919,6 +921,7 @@ body.intro-complete .floating-whatsapp {
   overflow: visible;
   isolation: isolate;
   background: transparent;
+  border-radius: 0;
 }
 
 .fabian-intro .intro-screen__host-asset::before {
@@ -977,7 +980,8 @@ body.intro-complete .floating-whatsapp {
     saturate(1.04)
     contrast(1.04)
     brightness(1.01);
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
+  box-shadow: none;
 }
 
 .fabian-intro .intro-screen__host-glow,
@@ -4005,18 +4009,18 @@ td {
 
   .fabian-intro {
     grid-template-columns: 1fr;
-    left: 50%;
-    right: auto;
-    top: clamp(10.6rem, 32vh, 13.4rem);
-    bottom: auto;
+    left: auto;
+    right: 0.6rem;
+    top: auto;
+    bottom: calc(var(--intro-actions-space) + 5.8rem);
     width: clamp(180px, 32vw, 220px);
     max-width: none;
     text-align: center;
   }
 
   .fabian-intro.is-swapped {
-    left: 50%;
-    right: auto;
+    left: auto;
+    right: 0.6rem;
   }
 
   .intro-screen__host-portrait {
@@ -4168,9 +4172,11 @@ td {
   }
 
   .intro-screen__story {
-    width: 100%;
+    right: 0.7rem;
+    bottom: calc(var(--intro-actions-space) + 0.2rem);
+    width: min(16rem, calc(100% - 1.2rem));
     padding-right: 0;
-    padding-top: min(22vw, 6.3rem);
+    padding-top: 0;
   }
 
   .floating-fabian-host__stage {
@@ -4189,8 +4195,8 @@ td {
 
   .intro-screen__narration {
     min-height: 4.6rem;
-    max-width: min(82vw, 17rem);
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     padding: 0.52rem 0.6rem;
     border-radius: 16px;
     background: linear-gradient(135deg, rgba(8, 10, 14, 0.34), rgba(24, 16, 14, 0.18));
@@ -4319,25 +4325,28 @@ td {
   }
 
   .intro-screen__story {
-    padding-top: min(24vw, 6rem);
+    right: 0.55rem;
+    bottom: calc(var(--intro-actions-space) + 0.15rem);
+    width: min(12.8rem, calc(100% - 1rem));
+    padding-top: 0;
   }
 
   .fabian-intro {
-    right: auto;
-    left: 50%;
-    top: clamp(9.6rem, 28vh, 11rem);
-    bottom: auto;
+    right: 0.4rem;
+    left: auto;
+    top: auto;
+    bottom: calc(var(--intro-actions-space) + 5.1rem);
     width: clamp(150px, 44vw, 188px);
-    transform: translate(-50%, 22px) scale(0.96);
+    transform: translateY(22px) scale(0.96);
   }
 
   .fabian-intro.is-visible {
-    transform: translate(-50%, 0) scale(1);
+    transform: translateY(0) scale(1);
   }
 
   .fabian-intro.is-swapped {
-    right: auto;
-    left: 50%;
+    right: 0.4rem;
+    left: auto;
   }
 
   .fabian-intro .intro-screen__host-stage {
@@ -4365,7 +4374,7 @@ td {
 
   .intro-screen__narration {
     min-height: 4rem;
-    max-width: min(88vw, 18rem);
+    max-width: 100%;
   }
 
   .intro-screen__narration-line {
