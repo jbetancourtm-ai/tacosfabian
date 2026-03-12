@@ -140,7 +140,7 @@ function createTaqueriaGroup() {
 }
 
 function createHostPlane(textureLoader) {
-  const texture = textureLoader.load("/images/fabio.png");
+  const texture = textureLoader.load("/images/fabian.png");
   texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.MeshBasicMaterial({
     map: texture,
@@ -241,7 +241,8 @@ export async function initIntroExperience({
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
-  const audioFallbackSrc = hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian.mp4" : "";
+  const audioFallbackSrc =
+    hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4" : "";
   const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
   if (fallbackAudio) {
     fallbackAudio.preload = "auto";
