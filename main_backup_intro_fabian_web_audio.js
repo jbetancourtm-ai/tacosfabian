@@ -358,11 +358,133 @@ function setupFabianVideos() {
 
   const pickBestSource = (video) => {
     if (!(video instanceof HTMLVideoElement)) return null;
-    const preferredSrc = video.dataset.preferredVisual || "/images/fabian_web_audio.webm";
-    return {
-      src: preferredSrc,
-      type: 'video/webm; codecs="vp9,opus"',
+    const candidates = [
+      {
+        src: "/images/fabian.webm",
+        type: 'video/webm; codecs="vp9,opus"',
+      },
+      {
+        src: "/images/fabian.mp4",
+        type: "video/mp4",
+      },
+      {
+        src: "/images/fabian.mov",
+        type: 'video/quicktime; codecs="hvc1"',
+      },
+    ];
+
+    return (
+      candidates.find((candidate) => {
+        try {
+          return video.canPlayType(candidate.type) !== "";
+        } catch {
+          return false;
+        }
+      }) ?? candidates[candidates.length - 1]
+    );
+  };
+
+  const hasNativeAudioTrack = (video) => {
+    if (!(video instanceof HTMLVideoElement)) return false;
+    if (typeof video.mozHasAudio === "boolean") return video.mozHasAudio;
+    if (video.audioTracks && typeof video.audioTracks.length === "number") {
+      return video.audioTracks.length > 0;
+    }
+    if (typeof video.webkitAudioDecodedByteCount === "number") {
+      return video.webkitAudioDecodedByteCount > 0;
+    }
+    return false;
+  };
+
+  const attachAudioFallbackBridge = (video) => {
+    if (!(video instanceof HTMLVideoElement) || video.dataset.audioBridgeReady === "true") return;
+
+    const fallbackSrc = video.dataset.audioFallback || "/images/fabian.mp4";
+    const fallbackAudio = document.createElement("audio");
+    fallbackAudio.preload = "auto";
+    fallbackAudio.src = fallbackSrc;
+    fallbackAudio.loop = true;
+    fallbackAudio.tabIndex = -1;
+    fallbackAudio.setAttribute("aria-hidden", "true");
+    fallbackAudio.style.display = "none";
+    video.insertAdjacentElement("afterend", fallbackAudio);
+
+    const nativePlay = video.play.bind(video);
+    const nativePause = video.pause.bind(video);
+    let useFallbackAudio = false;
+
+    const syncAudioVolume = () => {
+      fallbackAudio.volume = Math.max(0, Math.min(1, Number(video.volume) || 0));
+      fallbackAudio.muted = false;
     };
+
+    const syncAudioTime = (force = false) => {
+      if (!useFallbackAudio) return;
+      if (force || Math.abs(fallbackAudio.currentTime - video.currentTime) > 0.18) {
+        try {
+          fallbackAudio.currentTime = video.currentTime;
+        } catch {
+          // Ignore sync errors while metadata is still loading.
+        }
+      }
+    };
+
+    const evaluateAudioMode = () => {
+      const resolvedSrc = video.currentSrc || video.dataset.resolvedSrc || "";
+      const isWebmVisual = resolvedSrc.includes("/images/fabian.webm") || resolvedSrc.endsWith(".webm");
+      const canUseNativeAudio = !isWebmVisual || hasNativeAudioTrack(video);
+
+      useFallbackAudio = isWebmVisual && !canUseNativeAudio;
+      video.dataset.audioMode = useFallbackAudio ? "fallback-mp4" : "native";
+
+      if (useFallbackAudio) {
+        video.muted = true;
+        video.defaultMuted = true;
+        syncAudioVolume();
+        fallbackAudio.load();
+      } else {
+        fallbackAudio.pause();
+        try {
+          fallbackAudio.currentTime = 0;
+        } catch {
+          // Ignore reset errors for unloaded audio.
+        }
+      }
+    };
+
+    video.play = async () => {
+      const result = await nativePlay();
+      evaluateAudioMode();
+      if (!useFallbackAudio) return result;
+
+      video.muted = true;
+      video.defaultMuted = true;
+      syncAudioVolume();
+      syncAudioTime(true);
+      await fallbackAudio.play();
+      return result;
+    };
+
+    video.pause = () => {
+      fallbackAudio.pause();
+      return nativePause();
+    };
+
+    video.addEventListener("loadedmetadata", evaluateAudioMode);
+    video.addEventListener("loadeddata", evaluateAudioMode);
+    video.addEventListener("volumechange", () => {
+      if (!useFallbackAudio) return;
+      video.muted = true;
+      video.defaultMuted = true;
+      syncAudioVolume();
+    });
+    video.addEventListener("timeupdate", () => syncAudioTime());
+    video.addEventListener("seeking", () => syncAudioTime(true));
+    video.addEventListener("seeked", () => syncAudioTime(true));
+    video.addEventListener("ended", () => {
+      fallbackAudio.pause();
+      syncAudioTime(true);
+    });
   };
 
   const prepareVideo = (video) => {
@@ -378,8 +500,7 @@ function setupFabianVideos() {
     video.loop = true;
     video.preload = "auto";
     video.controls = false;
-    video.muted = false;
-    video.defaultMuted = false;
+    attachAudioFallbackBridge(video);
   };
 
   fabianVideos.forEach((video) => {

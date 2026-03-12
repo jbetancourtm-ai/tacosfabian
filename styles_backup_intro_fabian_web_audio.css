@@ -820,7 +820,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro {
-  width: clamp(205px, 24vw, 285px);
+  width: clamp(250px, 28vw, 340px);
   max-width: calc(100vw - 1.5rem);
   transform: translateY(22px) scale(0.96);
 }
@@ -849,7 +849,7 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-stage--hero {
   width: 100%;
-  min-height: clamp(205px, 24vw, 285px);
+  min-height: clamp(250px, 28vw, 340px);
 }
 
 .intro-screen__host-mural {
@@ -4006,7 +4006,7 @@ td {
     right: 0.3rem;
     left: auto;
     bottom: calc(var(--intro-actions-space) + 0.7rem);
-    width: clamp(185px, 34vw, 235px);
+    width: clamp(210px, 40vw, 280px);
     max-width: none;
     text-align: center;
   }
@@ -4022,7 +4022,7 @@ td {
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(185px, 34vw, 235px);
+    min-height: clamp(210px, 40vw, 280px);
   }
 
   .fabian-intro .intro-screen__host-asset::before {
@@ -4313,7 +4313,7 @@ td {
     right: 50%;
     left: auto;
     bottom: calc(var(--intro-actions-space) + 0.45rem);
-    width: clamp(160px, 46vw, 195px);
+    width: clamp(180px, 54vw, 225px);
     transform: translate(50%, 22px) scale(0.96);
   }
 
@@ -4326,7 +4326,7 @@ td {
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(160px, 46vw, 195px);
+    min-height: clamp(180px, 54vw, 225px);
   }
 
   .intro-screen__btn {
