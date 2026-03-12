@@ -448,9 +448,9 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__brand-beam {
   position: absolute;
-  top: 8px;
-  width: 34px;
-  height: 84px;
+  top: -26px;
+  width: 28px;
+  height: 70px;
   transform-origin: 50% 100%;
   pointer-events: none;
   z-index: 1;
@@ -468,14 +468,15 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__brand-beam::before {
   inset: 0;
   clip-path: polygon(50% 100%, 0 0, 100% 0);
-  background: linear-gradient(180deg, rgba(255, 250, 240, 0.72), rgba(255, 230, 200, 0.12) 48%, transparent 86%);
+  background: linear-gradient(180deg, rgba(255, 250, 240, 0.78), rgba(255, 230, 200, 0.16) 50%, transparent 88%);
 }
 
 .intro-screen__brand-beam::after {
   left: 50%;
-  bottom: -3px;
-  width: 12px;
-  height: 12px;
+  top: -6px;
+  bottom: auto;
+  width: 10px;
+  height: 10px;
   transform: translateX(-50%);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.96), rgba(255, 240, 212, 0.18) 58%, transparent 72%);
@@ -483,26 +484,26 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__brand-beam--left {
-  left: 14px;
-  transform: rotate(-12deg);
+  left: 10px;
+  transform: rotate(20deg);
   animation: intro-brand-beam-left 4.6s ease-in-out infinite;
 }
 
 .intro-screen__brand-beam--right {
-  right: 14px;
+  right: 10px;
   left: auto;
-  transform: rotate(12deg);
+  transform: rotate(-20deg);
   animation: intro-brand-beam-right 4.9s ease-in-out infinite;
 }
 
 @keyframes intro-brand-beam-left {
   0%,
   100% {
-    transform: rotate(-16deg) translateX(-2px);
+    transform: rotate(14deg) translateX(-1px);
     opacity: 0.52;
   }
   50% {
-    transform: rotate(-6deg) translateX(2px);
+    transform: rotate(24deg) translateX(1px);
     opacity: 0.86;
   }
 }
@@ -510,11 +511,11 @@ body.intro-complete .floating-whatsapp {
 @keyframes intro-brand-beam-right {
   0%,
   100% {
-    transform: rotate(16deg) translateX(2px);
+    transform: rotate(-14deg) translateX(1px);
     opacity: 0.54;
   }
   50% {
-    transform: rotate(6deg) translateX(-2px);
+    transform: rotate(-24deg) translateX(-1px);
     opacity: 0.88;
   }
 }
