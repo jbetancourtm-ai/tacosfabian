@@ -340,17 +340,27 @@ function setupFabianVideos() {
   const fabianVideos = Array.from(document.querySelectorAll(".intro-screen__host-video"));
   if (!fabianVideos.length) return;
 
-  const prepareVideo = (video) => {
+  const ensurePlayback = (video) => {
     if (!(video instanceof HTMLVideoElement)) return;
     video.playsInline = true;
     video.loop = true;
     video.preload = "auto";
+
+    const playAttempt = video.play();
+    if (playAttempt?.catch) {
+      playAttempt.catch(() => {});
+    }
   };
 
   fabianVideos.forEach((video) => {
     if (!(video instanceof HTMLVideoElement)) return;
-    video.addEventListener("loadeddata", () => prepareVideo(video), { once: true });
-    prepareVideo(video);
+    video.addEventListener("loadeddata", () => ensurePlayback(video), { once: true });
+    ensurePlayback(video);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    fabianVideos.forEach((video) => ensurePlayback(video));
   });
 }
 
