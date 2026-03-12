@@ -375,7 +375,7 @@ function setupFabianVideos() {
       video.load();
     }
     video.playsInline = true;
-    video.loop = true;
+    video.loop = false;
     video.preload = "auto";
     video.controls = false;
     video.muted = false;
