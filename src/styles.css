@@ -832,8 +832,8 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro.is-swapped {
-  left: clamp(1rem, 4vw, 3.4rem);
-  right: auto;
+  left: auto;
+  right: clamp(1rem, 4vw, 3.4rem);
 }
 
 .intro-screen__host-card--hero {
@@ -859,21 +859,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__host-mural {
-  position: absolute;
-  right: clamp(0.5rem, 2.4vw, 1.9rem);
-  bottom: clamp(2.3rem, 5.6vh, 3rem);
-  width: clamp(140px, 18vw, 210px);
-  opacity: 0.04;
-  transform: translateY(0) scale(1);
-  filter:
-    blur(1.5px)
-    saturate(0.78)
-    contrast(0.96)
-    brightness(0.72)
-    drop-shadow(0 18px 28px rgba(0, 0, 0, 0.18));
-  transition: opacity 0.7s ease, transform 0.7s ease;
-  pointer-events: none;
-  z-index: 2;
+  display: none;
 }
 
 .intro-screen__host-mural img,
@@ -4012,15 +3998,8 @@ td {
   }
 
   .fabian-intro.is-swapped {
-    left: 0.35rem;
-    right: auto;
-  }
-
-  .intro-screen__host-mural {
-    right: 0.15rem;
-    bottom: 4.45rem;
-    width: clamp(88px, 24vw, 116px);
-    opacity: 0.04;
+    left: auto;
+    right: 0.35rem;
   }
 
   .intro-screen__host-portrait {
