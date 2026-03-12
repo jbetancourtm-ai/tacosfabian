@@ -4079,13 +4079,14 @@ td {
 
   .intro-screen__topbar {
     grid-template-columns: 1fr;
-    justify-items: center;
+    justify-items: start;
     gap: 0.42rem;
   }
 
   .intro-screen__brandlock {
     width: 4.6rem;
     height: 4.6rem;
+    justify-self: start;
     border-radius: 18px;
     background: linear-gradient(135deg, rgba(14, 17, 22, 0.48), rgba(30, 20, 16, 0.18));
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
@@ -4103,7 +4104,7 @@ td {
 
   .intro-screen__headline {
     left: 50%;
-    top: 5.2rem;
+    top: 4.7rem;
     max-width: min(82vw, 18rem);
     transform: translateX(-50%);
     text-align: center;
@@ -4169,7 +4170,7 @@ td {
   .intro-screen__story {
     width: 100%;
     padding-right: 0;
-    padding-top: min(16vw, 4.8rem);
+    padding-top: min(22vw, 6.3rem);
   }
 
   .floating-fabian-host__stage {
@@ -4285,8 +4286,17 @@ td {
     padding: 0.46rem 0.42rem 0.62rem;
   }
 
+  .intro-screen__topbar {
+    justify-items: start;
+  }
+
+  .intro-screen__brandlock {
+    width: 4rem;
+    height: 4rem;
+  }
+
   .intro-screen__headline {
-    top: 4.65rem;
+    top: 4.1rem;
     max-width: min(86vw, 15rem);
   }
 
@@ -4309,7 +4319,7 @@ td {
   }
 
   .intro-screen__story {
-    padding-top: min(6vw, 0.8rem);
+    padding-top: min(24vw, 6rem);
   }
 
   .fabian-intro {
@@ -4335,14 +4345,22 @@ td {
   }
 
   .intro-screen__btn {
-    min-width: 7.4rem;
-    width: 7.4rem;
-    min-height: 2.5rem;
-    padding: 0.42rem 0.46rem;
+    min-width: 0;
+    width: calc((100% - 0.5rem * 2) / 3);
+    min-height: 2.55rem;
+    padding: 0.42rem 0.3rem;
   }
 
   .intro-screen__btn-text {
-    font-size: 0.52rem;
+    font-size: 0.48rem;
+    letter-spacing: 0.04em;
+  }
+
+  .intro-screen__actions {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: min(calc(100% - 0.7rem), 22rem);
   }
 
   .intro-screen__narration {
