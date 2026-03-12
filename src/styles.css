@@ -1312,6 +1312,24 @@ p {
   gap: 0.7rem;
 }
 
+.header-cta-group .btn-install-app,
+.header-cta-group .btn-whatsapp {
+  align-self: center;
+}
+
+.hero-actions--header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+  margin-left: auto;
+}
+
+.hero-actions--header .btn {
+  width: auto;
+  min-width: 0;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -3861,6 +3879,11 @@ td {
     grid-column: auto;
     justify-self: end;
     flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .hero-actions--header {
+    flex-wrap: nowrap;
   }
 
   .menu-btn {
@@ -4001,6 +4024,16 @@ td {
   .social-floating-links a {
     width: 28px;
     height: 28px;
+  }
+
+  .hero-actions--header {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .hero-actions--header .btn {
+    flex: 1 1 9rem;
   }
 
   .intro-screen {
