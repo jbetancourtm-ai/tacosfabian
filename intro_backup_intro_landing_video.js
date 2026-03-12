@@ -221,9 +221,49 @@ function inferSteamQuality(reducedMotion) {
 }
 
 function buildSpeechQueue() {
+  const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
+  if (!synth) {
+    return {
+      speak() {},
+      stop() {},
+    };
+  }
+
+  const pickVoice = () => {
+    const voices = synth.getVoices();
+    return (
+      voices.find((voice) => voice.lang?.toLowerCase().startsWith("es-mx")) ||
+      voices.find((voice) => voice.lang?.toLowerCase().startsWith("es")) ||
+      null
+    );
+  };
+
+  let voice = pickVoice();
+  if (!voice) {
+    window.setTimeout(() => {
+      voice = pickVoice();
+    }, 120);
+  }
+
   return {
-    speak() {},
-    stop() {},
+    speak(text) {
+      if (!text) return;
+      synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = voice?.lang || "es-MX";
+      utterance.voice = voice;
+      utterance.rate = 1.05;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      try {
+        synth.speak(utterance);
+      } catch {
+        // Ignore browser autoplay or synth errors; subtitles remain visible.
+      }
+    },
+    stop() {
+      synth.cancel();
+    },
   };
 }
 
@@ -241,13 +281,6 @@ export async function initIntroExperience({
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
-  const audioFallbackSrc = hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian.mp4" : "";
-  const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
-  if (fallbackAudio) {
-    fallbackAudio.preload = "auto";
-    fallbackAudio.loop = true;
-    fallbackAudio.volume = 0.88;
-  }
   if (hostVideo instanceof HTMLVideoElement) {
     hostVideo.preload = "auto";
     hostVideo.playsInline = true;
@@ -269,7 +302,6 @@ export async function initIntroExperience({
   let timeline = null;
   let audioMode = "idle";
   let audioToken = 0;
-  let usingFallbackAudio = false;
   const exitDurationMs = reducedMotion ? 120 : 980;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
@@ -491,29 +523,6 @@ export async function initIntroExperience({
   };
   window.addEventListener("resize", resize);
 
-  const syncFallbackAudioTime = (force = false) => {
-    if (!usingFallbackAudio || !fallbackAudio || !(hostVideo instanceof HTMLVideoElement)) return;
-    if (force || Math.abs(fallbackAudio.currentTime - hostVideo.currentTime) > 0.2) {
-      try {
-        fallbackAudio.currentTime = hostVideo.currentTime;
-      } catch {
-        // Ignore sync issues while media metadata is still settling.
-      }
-    }
-  };
-
-  const stopFallbackAudio = ({ reset = false } = {}) => {
-    if (!fallbackAudio) return;
-    fallbackAudio.pause();
-    if (reset) {
-      try {
-        fallbackAudio.currentTime = 0;
-      } catch {
-        // Ignore reset issues if audio has not loaded yet.
-      }
-    }
-  };
-
   const fadeHostVideoTo = (volume, duration = 0.45) => {
     if (!(hostVideo instanceof HTMLVideoElement)) return;
     gsap.killTweensOf(hostVideo);
@@ -523,27 +532,6 @@ export async function initIntroExperience({
       ease: "sine.inOut",
       overwrite: true,
     });
-    if (usingFallbackAudio && fallbackAudio) {
-      gsap.killTweensOf(fallbackAudio);
-      gsap.to(fallbackAudio, {
-        volume,
-        duration,
-        ease: "sine.inOut",
-        overwrite: true,
-      });
-    }
-  };
-
-  const mediaHasUsableAudio = () => {
-    if (!(hostVideo instanceof HTMLVideoElement)) return false;
-    if (typeof hostVideo.mozHasAudio === "boolean") return hostVideo.mozHasAudio;
-    if (hostVideo.audioTracks && typeof hostVideo.audioTracks.length === "number") {
-      return hostVideo.audioTracks.length > 0;
-    }
-    if (typeof hostVideo.webkitAudioDecodedByteCount === "number") {
-      return hostVideo.webkitAudioDecodedByteCount > 0;
-    }
-    return false;
   };
 
   const unlockIntroAudioOnInteraction = (event) => {
@@ -600,24 +588,14 @@ export async function initIntroExperience({
 
     const token = ++audioToken;
     audioMode = "starting";
-    usingFallbackAudio = false;
 
     try {
-      stopFallbackAudio({ reset: true });
       hostVideo.pause();
       hostVideo.currentTime = 0;
       hostVideo.muted = false;
       hostVideo.defaultMuted = false;
       hostVideo.volume = 0;
       await hostVideo.play();
-      if (!mediaHasUsableAudio() && fallbackAudio) {
-        usingFallbackAudio = true;
-        hostVideo.muted = true;
-        hostVideo.defaultMuted = true;
-        syncFallbackAudioTime(true);
-        fallbackAudio.volume = 0;
-        await fallbackAudio.play();
-      }
       if (token !== audioToken) return false;
       fadeHostVideoTo(0.88, 0.55);
       audioMode = "media";
@@ -627,8 +605,6 @@ export async function initIntroExperience({
     } catch {
       if (token !== audioToken) return false;
       try {
-        usingFallbackAudio = false;
-        stopFallbackAudio({ reset: true });
         hostVideo.pause();
         hostVideo.currentTime = 0;
         hostVideo.muted = true;
@@ -642,8 +618,6 @@ export async function initIntroExperience({
         return false;
       } catch {
         if (token !== audioToken) return false;
-        usingFallbackAudio = false;
-        stopFallbackAudio({ reset: true });
         hostVideo.pause();
         hostVideo.currentTime = 0;
         hostVideo.volume = 0.88;
@@ -706,8 +680,6 @@ export async function initIntroExperience({
     fadeHostVideoTo(0, 0.35);
     window.setTimeout(() => {
       if (!(hostVideo instanceof HTMLVideoElement)) return;
-      usingFallbackAudio = false;
-      stopFallbackAudio({ reset: true });
       hostVideo.pause();
       hostVideo.currentTime = 0;
       hostVideo.volume = 0.88;
@@ -741,13 +713,6 @@ export async function initIntroExperience({
   introSoundBtn?.addEventListener("click", () => {
     if (audioMode === "media" && hostVideo instanceof HTMLVideoElement && !hostVideo.paused) return;
     void restartIntroExperience();
-  });
-  hostVideo?.addEventListener("timeupdate", () => syncFallbackAudioTime());
-  hostVideo?.addEventListener("seeking", () => syncFallbackAudioTime(true));
-  hostVideo?.addEventListener("seeked", () => syncFallbackAudioTime(true));
-  hostVideo?.addEventListener("pause", () => {
-    if (!usingFallbackAudio) return;
-    stopFallbackAudio();
   });
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") finishIntro();
