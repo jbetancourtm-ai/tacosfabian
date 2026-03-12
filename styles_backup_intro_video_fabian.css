@@ -922,6 +922,20 @@ body.intro-complete .floating-whatsapp {
 
 .fabian-intro .intro-screen__host-asset {
   overflow: hidden;
+  isolation: isolate;
+}
+
+.fabian-intro .intro-screen__host-asset::before {
+  content: "";
+  position: absolute;
+  inset: 7% 10% 4%;
+  border-radius: 48% 48% 38% 38%;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(21, 14, 12, 0.96), rgba(12, 9, 8, 0.92) 58%, rgba(8, 6, 6, 0) 78%);
+  filter: blur(12px);
+  opacity: 0.82;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .intro-screen__host-asset img,
@@ -967,8 +981,14 @@ body.intro-complete .floating-whatsapp {
 .fabian-intro .intro-screen__host-asset img,
 .fabian-intro .intro-screen__host-asset video {
   transform: none;
-  mix-blend-mode: normal;
-  filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.22)) saturate(1.01) contrast(1.01) brightness(1);
+  position: relative;
+  z-index: 1;
+  mix-blend-mode: multiply;
+  filter:
+    drop-shadow(0 20px 28px rgba(0, 0, 0, 0.22))
+    saturate(1.04)
+    contrast(1.08)
+    brightness(1.02);
 }
 
 .fabian-intro .intro-screen__host-glow,
@@ -4009,6 +4029,12 @@ td {
 
   .fabian-intro .intro-screen__host-stage {
     min-height: clamp(235px, 58vw, 280px);
+  }
+
+  .fabian-intro .intro-screen__host-asset::before {
+    inset: 9% 12% 6%;
+    opacity: 0.72;
+    filter: blur(10px);
   }
 
   .intro-screen__actions {
