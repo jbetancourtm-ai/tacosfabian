@@ -358,7 +358,7 @@ function setupFabianVideos() {
 
   const pickBestSource = (video) => {
     if (!(video instanceof HTMLVideoElement)) return null;
-    const preferredSrc = video.dataset.preferredVisual || "/images/fabian_web_audio.webm";
+    const preferredSrc = video.dataset.preferredVisual || "/images/fabian.webm";
     return {
       src: preferredSrc,
       type: 'video/webm; codecs="vp9,opus"',
