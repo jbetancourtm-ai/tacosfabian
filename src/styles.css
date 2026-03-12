@@ -3999,12 +3999,17 @@ td {
     padding: 0;
   }
 
+  .intro-screen__ui {
+    grid-template-rows: auto auto 1fr;
+    padding: 0.75rem 0.7rem 0.95rem;
+  }
+
   .fabian-intro {
     grid-template-columns: 1fr;
-    right: 0.35rem;
+    right: 0.2rem;
     left: auto;
-    bottom: 5.1rem;
-    width: clamp(235px, 58vw, 280px);
+    bottom: 4.7rem;
+    width: clamp(220px, 52vw, 264px);
     max-width: none;
     text-align: center;
   }
@@ -4020,7 +4025,7 @@ td {
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(235px, 58vw, 280px);
+    min-height: clamp(220px, 52vw, 264px);
   }
 
   .fabian-intro .intro-screen__host-asset::before {
@@ -4034,18 +4039,18 @@ td {
     justify-content: center;
     width: 100%;
     max-width: 100%;
-    gap: 0.45rem;
+    gap: 0.4rem;
   }
 
   .intro-screen__btn {
-    min-width: 9.55rem;
-    width: 9.55rem;
-    min-height: 3.18rem;
-    padding: 0.66rem 0.78rem;
+    min-width: 9.2rem;
+    width: 9.2rem;
+    min-height: 3rem;
+    padding: 0.6rem 0.72rem;
     gap: 0.48rem;
     border-radius: 999px;
     box-shadow:
-      0 10px 20px rgba(0, 0, 0, 0.24),
+      0 8px 16px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
 
@@ -4075,13 +4080,15 @@ td {
   .intro-screen__topbar {
     grid-template-columns: 1fr;
     justify-items: center;
-    gap: 0.7rem;
+    gap: 0.55rem;
   }
 
   .intro-screen__brandlock {
-    width: min(100%, 320px);
+    width: min(100%, 304px);
     grid-column: 1;
     justify-self: center;
+    padding: 0.74rem 0.9rem 0.74rem 0.8rem;
+    border-radius: 22px;
   }
 
   .intro-screen__actions {
@@ -4090,84 +4097,84 @@ td {
   }
 
   .intro-screen__brand-mark {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
   }
 
   .intro-screen__brand-copy strong {
-    font-size: 0.88rem;
+    font-size: 0.82rem;
   }
 
   .intro-screen__brand-copy small {
-    font-size: 0.68rem;
+    font-size: 0.63rem;
   }
 
   .intro-screen__headline {
     left: 50%;
-    top: 6.65rem;
-    max-width: min(84vw, 21rem);
+    top: 6.25rem;
+    max-width: min(82vw, 19.5rem);
     transform: translateX(-50%);
     text-align: center;
   }
 
   .intro-screen__media-reserve {
-    top: clamp(12.4rem, 30vh, 14.8rem);
+    top: clamp(12.1rem, 29vh, 14.1rem);
     left: 50%;
     right: auto;
-    width: min(54vw, 244px);
-    min-width: 170px;
+    width: min(48vw, 218px);
+    min-width: 156px;
     transform: translateX(-50%);
-    opacity: 0.48;
+    opacity: 0.3;
   }
 
   .intro-screen__corner-lights {
-    width: min(19rem, 86vw);
-    height: 6rem;
-    top: 0.6rem;
-    opacity: 0.56;
+    width: min(17.5rem, 82vw);
+    height: 5.2rem;
+    top: 0.5rem;
+    opacity: 0.34;
   }
 
   .intro-screen__corner-light {
-    width: 4.6rem;
-    height: 4.6rem;
+    width: 3.9rem;
+    height: 3.9rem;
   }
 
   .intro-screen__corner-light--top-left {
-    left: calc(50% - 4.1rem);
-    top: 1rem;
+    left: calc(50% - 3.5rem);
+    top: 0.92rem;
   }
 
   .intro-screen__corner-light--top-right {
-    left: calc(50% + 4.1rem);
-    top: 1rem;
+    left: calc(50% + 3.5rem);
+    top: 0.92rem;
   }
 
   .intro-screen__corner-light--bottom-left {
-    left: calc(50% - 2.2rem);
-    top: 2.95rem;
+    left: calc(50% - 1.9rem);
+    top: 2.45rem;
   }
 
   .intro-screen__corner-light--bottom-right {
-    left: calc(50% + 2.2rem);
-    top: 2.95rem;
+    left: calc(50% + 1.9rem);
+    top: 2.45rem;
   }
 
   .intro-screen__title {
-    font-size: clamp(1.75rem, 8.8vw, 2.65rem);
-    letter-spacing: 0.1em;
-    line-height: 0.96;
+    font-size: clamp(1.62rem, 7.6vw, 2.35rem);
+    letter-spacing: 0.08em;
+    line-height: 0.98;
   }
 
   .intro-screen__subtitle {
-    margin-top: 0.55rem;
-    font-size: clamp(0.68rem, 2.7vw, 0.84rem);
-    letter-spacing: 0.08em;
+    margin-top: 0.42rem;
+    font-size: clamp(0.64rem, 2.2vw, 0.8rem);
+    letter-spacing: 0.06em;
   }
 
   .intro-screen__story {
     width: 100%;
     padding-right: 0;
-    padding-top: min(34vw, 7.4rem);
+    padding-top: min(30vw, 6.2rem);
   }
 
   .floating-fabian-host__stage {
@@ -4185,11 +4192,18 @@ td {
   }
 
   .intro-screen__narration {
-    min-height: 7.5rem;
-    max-width: min(92vw, 26rem);
+    min-height: 6.6rem;
+    max-width: min(90vw, 24rem);
     margin: 0 auto;
-    padding: 0.82rem 0.92rem;
-    border-radius: 22px;
+    padding: 0.72rem 0.82rem;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(8, 10, 14, 0.58), rgba(24, 16, 14, 0.38));
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .intro-screen__narration-line {
+    font-size: 0.92rem;
+    line-height: 1.42;
   }
 
   .intro-screen__meta {
@@ -4271,34 +4285,68 @@ td {
 }
 
 @media (max-width: 599px) {
+  .intro-screen__ui {
+    padding: 0.68rem 0.62rem 0.88rem;
+  }
+
   .intro-screen__headline {
-    top: 6.1rem;
-    max-width: min(86vw, 18rem);
+    top: 5.85rem;
+    max-width: min(84vw, 16.8rem);
   }
 
   .intro-screen__title {
-    font-size: clamp(1.48rem, 8.2vw, 2.15rem);
-    letter-spacing: 0.08em;
-  }
-
-  .intro-screen__subtitle {
-    font-size: 0.66rem;
+    font-size: clamp(1.34rem, 7.4vw, 1.95rem);
     letter-spacing: 0.06em;
   }
 
+  .intro-screen__subtitle {
+    font-size: 0.61rem;
+    letter-spacing: 0.05em;
+  }
+
   .intro-screen__media-reserve {
-    top: 11.75rem;
-    width: min(48vw, 208px);
-    min-width: 150px;
-    opacity: 0.36;
+    top: 10.9rem;
+    width: min(42vw, 186px);
+    min-width: 132px;
+    opacity: 0.22;
   }
 
   .intro-screen__corner-lights {
-    opacity: 0.4;
+    opacity: 0.24;
   }
 
   .intro-screen__story {
-    padding-top: min(28vw, 5.8rem);
+    padding-top: min(22vw, 4.7rem);
+  }
+
+  .fabian-intro {
+    right: 0.1rem;
+    bottom: 4.5rem;
+    width: clamp(198px, 50vw, 236px);
+  }
+
+  .fabian-intro .intro-screen__host-stage {
+    min-height: clamp(198px, 50vw, 236px);
+  }
+
+  .intro-screen__btn {
+    min-width: 8.6rem;
+    width: 8.6rem;
+    min-height: 2.84rem;
+    padding: 0.54rem 0.62rem;
+  }
+
+  .intro-screen__btn-text {
+    font-size: 0.61rem;
+  }
+
+  .intro-screen__narration {
+    min-height: 6rem;
+    max-width: min(88vw, 21.5rem);
+  }
+
+  .intro-screen__narration-line {
+    font-size: 0.85rem;
   }
 }
 
