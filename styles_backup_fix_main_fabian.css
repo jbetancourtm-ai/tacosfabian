@@ -3422,9 +3422,9 @@ td {
 .floating-fabian-host {
   position: fixed;
   right: 0.05rem;
-  bottom: 6.2rem;
+  bottom: 5.7rem;
   z-index: 319;
-  width: 132px;
+  width: 124px;
   display: grid;
   justify-items: center;
   pointer-events: auto;
@@ -3434,8 +3434,8 @@ td {
 
 .fabian-main {
   right: 0.05rem;
-  bottom: 6.5rem;
-  width: 132px;
+  bottom: 6rem;
+  width: 124px;
 }
 
 .floating-fabian-host__shadow {
@@ -3450,8 +3450,8 @@ td {
 
 .floating-fabian-host__stage {
   position: relative;
-  width: 132px;
-  height: 164px;
+  width: 124px;
+  height: 152px;
   display: grid;
   place-items: end center;
   transform-origin: center bottom;
@@ -3495,7 +3495,7 @@ td {
   height: 100%;
   display: block;
   object-fit: contain;
-  object-position: center center;
+  object-position: center bottom;
   filter:
     drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22))
     brightness(1.01)
@@ -3962,13 +3962,13 @@ td {
 
   .fabian-main {
     right: 0.05rem;
-    bottom: 5.2rem;
-    width: 114px;
+    bottom: 4.75rem;
+    width: 108px;
   }
 
   .fabian-main .floating-fabian-host__stage {
-    width: 114px;
-    height: 140px;
+    width: 108px;
+    height: 132px;
   }
 
   .fabian-main .floating-fabian-host__stage::before {
