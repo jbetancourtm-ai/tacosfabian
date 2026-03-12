@@ -267,7 +267,7 @@ body.intro-complete .floating-whatsapp {
   align-items: start;
   justify-items: center;
   gap: 1rem;
-  z-index: 3;
+  z-index: 2;
 }
 
 .intro-screen__corner-lights {
@@ -359,8 +359,8 @@ body.intro-complete .floating-whatsapp {
   position: relative;
   display: inline-grid;
   place-items: center;
-  width: clamp(5rem, 6.8vw, 6.2rem);
-  height: clamp(5rem, 6.8vw, 6.2rem);
+  width: clamp(4.6rem, 6vw, 5.5rem);
+  height: clamp(4.6rem, 6vw, 5.5rem);
   padding: 0;
   border-radius: 28px;
   background:
@@ -372,9 +372,10 @@ body.intro-complete .floating-whatsapp {
   overflow: visible;
   isolation: isolate;
   box-shadow:
-    0 12px 24px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 16px rgba(255, 184, 112, 0.05);
+    0 8px 18px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 12px rgba(255, 184, 112, 0.04);
+  opacity: 0.84;
 }
 
 .intro-screen__brand-mark {
@@ -383,8 +384,8 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__brand-mark {
-  width: clamp(3.4rem, 4.7vw, 4.2rem);
-  height: clamp(3.4rem, 4.7vw, 4.2rem);
+  width: clamp(3rem, 4.1vw, 3.7rem);
+  height: clamp(3rem, 4.1vw, 3.7rem);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -428,7 +429,7 @@ body.intro-complete .floating-whatsapp {
     radial-gradient(circle at 34% 34%, rgba(255, 255, 255, 0.12), transparent 28%),
     radial-gradient(circle at 50% 50%, rgba(255, 188, 120, 0.14), transparent 46%);
   filter: blur(14px);
-  opacity: 0.48;
+  opacity: 0.34;
   z-index: 0;
   pointer-events: none;
 }
@@ -453,8 +454,8 @@ body.intro-complete .floating-whatsapp {
   height: 86px;
   transform-origin: 50% 0;
   pointer-events: none;
-  z-index: 1;
-  opacity: 0.52;
+  z-index: 0;
+  opacity: 0.38;
   mix-blend-mode: screen;
   filter: blur(1px);
 }
@@ -691,7 +692,7 @@ body.intro-complete .floating-whatsapp {
   top: clamp(1.1rem, 2.8vh, 1.7rem);
   z-index: 4;
   text-align: center;
-  max-width: min(40rem, 70vw);
+  max-width: min(30rem, 54vw);
   margin: 0;
   transform: translateX(-50%);
   pointer-events: none;
@@ -772,10 +773,10 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__story {
   position: absolute;
   right: clamp(1rem, 4vw, 3.2rem);
-  top: clamp(18rem, 49vh, 24rem);
+  top: clamp(15.5rem, 41vh, 19.5rem);
   bottom: auto;
   display: grid;
-  width: min(16rem, calc(100% - 2rem));
+  width: min(14rem, calc(100% - 2rem));
   margin: 0;
   z-index: 5;
 }
@@ -808,14 +809,14 @@ body.intro-complete .floating-whatsapp {
   position: absolute;
   left: auto;
   right: clamp(1rem, 4vw, 3.2rem);
-  top: clamp(7.2rem, 20vh, 10.5rem);
+  top: clamp(6.1rem, 14vh, 8.4rem);
   bottom: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: clamp(186px, 18vw, 228px);
+  width: clamp(178px, 16vw, 204px);
   max-width: calc(100vw - 1.5rem);
   padding: 0;
   opacity: 0;
@@ -825,7 +826,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro {
-  width: clamp(174px, 17vw, 214px);
+  width: clamp(168px, 15vw, 196px);
   max-width: calc(100vw - 1.5rem);
   transform: translateY(22px) scale(0.96);
 }
@@ -854,7 +855,7 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-stage--hero {
   width: 100%;
-  min-height: clamp(174px, 17vw, 214px);
+  min-height: clamp(168px, 15vw, 196px);
 }
 
 .intro-screen__host-mural {
@@ -3422,7 +3423,7 @@ td {
 .floating-fabian-host {
   position: fixed;
   right: 0.05rem;
-  bottom: 6.2rem;
+  bottom: 6.75rem;
   z-index: 319;
   width: 132px;
   display: grid;
@@ -3434,7 +3435,7 @@ td {
 
 .fabian-main {
   right: 0.05rem;
-  bottom: 6.5rem;
+  bottom: 7rem;
   width: 132px;
 }
 
@@ -3495,7 +3496,7 @@ td {
   height: 100%;
   display: block;
   object-fit: contain;
-  object-position: center center;
+  object-position: center bottom;
   filter:
     drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22))
     brightness(1.01)
@@ -3962,7 +3963,7 @@ td {
 
   .fabian-main {
     right: 0.05rem;
-    bottom: 5.2rem;
+    bottom: 5.45rem;
     width: 114px;
   }
 
