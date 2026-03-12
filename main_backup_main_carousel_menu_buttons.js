@@ -27,10 +27,6 @@ const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
 const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
-const heroGallery = document.querySelector("#heroGallery");
-const heroGalleryPrev = document.querySelector("#heroGalleryPrev");
-const heroGalleryNext = document.querySelector("#heroGalleryNext");
-const heroGalleryDots = document.querySelector("#heroGalleryDots");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
@@ -60,7 +56,6 @@ let siteAmbientUnlockBound = false;
 let siteAmbientPendingTimer = 0;
 let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
-let heroGalleryTimer = 0;
 
 function showToast(message, type = "info") {
   if (!toastRegion) return;
@@ -1102,74 +1097,6 @@ function setupRevealAnimations() {
   });
 }
 
-function setupHeroGalleryCarousel() {
-  if (!heroGallery || !heroGalleryDots) return;
-
-  const slides = Array.from(heroGallery.querySelectorAll(".hero-gallery-item"));
-  if (slides.length <= 1) return;
-
-  let currentIndex = slides.findIndex((slide) => slide.classList.contains("is-active"));
-  if (currentIndex < 0) currentIndex = 0;
-
-  const stopAuto = () => {
-    if (!heroGalleryTimer) return;
-    window.clearInterval(heroGalleryTimer);
-    heroGalleryTimer = 0;
-  };
-
-  const render = () => {
-    slides.forEach((slide, index) => {
-      slide.classList.toggle("is-active", index === currentIndex);
-    });
-
-    const dots = Array.from(heroGalleryDots.children);
-    dots.forEach((dot, index) => {
-      dot.setAttribute("aria-current", index === currentIndex ? "true" : "false");
-    });
-  };
-
-  const startAuto = () => {
-    stopAuto();
-    heroGalleryTimer = window.setInterval(() => {
-      currentIndex = (currentIndex + 1) % slides.length;
-      render();
-    }, 3000);
-  };
-
-  heroGalleryDots.innerHTML = "";
-  slides.forEach((_, index) => {
-    const dot = document.createElement("button");
-    dot.type = "button";
-    dot.className = "hero-gallery__dot";
-    dot.setAttribute("aria-label", `Ver imagen ${index + 1}`);
-    dot.setAttribute("aria-current", index === currentIndex ? "true" : "false");
-    dot.addEventListener("click", () => {
-      currentIndex = index;
-      render();
-      startAuto();
-    });
-    heroGalleryDots.appendChild(dot);
-  });
-
-  heroGalleryPrev?.addEventListener("click", () => {
-    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-    render();
-    startAuto();
-  });
-
-  heroGalleryNext?.addEventListener("click", () => {
-    currentIndex = (currentIndex + 1) % slides.length;
-    render();
-    startAuto();
-  });
-
-  heroGallery.addEventListener("pointerenter", stopAuto);
-  heroGallery.addEventListener("pointerleave", startAuto);
-
-  render();
-  startAuto();
-}
-
 if (heroReviewsCard) {
   let resizeTimer = 0;
   window.addEventListener("resize", () => {
@@ -1195,6 +1122,5 @@ setupFloatingWhatsapp();
 setupWhatsappAudio();
 setupVisitCounter();
 setupMenuDestacadoButton();
-setupHeroGalleryCarousel();
 loadReviews();
 
