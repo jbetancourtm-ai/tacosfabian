@@ -340,8 +340,43 @@ function setupFabianVideos() {
   const fabianVideos = Array.from(document.querySelectorAll(".intro-screen__host-video"));
   if (!fabianVideos.length) return;
 
+  const pickBestSource = (video) => {
+    if (!(video instanceof HTMLVideoElement)) return null;
+    const candidates = [
+      {
+        src: "/images/fabian.webm",
+        type: 'video/webm; codecs="vp9,opus"',
+      },
+      {
+        src: "/images/fabian.mov",
+        type: 'video/quicktime; codecs="hvc1"',
+      },
+      {
+        src: "/images/fabian.mp4",
+        type: "video/mp4",
+      },
+    ];
+
+    return (
+      candidates.find((candidate) => {
+        try {
+          return video.canPlayType(candidate.type) !== "";
+        } catch {
+          return false;
+        }
+      }) ?? candidates[candidates.length - 1]
+    );
+  };
+
   const prepareVideo = (video) => {
     if (!(video instanceof HTMLVideoElement)) return;
+    const bestSource = pickBestSource(video);
+    if (bestSource && !video.dataset.resolvedSrc) {
+      video.src = bestSource.src;
+      video.dataset.resolvedSrc = bestSource.src;
+      video.dataset.resolvedType = bestSource.type;
+      video.load();
+    }
     video.playsInline = true;
     video.loop = true;
     video.preload = "auto";

@@ -604,13 +604,28 @@ export async function initIntroExperience({
       return true;
     } catch {
       if (token !== audioToken) return false;
-      hostVideo.pause();
-      hostVideo.currentTime = 0;
-      hostVideo.volume = 0.88;
-      audioMode = "idle";
-      introSoundBtn?.classList.remove("is-hidden");
-      armIntroAudioUnlockListeners();
-      return false;
+      try {
+        hostVideo.pause();
+        hostVideo.currentTime = 0;
+        hostVideo.muted = true;
+        hostVideo.defaultMuted = true;
+        hostVideo.volume = 0;
+        await hostVideo.play();
+        if (token !== audioToken) return false;
+        audioMode = "idle";
+        introSoundBtn?.classList.remove("is-hidden");
+        armIntroAudioUnlockListeners();
+        return false;
+      } catch {
+        if (token !== audioToken) return false;
+        hostVideo.pause();
+        hostVideo.currentTime = 0;
+        hostVideo.volume = 0.88;
+        audioMode = "idle";
+        introSoundBtn?.classList.remove("is-hidden");
+        armIntroAudioUnlockListeners();
+        return false;
+      }
     }
   };
 
