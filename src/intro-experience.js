@@ -245,13 +245,13 @@ export async function initIntroExperience({
   const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
   if (fallbackAudio) {
     fallbackAudio.preload = "auto";
-    fallbackAudio.loop = true;
+    fallbackAudio.loop = false;
     fallbackAudio.volume = 0.88;
   }
   if (hostVideo instanceof HTMLVideoElement) {
     hostVideo.preload = "auto";
     hostVideo.playsInline = true;
-    hostVideo.loop = true;
+    hostVideo.loop = false;
     hostVideo.muted = false;
     hostVideo.defaultMuted = false;
     hostVideo.volume = 0.88;
@@ -657,6 +657,22 @@ export async function initIntroExperience({
     autoDismissTimer = window.setTimeout(finishIntro, delay);
   };
 
+  const scheduleFinishFromMedia = () => {
+    if (!(hostVideo instanceof HTMLVideoElement)) {
+      scheduleFinish(autoDismissMs);
+      return;
+    }
+
+    const durationSeconds = usingFallbackAudio && fallbackAudio ? fallbackAudio.duration : hostVideo.duration;
+    if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
+      const remainingMs = Math.max(900, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + 250);
+      scheduleFinish(remainingMs);
+      return;
+    }
+
+    scheduleFinish(autoDismissMs);
+  };
+
   const restartIntroExperience = async () => {
     if (closed) return false;
 
@@ -666,7 +682,7 @@ export async function initIntroExperience({
     const started = await tryPlayNarrationAudio({ restart: true });
 
     if (started) {
-      scheduleFinish(autoDismissMs);
+      scheduleFinishFromMedia();
       pulseSpeaking(2600);
     }
 
@@ -745,6 +761,13 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("pause", () => {
     if (!usingFallbackAudio) return;
     stopFallbackAudio();
+  });
+  hostVideo?.addEventListener("ended", () => {
+    finishIntro();
+  });
+  fallbackAudio?.addEventListener("ended", () => {
+    if (!usingFallbackAudio) return;
+    finishIntro();
   });
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") finishIntro();
@@ -869,6 +892,6 @@ export async function initIntroExperience({
   }
 
   void tryPlayNarrationAudio();
-  scheduleFinish(autoDismissMs);
+  scheduleFinishFromMedia();
   render();
 }
