@@ -256,9 +256,9 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__ui {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  --intro-actions-offset: clamp(0.9rem, 2.8vh, 1.5rem);
-  --intro-actions-space: clamp(5.8rem, 13vh, 7.6rem);
-  padding: clamp(1rem, 2vw, 1.5rem);
+  --intro-actions-offset: clamp(1rem, 3.2vh, 1.7rem);
+  --intro-actions-space: clamp(6.2rem, 14vh, 8.2rem);
+  padding: clamp(1rem, 2vw, 1.6rem);
 }
 
 .intro-screen__topbar {
@@ -441,7 +441,7 @@ body.intro-complete .floating-whatsapp {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
-  width: min(100% - 2rem, 54rem);
+  width: min(100% - 2rem, 48rem);
   transform: translateX(-50%);
   z-index: 8;
 }
@@ -520,14 +520,14 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__btn {
-  min-width: 11.25rem;
+  min-width: 11rem;
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.72rem;
   justify-content: center;
   min-height: 3.85rem;
-  padding: 0.84rem 1.18rem;
+  padding: 0.84rem 1.22rem;
   border-radius: 9999px;
   border: 1px solid rgba(255, 223, 197, 0.18);
   box-shadow:
@@ -687,10 +687,10 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__headline {
   position: absolute;
   left: 50%;
-  top: clamp(6.8rem, 16vh, 9rem);
+  top: clamp(6.6rem, 15vh, 8.6rem);
   z-index: 5;
   text-align: center;
-  max-width: min(40rem, 70vw);
+  max-width: min(38rem, 64vw);
   margin: 0;
   transform: translateX(-50%);
   pointer-events: none;
@@ -750,9 +750,9 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__title {
-  font-size: clamp(2.4rem, 6.8vw, 5rem);
-  line-height: 0.94;
-  letter-spacing: 0.11em;
+  font-size: clamp(2.3rem, 6.5vw, 4.8rem);
+  line-height: 0.96;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-shadow:
     0 0 12px rgba(255, 194, 135, 0.36),
@@ -761,9 +761,9 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__subtitle {
-  margin-top: 0.72rem;
-  font-size: clamp(0.84rem, 1.4vw, 1rem);
-  letter-spacing: 0.08em;
+  margin-top: 0.68rem;
+  font-size: clamp(0.84rem, 1.32vw, 0.96rem);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   text-shadow: 0 0 16px rgba(255, 124, 26, 0.12);
 }
@@ -771,14 +771,14 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__story {
   align-self: end;
   display: grid;
-  width: min(42rem, calc(100% - 2rem));
-  margin: 0 auto var(--intro-actions-space);
+  width: min(33rem, calc(100% - 2rem));
+  margin: 0 auto calc(var(--intro-actions-space) + 0.35rem);
   z-index: 4;
 }
 
 .intro-screen__narration {
-  min-height: 5.8rem;
-  padding: 0.95rem 1.15rem;
+  min-height: 5.4rem;
+  padding: 0.9rem 1.15rem;
   border-radius: 28px;
   background: linear-gradient(135deg, rgba(8, 10, 14, 0.66), rgba(24, 16, 14, 0.46));
   border: 1px solid rgba(255, 198, 147, 0.12);
@@ -802,33 +802,32 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-card {
   position: absolute;
-  left: 50%;
-  right: auto;
-  top: clamp(10.6rem, 29vh, 13.8rem);
-  bottom: auto;
+  left: auto;
+  right: clamp(1.4rem, 5vw, 4rem);
+  bottom: calc(var(--intro-actions-space) + clamp(1rem, 3.2vh, 2.1rem));
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: clamp(240px, 26vw, 300px);
+  width: clamp(285px, 31vw, 360px);
   max-width: calc(100vw - 1.5rem);
   padding: 0;
   opacity: 0;
-  transform: translate(-50%, 22px) scale(0.96);
+  transform: translateY(22px) scale(0.96);
   transition: opacity 0.55s ease, transform 0.55s ease;
   z-index: 6;
 }
 
 .fabian-intro {
-  width: clamp(220px, 24vw, 280px);
+  width: clamp(190px, 22vw, 260px);
   max-width: calc(100vw - 1.5rem);
-  transform: translate(-50%, 22px) scale(0.96);
+  transform: translateY(22px) scale(0.96);
 }
 
 .fabian-intro.is-swapped {
-  left: 50%;
-  right: auto;
+  left: auto;
+  right: clamp(1rem, 4vw, 3.4rem);
 }
 
 .intro-screen__host-card--hero {
@@ -837,7 +836,7 @@ body.intro-complete .floating-whatsapp {
 
 .fabian-intro.is-visible {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+  transform: translateY(0) scale(1);
 }
 
 .intro-screen__host-stage {
@@ -850,7 +849,7 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-stage--hero {
   width: 100%;
-  min-height: clamp(220px, 24vw, 280px);
+  min-height: clamp(190px, 22vw, 260px);
 }
 
 .intro-screen__host-mural {
@@ -916,7 +915,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro .intro-screen__host-asset {
-  overflow: visible;
+  overflow: hidden;
   isolation: isolate;
   background: transparent;
 }
@@ -977,7 +976,6 @@ body.intro-complete .floating-whatsapp {
     saturate(1.04)
     contrast(1.04)
     brightness(1.01);
-  mix-blend-mode: screen;
 }
 
 .fabian-intro .intro-screen__host-glow,
@@ -3998,25 +3996,24 @@ td {
 
   .intro-screen__ui {
     grid-template-rows: auto auto 1fr;
-    --intro-actions-offset: max(0.7rem, env(safe-area-inset-bottom));
-    --intro-actions-space: clamp(4.8rem, 17vh, 6rem);
+    --intro-actions-offset: max(0.75rem, env(safe-area-inset-bottom));
+    --intro-actions-space: clamp(5rem, 18vh, 6.2rem);
     padding: 0.52rem 0.48rem 0.68rem;
   }
 
   .fabian-intro {
     grid-template-columns: 1fr;
-    left: 50%;
-    right: auto;
-    top: clamp(10.6rem, 32vh, 13.4rem);
-    bottom: auto;
-    width: clamp(180px, 32vw, 220px);
+    right: 0.3rem;
+    left: auto;
+    bottom: calc(var(--intro-actions-space) + 0.95rem);
+    width: clamp(175px, 31vw, 220px);
     max-width: none;
     text-align: center;
   }
 
   .fabian-intro.is-swapped {
-    left: 50%;
-    right: auto;
+    left: auto;
+    right: 0.35rem;
   }
 
   .intro-screen__host-portrait {
@@ -4025,7 +4022,7 @@ td {
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(180px, 32vw, 220px);
+    min-height: clamp(175px, 31vw, 220px);
   }
 
   .fabian-intro .intro-screen__host-asset::before {
@@ -4103,8 +4100,8 @@ td {
 
   .intro-screen__headline {
     left: 50%;
-    top: 5.2rem;
-    max-width: min(82vw, 18rem);
+    top: 5.1rem;
+    max-width: min(82vw, 17rem);
     transform: translateX(-50%);
     text-align: center;
   }
@@ -4169,7 +4166,7 @@ td {
   .intro-screen__story {
     width: 100%;
     padding-right: 0;
-    padding-top: min(16vw, 4.8rem);
+    padding-top: min(6vw, 0.9rem);
   }
 
   .floating-fabian-host__stage {
@@ -4187,8 +4184,8 @@ td {
   }
 
   .intro-screen__narration {
-    min-height: 4.6rem;
-    max-width: min(82vw, 17rem);
+    min-height: 4.2rem;
+    max-width: min(82vw, 16rem);
     margin: 0 auto;
     padding: 0.52rem 0.6rem;
     border-radius: 16px;
@@ -4281,23 +4278,23 @@ td {
 
 @media (max-width: 599px) {
   .intro-screen__ui {
-    --intro-actions-space: clamp(4.6rem, 18vh, 5.6rem);
+    --intro-actions-space: clamp(4.7rem, 20vh, 5.8rem);
     padding: 0.46rem 0.42rem 0.62rem;
   }
 
   .intro-screen__headline {
-    top: 4.65rem;
-    max-width: min(86vw, 15rem);
+    top: 4.5rem;
+    max-width: min(86vw, 13.8rem);
   }
 
   .intro-screen__title {
-    font-size: clamp(1.1rem, 5.8vw, 1.5rem);
+    font-size: clamp(1rem, 5.1vw, 1.34rem);
     letter-spacing: 0.08em;
   }
 
   .intro-screen__subtitle {
-    font-size: 0.54rem;
-    letter-spacing: 0.06em;
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
   }
 
   .intro-screen__media-reserve {
@@ -4313,25 +4310,23 @@ td {
   }
 
   .fabian-intro {
-    right: auto;
-    left: 50%;
-    top: clamp(9.6rem, 28vh, 11rem);
-    bottom: auto;
-    width: clamp(150px, 44vw, 188px);
-    transform: translate(-50%, 22px) scale(0.96);
+    right: 50%;
+    left: auto;
+    bottom: calc(var(--intro-actions-space) + 0.7rem);
+    width: clamp(148px, 42vw, 178px);
+    transform: translate(50%, 22px) scale(0.96);
   }
 
   .fabian-intro.is-visible {
-    transform: translate(-50%, 0) scale(1);
+    transform: translate(50%, 0) scale(1);
   }
 
   .fabian-intro.is-swapped {
-    right: auto;
-    left: 50%;
+    right: 50%;
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(150px, 44vw, 188px);
+    min-height: clamp(148px, 42vw, 178px);
   }
 
   .intro-screen__btn {
@@ -4346,8 +4341,8 @@ td {
   }
 
   .intro-screen__narration {
-    min-height: 4rem;
-    max-width: min(88vw, 18rem);
+    min-height: 3.7rem;
+    max-width: min(88vw, 15rem);
   }
 
   .intro-screen__narration-line {

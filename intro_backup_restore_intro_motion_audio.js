@@ -575,18 +575,21 @@ export async function initIntroExperience({
   const moveHostToOppositeSide = () => {
     if (!hostCard || hostSideSwapped || closed) return;
     hostSideSwapped = true;
+
+    const startRect = hostCard.getBoundingClientRect();
+    hostCard.classList.add("is-swapped");
+    const endRect = hostCard.getBoundingClientRect();
+    const deltaX = startRect.left - endRect.left;
+
     gsap.fromTo(
       hostCard,
-      { y: 0, scale: 1 },
+      { x: deltaX },
       {
-        keyframes: [
-          { y: -10, scale: 1.02, duration: reducedMotion ? 0.16 : 0.3 },
-          { y: -4, scale: 0.995, duration: reducedMotion ? 0.16 : 0.28 },
-          { y: 0, scale: 1, duration: reducedMotion ? 0.16 : 0.32 },
-        ],
+        x: 0,
+        duration: reducedMotion ? 0.28 : 1.05,
         ease: "power2.inOut",
         overwrite: true,
-        clearProps: "y,scale",
+        clearProps: "x",
       }
     );
   };
