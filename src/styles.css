@@ -478,10 +478,11 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__brand-beam {
   position: absolute;
-  top: -38px;
+  top: auto;
+  bottom: -40px;
   width: 28px;
   height: 86px;
-  transform-origin: 50% 0;
+  transform-origin: 50% 100%;
   pointer-events: none;
   z-index: 0;
   opacity: 0;
@@ -497,14 +498,14 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__brand-beam::before {
   inset: 0;
-  clip-path: polygon(50% 0, 0 100%, 100% 100%);
-  background: linear-gradient(180deg, rgba(255, 250, 240, 0.92), rgba(255, 230, 200, 0.24) 54%, transparent 92%);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  background: linear-gradient(0deg, rgba(255, 250, 240, 0.92), rgba(255, 230, 200, 0.24) 54%, transparent 92%);
 }
 
 .intro-screen__brand-beam::after {
   left: 50%;
-  top: -8px;
-  bottom: auto;
+  top: auto;
+  bottom: -8px;
   width: 11px;
   height: 11px;
   transform: translateX(-50%);
