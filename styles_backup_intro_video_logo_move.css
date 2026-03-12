@@ -359,8 +359,8 @@ body.intro-complete .floating-whatsapp {
   position: relative;
   display: inline-grid;
   place-items: center;
-  width: clamp(5.1rem, 6.6vw, 6.1rem);
-  height: clamp(5.1rem, 6.6vw, 6.1rem);
+  width: clamp(4.6rem, 6vw, 5.5rem);
+  height: clamp(4.6rem, 6vw, 5.5rem);
   padding: 0;
   border-radius: 28px;
   background:
@@ -375,7 +375,7 @@ body.intro-complete .floating-whatsapp {
     0 8px 18px rgba(0, 0, 0, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 0 12px rgba(255, 184, 112, 0.04);
-  opacity: 0.88;
+  opacity: 0.84;
 }
 
 .intro-screen__brand-mark {
@@ -384,8 +384,8 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__brand-mark {
-  width: clamp(3.35rem, 4.6vw, 4.1rem);
-  height: clamp(3.35rem, 4.6vw, 4.1rem);
+  width: clamp(3rem, 4.1vw, 3.7rem);
+  height: clamp(3rem, 4.1vw, 3.7rem);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -455,7 +455,7 @@ body.intro-complete .floating-whatsapp {
   transform-origin: 50% 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0;
+  opacity: 0.38;
   mix-blend-mode: screen;
   filter: blur(1px);
 }
@@ -773,10 +773,10 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__story {
   position: absolute;
   right: clamp(1rem, 4vw, 3.2rem);
-  top: clamp(15.2rem, 40vh, 19rem);
+  top: clamp(15.5rem, 41vh, 19.5rem);
   bottom: auto;
   display: grid;
-  width: clamp(10.5rem, 14vw, 12.4rem);
+  width: min(14rem, calc(100% - 2rem));
   margin: 0;
   z-index: 5;
 }
@@ -809,14 +809,14 @@ body.intro-complete .floating-whatsapp {
   position: absolute;
   left: auto;
   right: clamp(1rem, 4vw, 3.2rem);
-  top: clamp(6rem, 13vh, 8rem);
+  top: clamp(6.1rem, 14vh, 8.4rem);
   bottom: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: clamp(188px, 18vw, 222px);
+  width: clamp(178px, 16vw, 204px);
   max-width: calc(100vw - 1.5rem);
   padding: 0;
   opacity: 0;
@@ -826,7 +826,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro {
-  width: clamp(182px, 17vw, 214px);
+  width: clamp(168px, 15vw, 196px);
   max-width: calc(100vw - 1.5rem);
   transform: translateY(22px) scale(0.96);
 }
@@ -855,7 +855,7 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-stage--hero {
   width: 100%;
-  min-height: clamp(182px, 17vw, 214px);
+  min-height: clamp(168px, 15vw, 196px);
 }
 
 .intro-screen__host-mural {
@@ -989,31 +989,6 @@ body.intro-complete .floating-whatsapp {
 
 .fabian-intro .intro-screen__host-video {
   background-color: transparent !important;
-}
-
-@keyframes intro-brand-glide-desktop {
-  0% {
-    left: calc(100vw - 7.2rem);
-    transform: translateX(0) translateY(0) scale(0.96);
-  }
-  72% {
-    left: 1.05rem;
-    transform: translateX(0) translateY(0) scale(1);
-  }
-  100% {
-    left: 1.05rem;
-    transform: translateX(0) translateY(0) scale(1);
-  }
-}
-
-@keyframes intro-brand-beams-reveal {
-  0%,
-  78% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0.72;
-  }
 }
 
 .fabian-intro .intro-screen__host-glow,
@@ -3893,48 +3868,6 @@ td {
 @media (min-width: 900px) {
   .nav-overlay {
     display: none !important;
-  }
-
-  .intro-screen__topbar {
-    position: relative;
-    min-height: 6.8rem;
-    justify-items: stretch;
-  }
-
-  .intro-screen__brandlock {
-    position: absolute;
-    top: 0.4rem;
-    left: 1.05rem;
-    justify-self: start;
-    animation: intro-brand-glide-desktop 2.2s cubic-bezier(0.22, 0.8, 0.2, 1) both;
-    z-index: 3;
-  }
-
-  .intro-screen__brand-beam--left,
-  .intro-screen__brand-beam--right {
-    animation:
-      intro-brand-beams-reveal 2.2s ease forwards,
-      intro-brand-beam-left 4.6s ease-in-out 2.2s infinite;
-  }
-
-  .intro-screen__brand-beam--right {
-    animation:
-      intro-brand-beams-reveal 2.2s ease forwards,
-      intro-brand-beam-right 4.9s ease-in-out 2.2s infinite;
-  }
-
-  .intro-screen__headline {
-    left: 38%;
-    top: clamp(1.6rem, 4.5vh, 2.4rem);
-    max-width: min(31rem, 50vw);
-    transform: translateX(-50%);
-    text-align: center;
-  }
-
-  .intro-screen__story {
-    right: clamp(1rem, 4vw, 3.2rem);
-    top: clamp(18.4rem, 46vh, 22rem);
-    width: clamp(11rem, 16vw, 13rem);
   }
 
   .header-inner {
