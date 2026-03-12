@@ -4001,7 +4001,7 @@ td {
 
   .intro-screen__ui {
     grid-template-rows: auto auto 1fr;
-    padding: 0.65rem 0.58rem 0.82rem;
+    padding: 0.52rem 0.48rem 0.68rem;
   }
 
   .fabian-intro {
@@ -4087,10 +4087,10 @@ td {
     width: min(100%, 288px);
     grid-column: 1;
     justify-self: center;
-    padding: 0.62rem 0.76rem 0.62rem 0.68rem;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(14, 17, 22, 0.64), rgba(30, 20, 16, 0.32));
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+    padding: 0.52rem 0.66rem 0.52rem 0.58rem;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(14, 17, 22, 0.48), rgba(30, 20, 16, 0.18));
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
   }
 
   .intro-screen__actions {
@@ -4113,13 +4113,14 @@ td {
 
   .intro-screen__headline {
     left: 50%;
-    top: 5.75rem;
-    max-width: min(80vw, 17rem);
+    top: 5.2rem;
+    max-width: min(78vw, 15.5rem);
     transform: translateX(-50%);
     text-align: center;
   }
 
   .intro-screen__media-reserve {
+    display: none;
     top: clamp(11.5rem, 28vh, 13rem);
     left: 50%;
     right: auto;
@@ -4131,6 +4132,7 @@ td {
   }
 
   .intro-screen__corner-lights {
+    display: none;
     width: min(15rem, 76vw);
     height: 4.5rem;
     top: 0.38rem;
@@ -4163,21 +4165,21 @@ td {
   }
 
   .intro-screen__title {
-    font-size: clamp(1.42rem, 6.6vw, 1.98rem);
-    letter-spacing: 0.05em;
-    line-height: 1;
+    font-size: clamp(1.26rem, 5.9vw, 1.72rem);
+    letter-spacing: 0.035em;
+    line-height: 1.02;
   }
 
   .intro-screen__subtitle {
     margin-top: 0.32rem;
-    font-size: clamp(0.58rem, 1.9vw, 0.72rem);
-    letter-spacing: 0.04em;
+    font-size: clamp(0.54rem, 1.7vw, 0.66rem);
+    letter-spacing: 0.03em;
   }
 
   .intro-screen__story {
     width: 100%;
     padding-right: 0;
-    padding-top: min(18vw, 3.8rem);
+    padding-top: min(10vw, 1.8rem);
   }
 
   .floating-fabian-host__stage {
@@ -4195,18 +4197,18 @@ td {
   }
 
   .intro-screen__narration {
-    min-height: 5.4rem;
-    max-width: min(86vw, 20rem);
+    min-height: 4.6rem;
+    max-width: min(82vw, 17rem);
     margin: 0 auto;
-    padding: 0.62rem 0.72rem;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(8, 10, 14, 0.46), rgba(24, 16, 14, 0.28));
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    padding: 0.52rem 0.6rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(8, 10, 14, 0.34), rgba(24, 16, 14, 0.18));
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
   }
 
   .intro-screen__narration-line {
-    font-size: 0.82rem;
-    line-height: 1.34;
+    font-size: 0.74rem;
+    line-height: 1.28;
   }
 
   .intro-screen__meta {
@@ -4289,67 +4291,64 @@ td {
 
 @media (max-width: 599px) {
   .intro-screen__ui {
-    padding: 0.58rem 0.54rem 0.76rem;
+    padding: 0.46rem 0.42rem 0.62rem;
   }
 
   .intro-screen__headline {
-    top: 5.35rem;
-    max-width: min(80vw, 15rem);
+    top: 4.95rem;
+    max-width: min(76vw, 13.6rem);
   }
 
   .intro-screen__title {
-    font-size: clamp(1.2rem, 6.2vw, 1.68rem);
-    letter-spacing: 0.04em;
+    font-size: clamp(1.08rem, 5.4vw, 1.44rem);
+    letter-spacing: 0.03em;
   }
 
   .intro-screen__subtitle {
-    font-size: 0.56rem;
-    letter-spacing: 0.04em;
+    font-size: 0.5rem;
+    letter-spacing: 0.03em;
   }
 
   .intro-screen__media-reserve {
-    top: 10rem;
-    width: min(32vw, 132px);
-    min-width: 96px;
-    opacity: 0.08;
+    display: none;
   }
 
   .intro-screen__corner-lights {
-    opacity: 0.1;
+    display: none;
   }
 
   .intro-screen__story {
-    padding-top: min(12vw, 2.2rem);
+    padding-top: min(6vw, 0.8rem);
   }
 
   .fabian-intro {
     right: -0.2rem;
-    bottom: 3.95rem;
-    width: clamp(260px, 72vw, 330px);
+    bottom: 3.7rem;
+    width: clamp(250px, 72vw, 320px);
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(260px, 72vw, 330px);
+    min-height: clamp(250px, 72vw, 320px);
   }
 
   .intro-screen__btn {
-    min-width: 8rem;
-    width: 8rem;
-    min-height: 2.7rem;
-    padding: 0.48rem 0.56rem;
+    min-width: 7.4rem;
+    width: 7.4rem;
+    min-height: 2.5rem;
+    padding: 0.42rem 0.46rem;
   }
 
   .intro-screen__btn-text {
-    font-size: 0.57rem;
+    font-size: 0.52rem;
   }
 
   .intro-screen__narration {
-    min-height: 4.8rem;
-    max-width: min(82vw, 17rem);
+    min-height: 4rem;
+    max-width: min(78vw, 14.5rem);
   }
 
   .intro-screen__narration-line {
-    font-size: 0.76rem;
+    font-size: 0.68rem;
   }
 }
 

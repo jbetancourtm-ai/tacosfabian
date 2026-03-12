@@ -360,16 +360,16 @@ function setupFabianVideos() {
     if (!(video instanceof HTMLVideoElement)) return null;
     const candidates = [
       {
+        src: "/images/fabian.mp4",
+        type: "video/mp4",
+      },
+      {
         src: "/images/fabian.webm",
         type: 'video/webm; codecs="vp9,opus"',
       },
       {
         src: "/images/fabian.mov",
         type: 'video/quicktime; codecs="hvc1"',
-      },
-      {
-        src: "/images/fabian.mp4",
-        type: "video/mp4",
       },
     ];
 
