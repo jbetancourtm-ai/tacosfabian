@@ -158,6 +158,16 @@ function setupSiteAmbientAudio() {
     siteAmbientPendingTimer = 0;
   };
 
+  const silenceAmbientForIntro = () => {
+    clearPendingStart();
+    if (!siteAmbientAudio) return;
+    gsap.killTweensOf(siteAmbientAudio);
+    siteAmbientAudio.volume = 0;
+    if (!siteAmbientAudio.paused) siteAmbientAudio.pause();
+    siteAmbientReady = false;
+    siteAmbientStarting = false;
+  };
+
   const removeUnlockListeners = () => {
     if (!siteAmbientUnlockBound) return;
     siteAmbientUnlockBound = false;
@@ -215,18 +225,24 @@ function setupSiteAmbientAudio() {
   };
 
   if (document.body.classList.contains("intro-active")) {
+    silenceAmbientForIntro();
     siteAmbientObserver = new MutationObserver(() => {
-      if (document.body.classList.contains("intro-active")) return;
+      if (document.body.classList.contains("intro-active")) {
+        silenceAmbientForIntro();
+        return;
+      }
       queueAmbientStart(introExitDelayMs);
     });
     siteAmbientObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
-    armUnlockListeners();
     return;
   }
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible") return;
-    if (document.body.classList.contains("intro-active")) return;
+    if (document.body.classList.contains("intro-active")) {
+      silenceAmbientForIntro();
+      return;
+    }
     queueAmbientStart(80);
   });
 
