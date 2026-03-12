@@ -383,8 +383,8 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__brand-mark {
-  width: clamp(3.7rem, 5vw, 4.5rem);
-  height: clamp(3.7rem, 5vw, 4.5rem);
+  width: clamp(4rem, 5.4vw, 4.9rem);
+  height: clamp(4rem, 5.4vw, 4.9rem);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -453,7 +453,7 @@ body.intro-complete .floating-whatsapp {
   height: 70px;
   transform-origin: 50% 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 3;
   opacity: 0.8;
   mix-blend-mode: screen;
   filter: blur(1px);
