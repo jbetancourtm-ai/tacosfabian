@@ -988,6 +988,15 @@ body.intro-complete .floating-whatsapp {
   background: transparent;
 }
 
+.intro-screen__host-video {
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.intro-screen__host-video.is-ready {
+  opacity: 1;
+}
+
 .fabian-video-canvas {
   position: absolute;
   inset: 0;
@@ -5856,7 +5865,7 @@ body::after {
 
 /* Conversion-focused premium refinements */
 .site-header {
-  top: 0.55rem;
+  top: 0.9rem;
   width: min(1220px, calc(100vw - 1.2rem));
 }
 
@@ -5884,6 +5893,10 @@ body::after {
   gap: clamp(2rem, 3.4vw, 2.9rem);
 }
 
+.hero {
+  padding-top: 5.9rem;
+}
+
 .hero-content {
   max-width: 44rem;
 }
@@ -5893,7 +5906,7 @@ body::after {
   font-size: clamp(3.1rem, 6.6vw, 5rem);
   line-height: 0.98;
   letter-spacing: -0.048em;
-  margin-top: 1.32rem;
+  margin-top: 1.7rem;
 }
 
 .hero-content p {
@@ -5914,7 +5927,7 @@ body::after {
 
 .menu-carousel--hero {
   max-width: min(58rem, 100%);
-  margin-top: 2.05rem;
+  margin-top: 2.35rem;
 }
 
 .menu-carousel--hero .carousel-viewport {
@@ -6072,6 +6085,10 @@ body::after {
     height: 224px;
   }
 
+  .intro-screen__host-video {
+    transition-duration: 0.18s;
+  }
+
   .floating-fabian-host,
   .fabian-main {
     right: 0.5rem;
@@ -6108,6 +6125,10 @@ body::after {
 
   .menu-carousel--hero .slide-visual {
     height: 188px;
+  }
+
+  .intro-screen__host-video {
+    transition-duration: 0.12s;
   }
 
   .menu-carousel--hero .slide-copy h3 {

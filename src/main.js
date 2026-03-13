@@ -433,6 +433,13 @@ function setupFabianVideos() {
     const fallbackSrc = video.dataset.browserFallback || video.dataset.audioFallback || "/images/fabian_web_audio5.mp4";
     const canPlayPreferred = video.canPlayType('video/webm; codecs="vp9,opus"');
 
+    if (!isStandaloneMode() && fallbackSrc) {
+      return {
+        src: fallbackSrc,
+        type: "video/mp4",
+      };
+    }
+
     if (preferredSrc.endsWith(".webm") && !isStandaloneMode() && canPlayPreferred !== "probably" && fallbackSrc) {
       return {
         src: fallbackSrc,
@@ -472,13 +479,17 @@ function setupFabianVideos() {
     video.loop = false;
     video.preload = "auto";
     video.controls = false;
-    video.muted = false;
-    video.defaultMuted = false;
+    video.muted = !isStandaloneMode();
+    video.defaultMuted = !isStandaloneMode();
   };
 
   fabianVideos.forEach((video) => {
     if (!(video instanceof HTMLVideoElement)) return;
+    video.classList.remove("is-ready");
     video.addEventListener("loadeddata", () => prepareVideo(video), { once: true });
+    video.addEventListener("loadeddata", () => video.classList.add("is-ready"));
+    video.addEventListener("canplay", () => video.classList.add("is-ready"));
+    video.addEventListener("playing", () => video.classList.add("is-ready"));
     video.addEventListener("error", () => swapToFallback(video));
     video.addEventListener("stalled", () => swapToFallback(video));
     prepareVideo(video);

@@ -256,14 +256,19 @@ export async function initIntroExperience({
     fallbackAudio.volume = 0.88;
   }
   if (hostVideo instanceof HTMLVideoElement) {
+    if (!isStandaloneMode && visualFallbackSrc) {
+      hostVideo.src = visualFallbackSrc;
+      hostVideo.dataset.resolvedSrc = visualFallbackSrc;
+      hostVideo.dataset.resolvedType = "video/mp4";
+    }
     hostVideo.autoplay = true;
     hostVideo.preload = "auto";
     hostVideo.playsInline = true;
     hostVideo.setAttribute("playsinline", "");
     hostVideo.setAttribute("webkit-playsinline", "");
     hostVideo.loop = false;
-    hostVideo.muted = false;
-    hostVideo.defaultMuted = false;
+    hostVideo.muted = !isStandaloneMode;
+    hostVideo.defaultMuted = !isStandaloneMode;
     hostVideo.volume = 0.88;
   }
 
@@ -596,6 +601,7 @@ export async function initIntroExperience({
       hostVideo.volume = muted ? 0 : 0.88;
       await hostVideo.play();
       const progressed = await waitForVideoProgress(preferFallback ? 1500 : 1200);
+      if (progressed) hostVideo.classList.add("is-ready");
       if (!progressed && visualFallbackSrc && !preferFallback && swapHostVideoSource(visualFallbackSrc)) {
         return ensureVisualPlayback({ restart: true, muted, preferFallback: true });
       }
@@ -716,6 +722,7 @@ export async function initIntroExperience({
         return tryPlayNarrationAudio({ restart: true });
       }
       if (token !== audioToken) return false;
+      hostVideo.classList.add("is-ready");
       fadeHostVideoTo(0.88, 0.55);
       audioMode = "media";
       introSoundBtn?.classList.add("is-hidden");
