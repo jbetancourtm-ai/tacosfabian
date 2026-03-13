@@ -329,9 +329,8 @@ export async function initIntroExperience({
     hostVideo.setAttribute("playsinline", "");
     hostVideo.setAttribute("webkit-playsinline", "");
     hostVideo.loop = false;
-    hostVideo.muted = false;
-    hostVideo.defaultMuted = false;
-    hostVideo.removeAttribute("muted");
+    hostVideo.muted = !isStandaloneMode;
+    hostVideo.defaultMuted = !isStandaloneMode;
     hostVideo.volume = 0.88;
   }
 
@@ -349,8 +348,6 @@ export async function initIntroExperience({
   let audioToken = 0;
   let usingFallbackAudio = false;
   let ambientEnabled = false;
-  let autoplayRetryTimer = 0;
-  let autoplayRetryCount = 0;
   const exitDurationMs = reducedMotion ? 120 : 980;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
@@ -633,21 +630,6 @@ export async function initIntroExperience({
     }
   };
 
-  const clearAutoplayRetry = () => {
-    if (autoplayRetryTimer) window.clearTimeout(autoplayRetryTimer);
-    autoplayRetryTimer = 0;
-  };
-
-  const scheduleAutoplayRetry = (delay = 220) => {
-    if (closed || document.hidden || audioMode === "media" || audioMode === "starting") return;
-    if (autoplayRetryCount >= 3) return;
-    clearAutoplayRetry();
-    autoplayRetryTimer = window.setTimeout(() => {
-      autoplayRetryCount += 1;
-      void tryPlayNarrationAudio({ restart: autoplayRetryCount > 1 });
-    }, delay);
-  };
-
   const swapHostVideoSource = (src) => {
     if (!(hostVideo instanceof HTMLVideoElement) || !src) return false;
     const resolvedSrc = hostVideo.dataset.resolvedSrc || hostVideo.currentSrc || hostVideo.src;
@@ -797,8 +779,6 @@ export async function initIntroExperience({
 
     if (audioMode === "media") {
       await tryPlayNarrationAudio({ restart: false });
-    } else if (autoplayRetryCount < 3) {
-      scheduleAutoplayRetry(120);
     }
   };
 
@@ -898,8 +878,6 @@ export async function initIntroExperience({
       } else {
         introSoundBtn?.classList.remove("is-hidden");
       }
-      clearAutoplayRetry();
-      autoplayRetryCount = 0;
       removeIntroAudioUnlockListeners();
       return true;
     } catch {
@@ -914,7 +892,6 @@ export async function initIntroExperience({
         if (ambientEnabled) fadeAmbientTo(0.085, 0.6);
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
-        scheduleAutoplayRetry(280);
         armIntroAudioUnlockListeners();
         return false;
       } catch {
@@ -929,7 +906,6 @@ export async function initIntroExperience({
         stopAmbientIntro({ reset: true });
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
-        scheduleAutoplayRetry(320);
         armIntroAudioUnlockListeners();
         return false;
       }
@@ -1000,7 +976,6 @@ export async function initIntroExperience({
 
     if (speakingTimer) window.clearTimeout(speakingTimer);
     if (viewportRepairTimer) window.clearTimeout(viewportRepairTimer);
-    clearAutoplayRetry();
     hostCard?.classList.remove("is-speaking");
     hostCard?.classList.remove("is-playing");
     audioToken += 1;
@@ -1071,14 +1046,6 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("stalled", () => {
     if (closed || isStandaloneMode) return;
     void ensureVisualPlayback({ restart: false, muted: audioMode !== "media" });
-  });
-  hostVideo?.addEventListener("loadeddata", () => {
-    if (closed || document.hidden) return;
-    scheduleAutoplayRetry(90);
-  });
-  hostVideo?.addEventListener("canplay", () => {
-    if (closed || document.hidden) return;
-    scheduleAutoplayRetry(60);
   });
   hostVideo?.addEventListener("error", () => {
     if (closed) return;
