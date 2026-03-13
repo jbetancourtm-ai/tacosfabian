@@ -135,19 +135,16 @@ function setupHeaderEffects() {
 
 function setupSiteAmbientAudio() {
   const storageKey = "tacos_fabian_premium_ambient";
-  const ambientSources = ["/audio/ambient-main.mp3.mp3", "/audio/ambient-main.mp3", "/audio/taqueria-ambient-night.wav"];
+  const ambientSources = ["/audio/ambient-main.mp3", "/audio/taqueria-ambient-night.wav"];
   const targetVolume = 0.038;
   const introExitDelayMs = 520;
   let ambientEnabled = false;
-  let unlockListenersBound = false;
 
   const readStoredPreference = () => {
     try {
-      const value = window.localStorage.getItem(storageKey);
-      if (value === null) return true;
-      return value === "on";
+      return window.localStorage.getItem(storageKey) === "on";
     } catch {
-      return true;
+      return false;
     }
   };
 
@@ -206,22 +203,6 @@ function setupSiteAmbientAudio() {
     if (textNode) textNode.textContent = isPlaying ? "Pausar ambiente" : "Activar ambiente";
   };
 
-  const removeUnlockListeners = () => {
-    if (!unlockListenersBound) return;
-    unlockListenersBound = false;
-    window.removeEventListener("pointerdown", tryUnlockAmbientFromGesture, true);
-    window.removeEventListener("touchstart", tryUnlockAmbientFromGesture, true);
-    window.removeEventListener("keydown", tryUnlockAmbientFromGesture, true);
-  };
-
-  const armUnlockListeners = () => {
-    if (unlockListenersBound) return;
-    unlockListenersBound = true;
-    window.addEventListener("pointerdown", tryUnlockAmbientFromGesture, true);
-    window.addEventListener("touchstart", tryUnlockAmbientFromGesture, true);
-    window.addEventListener("keydown", tryUnlockAmbientFromGesture, true);
-  };
-
   const pauseAmbient = ({ immediate = false } = {}) => {
     if (!siteAmbientAudio) {
       updateAmbientToggle();
@@ -259,23 +240,15 @@ function setupSiteAmbientAudio() {
     try {
       if (audio.paused) await audio.play();
       fadeAmbientTo(targetVolume, 1.6);
-      removeUnlockListeners();
       updateAmbientToggle();
       return true;
     } catch {
-      armUnlockListeners();
       updateAmbientToggle();
       return false;
     } finally {
       siteAmbientStarting = false;
     }
   };
-
-  async function tryUnlockAmbientFromGesture() {
-    if (!ambientEnabled || document.body.classList.contains("intro-active")) return;
-    const started = await playAmbient({ force: true });
-    if (started) removeUnlockListeners();
-  }
 
   const syncAmbientWithPage = () => {
     if (document.body.classList.contains("intro-active") || !ambientEnabled || document.visibilityState === "hidden") {
@@ -321,8 +294,9 @@ function setupSiteAmbientAudio() {
     }
     const started = await playAmbient({ force: true });
     if (!started) {
-      armUnlockListeners();
-      showToast("Tu navegador activará el ambiente en la siguiente interacción.", "info");
+      ambientEnabled = false;
+      storePreference(false);
+      showToast("Tu navegador requiere otra interaccion para activar el ambiente.", "info");
       updateAmbientToggle();
     }
   });
@@ -341,7 +315,6 @@ function setupSiteAmbientAudio() {
   siteAmbientObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
   syncAmbientWithPage();
-  if (ambientEnabled) armUnlockListeners();
 }
 
 function setupPwaSupport() {
@@ -805,7 +778,7 @@ function renderHeroReviewSlice(items) {
   if (!safeItems.length) {
     heroReviewsPreview.innerHTML = `
       <article class="hero-reviews-card__item hero-reviews-card__item--empty">
-        <p>Sé la primera persona en dejar una reseña.</p>
+        <p>Se la primera persona en dejar una resena.</p>
       </article>
     `;
     return;
@@ -862,7 +835,7 @@ function paintHeroReviews(items) {
     heroReviewsCache = [];
     heroReviewsStartIndex = 0;
     heroReviewsAvg.innerHTML = "&#9733; --";
-    heroReviewsCount.textContent = "Sin reseñas aún";
+    heroReviewsCount.textContent = "Sin resenas aun";
     renderHeroReviewSlice([]);
     return;
   }
@@ -874,17 +847,17 @@ function paintHeroReviews(items) {
   heroReviewsStartIndex = 0;
 
   heroReviewsAvg.innerHTML = `&#9733; ${avg.toFixed(1)}`;
-  heroReviewsCount.textContent = `${items.length} reseña${items.length === 1 ? "" : "s"}`;
+  heroReviewsCount.textContent = `${items.length} resena${items.length === 1 ? "" : "s"}`;
   syncHeroReviewsRotation();
 }
 
 function paintReviews(items) {
   if (!Array.isArray(items) || items.length === 0) {
-    reviewsStatus.textContent = "Aún no hay reseñas. Sé la primera persona en opinar.";
+    reviewsStatus.textContent = "Aun no hay resenas. Se la primera persona en opinar.";
     if (reviewsAverage) reviewsAverage.textContent = "Promedio: --/5";
     if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 -- promedio";
     if (reviewsSatisfied) reviewsSatisfied.textContent = "+0 clientes satisfechos";
-    if (heroProofAvg) heroProofAvg.textContent = "\u2605 4.8 calificación promedio";
+    if (heroProofAvg) heroProofAvg.textContent = "\u2605 4.8 calificacion promedio";
     if (heroProofCount) heroProofCount.textContent = "+120 clientes satisfechos";
     paintHeroReviews([]);
     reviewsList.innerHTML = "";
@@ -893,11 +866,11 @@ function paintReviews(items) {
 
   const avg = items.reduce((sum, item) => sum + (Number(item.stars) || 0), 0) / items.length;
   const satisfied = Math.max(items.length * 24, 120);
-  reviewsStatus.textContent = `${items.length} reseña${items.length === 1 ? " publicada" : "s publicadas"}`;
+  reviewsStatus.textContent = `${items.length} resena(s) publicadas`;
   if (reviewsAverage) reviewsAverage.textContent = `Promedio: ${avg.toFixed(1)}/5`;
   if (reviewsAverageBadge) reviewsAverageBadge.textContent = `\u2605 ${avg.toFixed(1)} promedio`;
   if (reviewsSatisfied) reviewsSatisfied.textContent = `+${satisfied} clientes satisfechos`;
-  if (heroProofAvg) heroProofAvg.textContent = `\u2605 ${avg.toFixed(1)} calificación promedio`;
+  if (heroProofAvg) heroProofAvg.textContent = `\u2605 ${avg.toFixed(1)} calificacion promedio`;
   if (heroProofCount) heroProofCount.textContent = `+${satisfied} clientes satisfechos`;
   paintHeroReviews(items);
 
@@ -938,7 +911,7 @@ function paintReviews(items) {
 }
 
 async function loadReviews() {
-  reviewsStatus.textContent = "Cargando reseñas...";
+  reviewsStatus.textContent = "Cargando resenas...";
   if (reviewsAverage) reviewsAverage.textContent = "Promedio: calculando...";
   if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 Calculando promedio...";
   if (reviewsSatisfied) reviewsSatisfied.textContent = "Cargando clientes satisfechos...";
@@ -969,9 +942,9 @@ async function loadReviews() {
     const payload = await response.json();
     paintReviews(payload.items || []);
   } catch {
-    reviewsStatus.textContent = "No fue posible cargar reseñas. Intenta más tarde.";
+    reviewsStatus.textContent = "No fue posible cargar resenas. Intenta mas tarde.";
     paintHeroReviews([]);
-    showToast("No pudimos cargar reseñas por el momento.", "error");
+    showToast("No pudimos cargar resenas por el momento.", "error");
   }
 }
 
@@ -992,7 +965,7 @@ function setupReviewsForm() {
 
   reviewForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    formStatus.textContent = "Enviando reseña...";
+    formStatus.textContent = "Enviando resena...";
 
     const formData = new FormData(reviewForm);
     const data = {
@@ -1014,16 +987,16 @@ function setupReviewsForm() {
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload.error || "No se pudo guardar la reseña.");
+        throw new Error(payload.error || "No se pudo guardar la resena.");
       }
 
       reviewForm.reset();
-      formStatus.textContent = "Reseña enviada. Gracias por compartir tu opinión.";
-      showToast("Reseña enviada con éxito.", "ok");
+      formStatus.textContent = "Resena enviada. Gracias por compartir tu opinion.";
+      showToast("Resena enviada con exito.", "ok");
       await loadReviews();
     } catch (error) {
       formStatus.textContent = error.message;
-      showToast(error.message || "No se pudo enviar la reseña.", "error");
+      showToast(error.message || "No se pudo enviar la resena.", "error");
     }
   });
 }
@@ -1035,23 +1008,6 @@ function setupMenuCarousel() {
   if (slides.length === 0) return;
 
   let currentIndex = 0;
-  let autoTimer = 0;
-  let resumeTimer = 0;
-
-  const stopAuto = () => {
-    if (autoTimer) window.clearInterval(autoTimer);
-    autoTimer = 0;
-  };
-
-  const scheduleAuto = (delay = 3800) => {
-    if (resumeTimer) window.clearTimeout(resumeTimer);
-    resumeTimer = window.setTimeout(() => {
-      stopAuto();
-      autoTimer = window.setInterval(() => {
-        nextSlide();
-      }, delay);
-    }, 1400);
-  };
 
   function renderDots() {
     menuDots.innerHTML = "";
@@ -1065,7 +1021,6 @@ function setupMenuCarousel() {
       dot.addEventListener("click", () => {
         currentIndex = index;
         updateSlide();
-        scheduleAuto();
       });
       menuDots.appendChild(dot);
     });
@@ -1094,14 +1049,8 @@ function setupMenuCarousel() {
     updateSlide();
   }
 
-  menuPrev.addEventListener("click", () => {
-    prevSlide();
-    scheduleAuto();
-  });
-  menuNext.addEventListener("click", () => {
-    nextSlide();
-    scheduleAuto();
-  });
+  menuPrev.addEventListener("click", prevSlide);
+  menuNext.addEventListener("click", nextSlide);
 
   let pointerStartX = 0;
   let pointerEndX = 0;
@@ -1121,7 +1070,6 @@ function setupMenuCarousel() {
     if (Math.abs(delta) > 45) {
       if (delta < 0) nextSlide();
       if (delta > 0) prevSlide();
-      scheduleAuto();
     }
     pointerStartX = 0;
     pointerEndX = 0;
@@ -1131,24 +1079,16 @@ function setupMenuCarousel() {
     if (event.key === "ArrowRight") {
       event.preventDefault();
       nextSlide();
-      scheduleAuto();
     }
 
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       prevSlide();
-      scheduleAuto();
     }
   });
 
-  menuCarousel.addEventListener("pointerenter", stopAuto);
-  menuCarousel.addEventListener("pointerleave", () => scheduleAuto());
-  menuCarousel.addEventListener("focusin", stopAuto);
-  menuCarousel.addEventListener("focusout", () => scheduleAuto());
-
   renderDots();
   updateSlide();
-  scheduleAuto();
 }
 
 function setupMenuSpotlightModal() {
@@ -1354,26 +1294,6 @@ if (heroReviewsCard) {
   });
 }
 
-function optimizeMainPageMedia() {
-  const heroPriorityImage = document.querySelector(".menu-carousel--hero .carousel-slide:first-child img");
-  if (heroPriorityImage instanceof HTMLImageElement) {
-    heroPriorityImage.loading = "eager";
-    heroPriorityImage.decoding = "async";
-    heroPriorityImage.fetchPriority = "high";
-  }
-
-  const deferredImages = document.querySelectorAll(
-    "#menu img, #especialidad img, #ubicacion img, #referencias img, .hero-gallery-item img:not(:first-child)"
-  );
-  deferredImages.forEach((image) => {
-    if (!(image instanceof HTMLImageElement)) return;
-    image.loading = "lazy";
-    image.decoding = "async";
-    if (!image.hasAttribute("fetchpriority")) image.fetchPriority = "low";
-  });
-}
-
-optimizeMainPageMedia();
 setupCommentCounter();
 setupReviewsForm();
 setupMenuCarousel();
