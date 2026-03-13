@@ -351,7 +351,6 @@ export async function initIntroExperience({
   const exitDurationMs = reducedMotion ? 120 : 980;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
-  let viewportRepairTimer = 0;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -749,48 +748,6 @@ export async function initIntroExperience({
     return false;
   };
 
-  const restoreIntroPlayback = async () => {
-    if (closed || !(hostVideo instanceof HTMLVideoElement) || document.hidden) return;
-
-    if (audioMode === "media") {
-      try {
-        if (hostVideo.paused) await hostVideo.play();
-        if (usingFallbackAudio && fallbackAudio?.paused) {
-          syncFallbackAudioTime(true);
-          await fallbackAudio.play();
-        }
-        if (ambientEnabled && ambientIntro?.paused) {
-          await ambientIntro.play();
-        }
-        hostCard?.classList.add("is-playing");
-        hostVideo.classList.add("is-ready");
-        return;
-      } catch {
-        // Fall through to the safe restart path below.
-      }
-    }
-
-    if (audioMode === "starting") return;
-
-    const visualStarted = await ensureVisualPlayback({ restart: false, muted: audioMode !== "media" });
-    if (!visualStarted) {
-      await ensureVisualPlayback({ restart: true, muted: audioMode !== "media", preferFallback: true });
-    }
-
-    if (audioMode === "media") {
-      await tryPlayNarrationAudio({ restart: false });
-    }
-  };
-
-  const scheduleViewportRepair = () => {
-    if (closed) return;
-    if (viewportRepairTimer) window.clearTimeout(viewportRepairTimer);
-    viewportRepairTimer = window.setTimeout(() => {
-      resize();
-      void restoreIntroPlayback();
-    }, 220);
-  };
-
   const unlockIntroAudioOnInteraction = (event) => {
     if (closed || audioMode === "media" || audioMode === "starting") return;
     const target = event.target;
@@ -975,7 +932,6 @@ export async function initIntroExperience({
     closed = true;
 
     if (speakingTimer) window.clearTimeout(speakingTimer);
-    if (viewportRepairTimer) window.clearTimeout(viewportRepairTimer);
     hostCard?.classList.remove("is-speaking");
     hostCard?.classList.remove("is-playing");
     audioToken += 1;
@@ -1001,9 +957,6 @@ export async function initIntroExperience({
     timeline.kill();
     window.cancelAnimationFrame(rafId);
     window.removeEventListener("resize", resize);
-    window.removeEventListener("orientationchange", scheduleViewportRepair);
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
-    window.removeEventListener("pageshow", scheduleViewportRepair);
     renderer.dispose();
     smokeGeometry.dispose();
     smokeMaterial.dispose();
@@ -1035,10 +988,8 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("seeking", () => syncFallbackAudioTime(true));
   hostVideo?.addEventListener("seeked", () => syncFallbackAudioTime(true));
   hostVideo?.addEventListener("pause", () => {
-    if (usingFallbackAudio) stopFallbackAudio();
-    if (!closed && !document.hidden) {
-      scheduleViewportRepair();
-    }
+    if (!usingFallbackAudio) return;
+    stopFallbackAudio();
   });
   hostVideo?.addEventListener("play", () => {
     hostCard?.classList.add("is-playing");
@@ -1063,13 +1014,6 @@ export async function initIntroExperience({
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") finishIntro();
   });
-  const handleVisibilityChange = () => {
-    if (document.hidden) return;
-    scheduleViewportRepair();
-  };
-  window.addEventListener("orientationchange", scheduleViewportRepair);
-  document.addEventListener("visibilitychange", handleVisibilityChange);
-  window.addEventListener("pageshow", scheduleViewportRepair);
 
   timeline = gsap.timeline({
     defaults: { ease: "power2.inOut" },

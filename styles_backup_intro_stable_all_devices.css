@@ -164,8 +164,6 @@ body.intro-complete .floating-whatsapp {
 .intro-screen {
   position: fixed;
   inset: 0;
-  min-height: 100vh;
-  min-height: 100dvh;
   z-index: 2200;
   background: radial-gradient(circle at top, rgba(255, 143, 44, 0.08), transparent 28%), #050608;
   overflow: hidden;
@@ -224,8 +222,6 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__ui {
   position: absolute;
   inset: 0;
-  min-height: 100vh;
-  min-height: 100dvh;
 }
 
 .intro-screen__render::before,
@@ -293,9 +289,6 @@ body.intro-complete .floating-whatsapp {
   grid-template-rows: auto 1fr auto;
   --intro-actions-offset: clamp(1rem, 3.2vh, 1.8rem);
   --intro-actions-space: clamp(5.8rem, 13vh, 7.8rem);
-  --intro-fabian-right: clamp(2.8rem, 6vw, 5.6rem);
-  --intro-fabian-top: clamp(8.9rem, 18vh, 10.8rem);
-  --intro-fabian-width: clamp(238px, 20.5vw, 286px);
   padding: clamp(1rem, 2vw, 1.5rem);
 }
 
@@ -505,7 +498,7 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__actions {
   position: absolute;
   left: 50%;
-  bottom: max(var(--intro-actions-offset), env(safe-area-inset-bottom));
+  bottom: var(--intro-actions-offset);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -884,11 +877,11 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__story {
   position: absolute;
   left: auto;
-  right: var(--intro-fabian-right);
-  top: calc(var(--intro-fabian-top) + var(--intro-fabian-width) + 0.35rem);
+  right: clamp(2.8rem, 6vw, 5.6rem);
+  top: clamp(24.2rem, 50vh, 28.6rem);
   bottom: auto;
   display: grid;
-  width: var(--intro-fabian-width);
+  width: clamp(13rem, 17vw, 15rem);
   margin: 0;
   transform: none;
   z-index: 5;
@@ -903,7 +896,6 @@ body.intro-complete .floating-whatsapp {
   box-shadow: none;
   backdrop-filter: none;
   text-align: center;
-  justify-items: center;
 }
 
 .intro-screen__narration-line {
@@ -915,7 +907,6 @@ body.intro-complete .floating-whatsapp {
   text-shadow:
     0 4px 18px rgba(0, 0, 0, 0.42),
     0 0 10px rgba(255, 177, 112, 0.16);
-  max-width: min(100%, 18rem);
 }
 
 .intro-screen__narration-line.is-active {
@@ -926,15 +917,15 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__host-card {
   position: absolute;
   left: auto;
-  right: var(--intro-fabian-right);
-  top: var(--intro-fabian-top);
+  right: clamp(2.8rem, 6vw, 5.6rem);
+  top: clamp(8.9rem, 18vh, 10.8rem);
   bottom: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: var(--intro-fabian-width);
+  width: clamp(238px, 20.5vw, 286px);
   max-width: calc(100vw - 1.5rem);
   padding: 0;
   opacity: 0;
@@ -4314,9 +4305,9 @@ td {
 
   .intro-screen__story {
     left: auto;
-    right: var(--intro-fabian-right);
-    top: calc(var(--intro-fabian-top) + var(--intro-fabian-width) + 0.35rem);
-    width: var(--intro-fabian-width);
+    right: clamp(2.6rem, 5.5vw, 4.8rem);
+    top: clamp(23.8rem, 50vh, 27.8rem);
+    width: clamp(13rem, 16vw, 15rem);
     transform: none;
   }
 
@@ -4519,19 +4510,16 @@ td {
     grid-template-rows: auto auto 1fr;
     --intro-actions-offset: max(0.7rem, env(safe-area-inset-bottom));
     --intro-actions-space: clamp(4.8rem, 17vh, 6rem);
-    --intro-fabian-right: 0.6rem;
-    --intro-fabian-top: auto;
-    --intro-fabian-width: clamp(165px, 29vw, 205px);
     padding: 0.52rem 0.48rem 0.68rem;
   }
 
   .fabian-intro {
     grid-template-columns: 1fr;
     left: auto;
-    right: var(--intro-fabian-right);
+    right: 0.6rem;
     top: auto;
     bottom: calc(var(--intro-actions-space) + 5.9rem);
-    width: var(--intro-fabian-width);
+    width: clamp(165px, 29vw, 205px);
     max-width: none;
     text-align: center;
   }
@@ -4690,13 +4678,13 @@ td {
   }
 
   .intro-screen__story {
-    left: auto;
-    right: var(--intro-fabian-right);
-    bottom: calc(var(--intro-actions-space) + 2.05rem);
-    width: var(--intro-fabian-width);
+    left: 50%;
+    right: auto;
+    bottom: calc(var(--intro-actions-space) + 5.15rem);
+    width: min(13rem, calc(100% - 1.4rem));
     padding-right: 0;
     padding-top: 0;
-    transform: none;
+    transform: translateX(-50%);
   }
 
   .intro-screen__promo-slot {
@@ -4847,8 +4835,6 @@ td {
 
   .intro-screen__ui {
     --intro-actions-space: clamp(4.6rem, 18vh, 5.6rem);
-    --intro-fabian-right: 0.4rem;
-    --intro-fabian-width: clamp(138px, 40vw, 170px);
     padding: 0.46rem 0.42rem 0.62rem;
   }
 
@@ -4889,20 +4875,20 @@ td {
   }
 
   .intro-screen__story {
-    left: auto;
-    right: var(--intro-fabian-right);
-    bottom: calc(var(--intro-actions-space) + 1.6rem);
-    width: var(--intro-fabian-width);
+    left: 50%;
+    right: auto;
+    bottom: calc(var(--intro-actions-space) + 4.55rem);
+    width: min(11rem, calc(100% - 1rem));
     padding-top: 0;
-    transform: none;
+    transform: translateX(-50%);
   }
 
   .fabian-intro {
-    right: var(--intro-fabian-right);
+    right: 0.4rem;
     left: auto;
     top: auto;
     bottom: calc(var(--intro-actions-space) + 5.1rem);
-    width: var(--intro-fabian-width);
+    width: clamp(138px, 40vw, 170px);
     transform: translateY(22px) scale(0.96);
   }
 
