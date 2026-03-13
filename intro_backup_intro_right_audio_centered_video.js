@@ -847,6 +847,7 @@ export async function initIntroExperience({
 
     try {
       stopFallbackAudio({ reset: true });
+      await ensureAmbientIntro({ force: restart });
       hostVideo.pause();
       hostVideo.currentTime = 0;
       hostVideo.muted = false;
@@ -861,7 +862,6 @@ export async function initIntroExperience({
         fallbackAudio.volume = 0;
         await fallbackAudio.play();
       }
-      await ensureAmbientIntro({ force: restart });
       const visualReady = await waitForVideoProgress(1200);
       if (!visualReady && visualFallbackSrc && swapHostVideoSource(visualFallbackSrc)) {
         stopFallbackAudio({ reset: true });
