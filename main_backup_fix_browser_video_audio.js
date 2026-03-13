@@ -361,16 +361,14 @@ function setupFabianVideos() {
   const fabianVideos = Array.from(document.querySelectorAll(".intro-screen__host-video"));
   if (!fabianVideos.length) return;
 
-  const isStandaloneMode = () =>
-    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-
   const pickBestSource = (video) => {
     if (!(video instanceof HTMLVideoElement)) return null;
     const preferredSrc = video.dataset.preferredVisual || "/images/fabian_transparente_mejor.webm";
-    const fallbackSrc = video.dataset.browserFallback || video.dataset.audioFallback || "/images/fabian_web_audio5.mp4";
+    const fallbackSrc = video.dataset.audioFallback || "/images/fabian_web_audio5.mp4";
+    const isDesktopViewport = window.matchMedia("(min-width: 900px)").matches;
     const canPlayPreferred = video.canPlayType('video/webm; codecs="vp9,opus"');
 
-    if (preferredSrc.endsWith(".webm") && !isStandaloneMode() && canPlayPreferred !== "probably" && fallbackSrc) {
+    if (preferredSrc.endsWith(".webm") && isDesktopViewport && canPlayPreferred !== "probably" && fallbackSrc) {
       return {
         src: fallbackSrc,
         type: "video/mp4",
@@ -385,7 +383,7 @@ function setupFabianVideos() {
 
   const swapToFallback = (video) => {
     if (!(video instanceof HTMLVideoElement)) return;
-    const fallbackSrc = video.dataset.browserFallback || video.dataset.audioFallback || "/images/fabian_web_audio5.mp4";
+    const fallbackSrc = video.dataset.audioFallback || "/images/fabian_web_audio5.mp4";
     if (!fallbackSrc || video.dataset.resolvedSrc === fallbackSrc) return;
     video.src = fallbackSrc;
     video.dataset.resolvedSrc = fallbackSrc;
@@ -403,9 +401,6 @@ function setupFabianVideos() {
       video.load();
     }
     video.playsInline = true;
-    video.setAttribute("playsinline", "");
-    video.setAttribute("webkit-playsinline", "");
-    video.autoplay = true;
     video.loop = false;
     video.preload = "auto";
     video.controls = false;

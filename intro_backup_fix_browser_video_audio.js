@@ -238,15 +238,9 @@ export async function initIntroExperience({
   const hostLine = introScreen.querySelector("#introHostLine");
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const hostVideo = introScreen.querySelector(".intro-screen__host-video");
-  const isStandaloneMode =
-    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
-  const visualFallbackSrc =
-    hostVideo instanceof HTMLVideoElement
-      ? hostVideo.dataset.browserFallback || hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4"
-      : "";
   const audioFallbackSrc =
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4" : "";
   const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
@@ -256,11 +250,8 @@ export async function initIntroExperience({
     fallbackAudio.volume = 0.88;
   }
   if (hostVideo instanceof HTMLVideoElement) {
-    hostVideo.autoplay = true;
     hostVideo.preload = "auto";
     hostVideo.playsInline = true;
-    hostVideo.setAttribute("playsinline", "");
-    hostVideo.setAttribute("webkit-playsinline", "");
     hostVideo.loop = false;
     hostVideo.muted = false;
     hostVideo.defaultMuted = false;
@@ -524,90 +515,6 @@ export async function initIntroExperience({
     }
   };
 
-  const swapHostVideoSource = (src) => {
-    if (!(hostVideo instanceof HTMLVideoElement) || !src) return false;
-    const resolvedSrc = hostVideo.dataset.resolvedSrc || hostVideo.currentSrc || hostVideo.src;
-    const absoluteTarget = new URL(src, window.location.origin).href;
-    if (resolvedSrc === src || resolvedSrc === absoluteTarget) return false;
-    hostVideo.pause();
-    hostVideo.src = src;
-    hostVideo.dataset.resolvedSrc = src;
-    hostVideo.dataset.resolvedType = src.endsWith(".mp4") ? "video/mp4" : 'video/webm; codecs="vp9,opus"';
-    hostVideo.load();
-    return true;
-  };
-
-  const waitForVideoProgress = (timeout = 1200) =>
-    new Promise((resolve) => {
-      if (!(hostVideo instanceof HTMLVideoElement)) {
-        resolve(false);
-        return;
-      }
-
-      const startTime = hostVideo.currentTime;
-      const startedAt = performance.now();
-
-      const finish = (result) => {
-        hostVideo.removeEventListener("timeupdate", onProgress);
-        resolve(result);
-      };
-
-      const onProgress = () => {
-        if (hostVideo.currentTime > startTime + 0.05) finish(true);
-      };
-
-      const tick = () => {
-        if (!(hostVideo instanceof HTMLVideoElement)) {
-          finish(false);
-          return;
-        }
-
-        if (hostVideo.currentTime > startTime + 0.05) {
-          finish(true);
-          return;
-        }
-
-        if (performance.now() - startedAt >= timeout) {
-          finish(false);
-          return;
-        }
-
-        window.requestAnimationFrame(tick);
-      };
-
-      hostVideo.addEventListener("timeupdate", onProgress, { once: false });
-      tick();
-    });
-
-  const ensureVisualPlayback = async ({ restart = false, muted = true, preferFallback = false } = {}) => {
-    if (!(hostVideo instanceof HTMLVideoElement)) return false;
-
-    if (preferFallback && visualFallbackSrc) {
-      swapHostVideoSource(visualFallbackSrc);
-    }
-
-    try {
-      if (restart) {
-        hostVideo.pause();
-        hostVideo.currentTime = 0;
-      }
-      hostVideo.muted = muted;
-      hostVideo.defaultMuted = muted;
-      hostVideo.volume = muted ? 0 : 0.88;
-      await hostVideo.play();
-      const progressed = await waitForVideoProgress(preferFallback ? 1500 : 1200);
-      if (!progressed && visualFallbackSrc && !preferFallback && swapHostVideoSource(visualFallbackSrc)) {
-        return ensureVisualPlayback({ restart: true, muted, preferFallback: true });
-      }
-      return progressed;
-    } catch {
-      if (visualFallbackSrc && !preferFallback && swapHostVideoSource(visualFallbackSrc)) {
-        return ensureVisualPlayback({ restart: true, muted, preferFallback: true });
-      }
-      return false;
-    }
-  };
-
   const fadeHostVideoTo = (volume, duration = 0.45) => {
     if (!(hostVideo instanceof HTMLVideoElement)) return;
     gsap.killTweensOf(hostVideo);
@@ -709,12 +616,6 @@ export async function initIntroExperience({
         fallbackAudio.volume = 0;
         await fallbackAudio.play();
       }
-      const visualReady = await waitForVideoProgress(1200);
-      if (!visualReady && visualFallbackSrc && swapHostVideoSource(visualFallbackSrc)) {
-        stopFallbackAudio({ reset: true });
-        usingFallbackAudio = false;
-        return tryPlayNarrationAudio({ restart: true });
-      }
       if (token !== audioToken) return false;
       fadeHostVideoTo(0.88, 0.55);
       audioMode = "media";
@@ -726,8 +627,12 @@ export async function initIntroExperience({
       try {
         usingFallbackAudio = false;
         stopFallbackAudio({ reset: true });
-        const visualStarted = await ensureVisualPlayback({ restart: true, muted: true });
-        if (!visualStarted) throw new Error("visual-playback-failed");
+        hostVideo.pause();
+        hostVideo.currentTime = 0;
+        hostVideo.muted = true;
+        hostVideo.defaultMuted = true;
+        hostVideo.volume = 0;
+        await hostVideo.play();
         if (token !== audioToken) return false;
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
@@ -739,9 +644,7 @@ export async function initIntroExperience({
         stopFallbackAudio({ reset: true });
         hostVideo.pause();
         hostVideo.currentTime = 0;
-        hostVideo.muted = true;
-        hostVideo.defaultMuted = true;
-        hostVideo.volume = 0;
+        hostVideo.volume = 0.88;
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
         armIntroAudioUnlockListeners();
@@ -859,15 +762,6 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("pause", () => {
     if (!usingFallbackAudio) return;
     stopFallbackAudio();
-  });
-  hostVideo?.addEventListener("stalled", () => {
-    if (closed || isStandaloneMode) return;
-    void ensureVisualPlayback({ restart: false, muted: audioMode !== "media" });
-  });
-  hostVideo?.addEventListener("error", () => {
-    if (closed) return;
-    if (visualFallbackSrc) swapHostVideoSource(visualFallbackSrc);
-    void ensureVisualPlayback({ restart: true, muted: audioMode !== "media", preferFallback: true });
   });
   hostVideo?.addEventListener("ended", () => {
     finishIntro();
@@ -998,13 +892,7 @@ export async function initIntroExperience({
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
   }
 
-  if (isStandaloneMode) {
-    void tryPlayNarrationAudio();
-  } else {
-    void ensureVisualPlayback({ restart: true, muted: true }).then(() => {
-      void tryPlayNarrationAudio();
-    });
-  }
+  void tryPlayNarrationAudio();
   scheduleFinishFromMedia();
   render();
 }
