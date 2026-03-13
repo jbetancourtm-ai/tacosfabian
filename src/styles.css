@@ -1377,6 +1377,15 @@ p {
 .header-cta-group .btn-install-app,
 .header-cta-group .btn-whatsapp {
   align-self: center;
+  flex: 0 0 auto;
+}
+
+.header-cta-group .btn-whatsapp {
+  order: 2;
+}
+
+.header-cta-group .btn-install-app {
+  order: 1;
 }
 
 .hero-actions--header {
@@ -1384,6 +1393,10 @@ p {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.7rem;
+  margin-left: 0;
+}
+
+.header-cta-group .hero-actions--header {
   margin-left: auto;
 }
 
