@@ -497,14 +497,14 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__actions {
   position: absolute;
-  left: 50%;
+  left: clamp(2.2rem, 7vw, 5rem);
   bottom: var(--intro-actions-offset);
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.9rem;
-  width: min(38rem, calc(100vw - 3rem));
-  transform: translateX(-50%);
+  width: min(36rem, calc(100vw - 8rem));
+  transform: none;
   z-index: 8;
 }
 
@@ -750,13 +750,13 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__headline {
   position: absolute;
-  left: 50%;
-  top: clamp(3.8rem, 9vh, 5.8rem);
+  left: clamp(2.4rem, 8vw, 5.6rem);
+  top: clamp(7.7rem, 16vh, 10rem);
   z-index: 4;
-  text-align: center;
-  max-width: min(36rem, calc(100vw - 3rem));
+  text-align: left;
+  max-width: min(31rem, 34vw);
   margin: 0;
-  transform: translateX(-50%);
+  transform: none;
   pointer-events: none;
 }
 
@@ -870,43 +870,41 @@ body.intro-complete .floating-whatsapp {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-shadow: 0 0 12px rgba(255, 124, 26, 0.08);
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .intro-screen__story {
   position: absolute;
-  left: auto;
-  right: clamp(2.8rem, 6vw, 5.6rem);
-  top: clamp(24.2rem, 50vh, 28.6rem);
+  left: 50%;
+  right: auto;
+  top: clamp(26.2rem, 59vh, 30rem);
   bottom: auto;
   display: grid;
-  width: clamp(13rem, 17vw, 15rem);
+  width: clamp(14rem, 18vw, 16.5rem);
   margin: 0;
-  transform: none;
+  transform: translateX(-50%);
   z-index: 5;
 }
 
 .intro-screen__narration {
   min-height: auto;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  backdrop-filter: none;
-  text-align: center;
+  padding: 0.9rem 1rem;
+  border-radius: 24px;
+  background:
+    linear-gradient(160deg, rgba(13, 16, 22, 0.56), rgba(22, 16, 13, 0.22));
+  border: 1px solid rgba(255, 227, 201, 0.1);
+  box-shadow:
+    0 16px 30px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  text-align: left;
 }
 
 .intro-screen__narration-line {
   margin: 0;
-  font-size: clamp(0.82rem, 0.96vw, 0.94rem);
-  line-height: 1.58;
-  color: rgba(255, 244, 233, 0.88);
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
+  line-height: 1.7;
+  color: rgba(255, 242, 229, 0.74);
   transition: color 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
-  text-shadow:
-    0 4px 18px rgba(0, 0, 0, 0.42),
-    0 0 10px rgba(255, 177, 112, 0.16);
 }
 
 .intro-screen__narration-line.is-active {
@@ -4296,25 +4294,25 @@ td {
   }
 
   .intro-screen__headline {
-    left: 50%;
-    top: clamp(3.9rem, 9vh, 5.8rem);
-    max-width: min(34rem, calc(100vw - 3rem));
-    transform: translateX(-50%);
-    text-align: center;
+    left: clamp(2.4rem, 8vw, 5.2rem);
+    top: clamp(7.6rem, 15vh, 9.5rem);
+    max-width: min(30rem, 33vw);
+    transform: none;
+    text-align: left;
   }
 
   .intro-screen__story {
-    left: auto;
-    right: clamp(2.6rem, 5.5vw, 4.8rem);
-    top: clamp(23.8rem, 50vh, 27.8rem);
-    width: clamp(13rem, 16vw, 15rem);
-    transform: none;
+    left: 50%;
+    right: auto;
+    top: clamp(25.5rem, 56vh, 29rem);
+    width: clamp(14rem, 17vw, 16rem);
+    transform: translateX(-50%);
   }
 
   .intro-screen__actions {
     bottom: clamp(1.5rem, 5vh, 2.8rem);
-    left: 50%;
-    width: min(38rem, calc(100vw - 3rem));
+    left: clamp(2.4rem, 8vw, 5.2rem);
+    width: min(34rem, calc(100vw - 8rem));
   }
 
   .intro-screen__btn {
@@ -4678,13 +4676,13 @@ td {
   }
 
   .intro-screen__story {
-    left: 50%;
-    right: auto;
-    bottom: calc(var(--intro-actions-space) + 5.15rem);
-    width: min(13rem, calc(100% - 1.4rem));
+    left: auto;
+    right: 0.7rem;
+    bottom: calc(var(--intro-actions-space) + 0.2rem);
+    width: min(13rem, calc(100% - 1.2rem));
     padding-right: 0;
     padding-top: 0;
-    transform: translateX(-50%);
+    transform: none;
   }
 
   .intro-screen__promo-slot {
@@ -4713,8 +4711,13 @@ td {
   }
 
   .intro-screen__narration {
+    min-height: auto;
     max-width: 100%;
     margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .intro-screen__narration-line {
@@ -4875,12 +4878,12 @@ td {
   }
 
   .intro-screen__story {
-    left: 50%;
-    right: auto;
-    bottom: calc(var(--intro-actions-space) + 4.55rem);
+    left: auto;
+    right: 0.55rem;
+    bottom: calc(var(--intro-actions-space) + 0.15rem);
     width: min(11rem, calc(100% - 1rem));
     padding-top: 0;
-    transform: translateX(-50%);
+    transform: none;
   }
 
   .fabian-intro {
