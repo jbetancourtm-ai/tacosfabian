@@ -35,7 +35,6 @@ const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
 const installAppButtons = Array.from(document.querySelectorAll("#installAppBtn, #introInstallAppBtn"));
-const ambientAudioToggle = document.querySelector("#ambientAudioToggle");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -54,9 +53,11 @@ let heroReviewsRotationTimer = 0;
 let heroReviewsCache = [];
 let heroReviewsStartIndex = 0;
 let siteAmbientAudio = null;
+let siteAmbientReady = false;
 let siteAmbientStarting = false;
 let siteAmbientObserver = null;
-let ambientAudioSourceIndex = 0;
+let siteAmbientUnlockBound = false;
+let siteAmbientPendingTimer = 0;
 let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 let heroGalleryTimer = 0;
@@ -134,39 +135,18 @@ function setupHeaderEffects() {
 }
 
 function setupSiteAmbientAudio() {
-  const storageKey = "tacos_fabian_premium_ambient";
-  const ambientSources = ["/audio/ambient-main.mp3", "/audio/taqueria-ambient-night.wav"];
-  const targetVolume = 0.038;
+  if (siteAmbientAudio) return;
+
+  siteAmbientAudio = new Audio("/audio/taqueria-ambient-night.wav");
+  siteAmbientAudio.preload = "auto";
+  siteAmbientAudio.playsInline = true;
+  siteAmbientAudio.loop = true;
+  siteAmbientAudio.volume = 0;
+
+  const targetVolume = 0.055;
   const introExitDelayMs = 520;
-  let ambientEnabled = false;
 
-  const readStoredPreference = () => {
-    try {
-      return window.localStorage.getItem(storageKey) === "on";
-    } catch {
-      return false;
-    }
-  };
-
-  const storePreference = (enabled) => {
-    try {
-      window.localStorage.setItem(storageKey, enabled ? "on" : "off");
-    } catch {
-      // Ignore storage failures.
-    }
-  };
-
-  const ensureAmbientAudio = () => {
-    if (siteAmbientAudio) return siteAmbientAudio;
-    siteAmbientAudio = new Audio();
-    siteAmbientAudio.preload = "auto";
-    siteAmbientAudio.playsInline = true;
-    siteAmbientAudio.loop = true;
-    siteAmbientAudio.volume = 0;
-    return siteAmbientAudio;
-  };
-
-  const fadeAmbientTo = (volume, duration = 1.2) => {
+  const fadeAmbientTo = (volume, duration = 1.4) => {
     if (!siteAmbientAudio) return;
     gsap.killTweensOf(siteAmbientAudio);
     gsap.to(siteAmbientAudio, {
@@ -177,144 +157,101 @@ function setupSiteAmbientAudio() {
     });
   };
 
-  const setAmbientSource = (index = 0) => {
-    const audio = ensureAmbientAudio();
-    const nextSrc = ambientSources[index];
-    if (!nextSrc) return false;
-    const absoluteNextSrc = new URL(nextSrc, window.location.origin).href;
-    if (audio.currentSrc === absoluteNextSrc || audio.src === absoluteNextSrc) {
-      ambientAudioSourceIndex = index;
+  const clearPendingStart = () => {
+    if (!siteAmbientPendingTimer) return;
+    window.clearTimeout(siteAmbientPendingTimer);
+    siteAmbientPendingTimer = 0;
+  };
+
+  const silenceAmbientForIntro = () => {
+    clearPendingStart();
+    if (!siteAmbientAudio) return;
+    gsap.killTweensOf(siteAmbientAudio);
+    siteAmbientAudio.volume = 0;
+    if (!siteAmbientAudio.paused) siteAmbientAudio.pause();
+    siteAmbientReady = false;
+    siteAmbientStarting = false;
+  };
+
+  const removeUnlockListeners = () => {
+    if (!siteAmbientUnlockBound) return;
+    siteAmbientUnlockBound = false;
+    window.removeEventListener("pointerdown", unlockAmbientOnInteraction, true);
+    window.removeEventListener("touchstart", unlockAmbientOnInteraction, true);
+  };
+
+  const playAmbient = async () => {
+    if (!siteAmbientAudio || document.body.classList.contains("intro-active")) return false;
+    if (siteAmbientStarting) return false;
+    if (!siteAmbientAudio.paused) {
+      siteAmbientReady = true;
+      fadeAmbientTo(targetVolume, 1.2);
+      removeUnlockListeners();
       return true;
     }
-    ambientAudioSourceIndex = index;
-    audio.src = nextSrc;
-    audio.load();
-    return true;
-  };
-
-  const updateAmbientToggle = () => {
-    if (!(ambientAudioToggle instanceof HTMLButtonElement)) return;
-    const isPlaying = Boolean(siteAmbientAudio && !siteAmbientAudio.paused && siteAmbientAudio.volume > 0.005);
-    ambientAudioToggle.classList.toggle("is-active", isPlaying);
-    ambientAudioToggle.setAttribute("aria-pressed", isPlaying ? "true" : "false");
-    ambientAudioToggle.setAttribute("aria-label", isPlaying ? "Pausar ambiente" : "Activar ambiente");
-    ambientAudioToggle.title = isPlaying ? "Pausar ambiente" : "Activar ambiente";
-    const textNode = ambientAudioToggle.querySelector(".ambient-audio-toggle__text");
-    if (textNode) textNode.textContent = isPlaying ? "Pausar ambiente" : "Activar ambiente";
-  };
-
-  const pauseAmbient = ({ immediate = false } = {}) => {
-    if (!siteAmbientAudio) {
-      updateAmbientToggle();
-      return;
-    }
-    if (immediate) {
-      gsap.killTweensOf(siteAmbientAudio);
-      siteAmbientAudio.volume = 0;
-      siteAmbientAudio.pause();
-      updateAmbientToggle();
-      return;
-    }
-    gsap.killTweensOf(siteAmbientAudio);
-    gsap.to(siteAmbientAudio, {
-      volume: 0,
-      duration: 0.6,
-      ease: "sine.inOut",
-      overwrite: true,
-      onComplete: () => {
-        siteAmbientAudio?.pause();
-        updateAmbientToggle();
-      },
-    });
-  };
-
-  const playAmbient = async ({ force = false } = {}) => {
-    if (!ambientEnabled && !force) return false;
-    if (document.body.classList.contains("intro-active")) return false;
-
-    const audio = ensureAmbientAudio();
-    if (!audio.src) setAmbientSource(0);
-    if (siteAmbientStarting) return false;
 
     siteAmbientStarting = true;
     try {
-      if (audio.paused) await audio.play();
-      fadeAmbientTo(targetVolume, 1.6);
-      updateAmbientToggle();
+      await siteAmbientAudio.play();
+      siteAmbientReady = true;
+      fadeAmbientTo(targetVolume, 1.8);
+      removeUnlockListeners();
+      if (siteAmbientObserver) {
+        siteAmbientObserver.disconnect();
+        siteAmbientObserver = null;
+      }
       return true;
     } catch {
-      updateAmbientToggle();
       return false;
     } finally {
       siteAmbientStarting = false;
     }
   };
 
-  const syncAmbientWithPage = () => {
-    if (document.body.classList.contains("intro-active") || !ambientEnabled || document.visibilityState === "hidden") {
-      pauseAmbient({ immediate: document.visibilityState === "hidden" });
-      return;
-    }
+  const unlockAmbientOnInteraction = () => {
     void playAmbient();
   };
 
-  ambientEnabled = readStoredPreference();
-  setAmbientSource(0);
-  updateAmbientToggle();
+  const armUnlockListeners = () => {
+    if (siteAmbientUnlockBound) return;
+    siteAmbientUnlockBound = true;
+    window.addEventListener("pointerdown", unlockAmbientOnInteraction, true);
+    window.addEventListener("touchstart", unlockAmbientOnInteraction, true);
+  };
 
-  siteAmbientAudio?.addEventListener("error", () => {
-    const nextIndex = ambientAudioSourceIndex + 1;
-    if (!ambientSources[nextIndex]) {
-      pauseAmbient({ immediate: true });
-      return;
-    }
-    setAmbientSource(nextIndex);
-    if (ambientEnabled && !document.body.classList.contains("intro-active")) {
-      void playAmbient({ force: true });
-    }
-  });
+  const queueAmbientStart = (delay = 0) => {
+    clearPendingStart();
+    siteAmbientPendingTimer = window.setTimeout(() => {
+      siteAmbientPendingTimer = 0;
+      void playAmbient().then((started) => {
+        if (!started) armUnlockListeners();
+      });
+    }, delay);
+  };
 
-  siteAmbientAudio?.addEventListener("ended", () => {
-    if (!siteAmbientAudio) return;
-    siteAmbientAudio.currentTime = 0;
-    if (ambientEnabled) void playAmbient({ force: true });
-  });
-
-  ambientAudioToggle?.addEventListener("click", async () => {
-    ambientEnabled = !(siteAmbientAudio && !siteAmbientAudio.paused && siteAmbientAudio.volume > 0.005);
-    storePreference(ambientEnabled);
-    if (!ambientEnabled) {
-      pauseAmbient();
-      return;
-    }
-    if (document.body.classList.contains("intro-active")) {
-      updateAmbientToggle();
-      showToast("El ambiente comenzara cuando termine el intro.", "info");
-      return;
-    }
-    const started = await playAmbient({ force: true });
-    if (!started) {
-      ambientEnabled = false;
-      storePreference(false);
-      showToast("Tu navegador requiere otra interaccion para activar el ambiente.", "info");
-      updateAmbientToggle();
-    }
-  });
+  if (document.body.classList.contains("intro-active")) {
+    silenceAmbientForIntro();
+    siteAmbientObserver = new MutationObserver(() => {
+      if (document.body.classList.contains("intro-active")) {
+        silenceAmbientForIntro();
+        return;
+      }
+      queueAmbientStart(introExitDelayMs);
+    });
+    siteAmbientObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    return;
+  }
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState !== "visible") {
-      pauseAmbient({ immediate: true });
+    if (document.visibilityState !== "visible") return;
+    if (document.body.classList.contains("intro-active")) {
+      silenceAmbientForIntro();
       return;
     }
-    syncAmbientWithPage();
+    queueAmbientStart(80);
   });
 
-  siteAmbientObserver = new MutationObserver(() => {
-    window.setTimeout(syncAmbientWithPage, introExitDelayMs);
-  });
-  siteAmbientObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
-
-  syncAmbientWithPage();
+  queueAmbientStart(120);
 }
 
 function setupPwaSupport() {
