@@ -777,19 +777,18 @@ export async function initIntroExperience({
   const moveHostToOppositeSide = () => {
     if (!hostCard || hostSideSwapped || closed) return;
     hostSideSwapped = true;
-    hostCard.classList.add("is-swapped");
     gsap.fromTo(
       hostCard,
-      { x: 0, y: 0, scale: 1 },
+      { y: 0, scale: 1 },
       {
         keyframes: [
-          { x: -18, y: -12, scale: 1.02, duration: reducedMotion ? 0.16 : 0.3 },
-          { x: -10, y: -5, scale: 0.995, duration: reducedMotion ? 0.16 : 0.28 },
-          { x: 0, y: 0, scale: 1, duration: reducedMotion ? 0.16 : 0.32 },
+          { y: -10, scale: 1.02, duration: reducedMotion ? 0.16 : 0.3 },
+          { y: -4, scale: 0.995, duration: reducedMotion ? 0.16 : 0.28 },
+          { y: 0, scale: 1, duration: reducedMotion ? 0.16 : 0.32 },
         ],
         ease: "power2.inOut",
         overwrite: true,
-        clearProps: "x,y,scale",
+        clearProps: "y,scale",
       }
     );
   };
@@ -895,8 +894,6 @@ export async function initIntroExperience({
 
     timeline?.pause(0);
     timeline?.restart();
-    hostSideSwapped = false;
-    hostCard?.classList.remove("is-swapped", "is-playing");
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
     const started = await tryPlayNarrationAudio({ restart: true });
 

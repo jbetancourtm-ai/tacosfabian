@@ -287,7 +287,7 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__ui {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  --intro-actions-offset: clamp(1rem, 3.2vh, 1.8rem);
+  --intro-actions-offset: clamp(0.9rem, 2.8vh, 1.5rem);
   --intro-actions-space: clamp(5.8rem, 13vh, 7.8rem);
   padding: clamp(1rem, 2vw, 1.5rem);
 }
@@ -300,11 +300,11 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__ui::before {
-  inset: 11% 18% 16% 14%;
-  border-radius: 44px;
+  inset: 10% 20% 18% 18%;
+  border-radius: 36px;
   background:
-    radial-gradient(circle at 30% 24%, rgba(255, 176, 94, 0.12), transparent 30%),
-    radial-gradient(circle at 66% 56%, rgba(255, 232, 210, 0.1), transparent 28%),
+    radial-gradient(circle at 32% 30%, rgba(255, 176, 94, 0.1), transparent 34%),
+    radial-gradient(circle at 68% 62%, rgba(255, 232, 210, 0.08), transparent 30%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012)),
     linear-gradient(180deg, rgba(95, 56, 35, 0.1), rgba(12, 9, 8, 0.06));
   border: 1px solid rgba(255, 219, 187, 0.08);
@@ -497,14 +497,14 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__actions {
   position: absolute;
-  left: clamp(2.2rem, 7vw, 5rem);
+  left: 50%;
   bottom: var(--intro-actions-offset);
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0.9rem;
-  width: min(36rem, calc(100vw - 8rem));
-  transform: none;
+  width: min(100% - 2rem, 42rem);
+  transform: translateX(-50%);
   z-index: 8;
 }
 
@@ -750,25 +750,25 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__headline {
   position: absolute;
-  left: clamp(2.4rem, 8vw, 5.6rem);
-  top: clamp(7.7rem, 16vh, 10rem);
+  left: 33%;
+  top: clamp(6.4rem, 15vh, 8.7rem);
   z-index: 4;
   text-align: left;
-  max-width: min(31rem, 34vw);
+  max-width: min(35rem, 40vw);
   margin: 0;
-  transform: none;
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
 .intro-screen__media-reserve {
   position: absolute;
-  top: clamp(9.8rem, 20vh, 12rem);
+  top: clamp(11.8rem, 27vh, 15.2rem);
   left: 50%;
   right: auto;
-  width: clamp(12.2rem, 16vw, 15rem);
-  min-width: 12.2rem;
+  width: clamp(11.5rem, 15vw, 14.5rem);
+  min-width: 11.5rem;
   aspect-ratio: 9 / 16;
-  transform: translateX(-50%);
+  transform: translateX(-68%);
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -852,9 +852,9 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__title {
-  font-size: clamp(2.2rem, 3.6vw, 3.3rem);
-  line-height: 1.02;
-  letter-spacing: 0.11em;
+  font-size: clamp(2.05rem, 3.8vw, 3.45rem);
+  line-height: 1.01;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   text-shadow:
     0 0 10px rgba(255, 194, 135, 0.26),
@@ -863,31 +863,29 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__subtitle {
-  margin-top: 1rem;
-  max-width: 22rem;
-  font-size: clamp(0.76rem, 0.9vw, 0.9rem);
-  line-height: 1.68;
-  letter-spacing: 0.12em;
+  margin-top: 1.2rem;
+  max-width: 27rem;
+  font-size: clamp(0.74rem, 0.92vw, 0.88rem);
+  line-height: 1.72;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-shadow: 0 0 12px rgba(255, 124, 26, 0.08);
 }
 
 .intro-screen__story {
   position: absolute;
-  left: 50%;
-  right: auto;
-  top: clamp(26.2rem, 59vh, 30rem);
+  right: clamp(3rem, 6vw, 5.6rem);
+  top: clamp(20.5rem, 47vh, 24rem);
   bottom: auto;
   display: grid;
-  width: clamp(14rem, 18vw, 16.5rem);
+  width: clamp(16rem, 20vw, 18rem);
   margin: 0;
-  transform: translateX(-50%);
   z-index: 5;
 }
 
 .intro-screen__narration {
   min-height: auto;
-  padding: 0.9rem 1rem;
+  padding: 1.05rem 1.15rem;
   border-radius: 24px;
   background:
     linear-gradient(160deg, rgba(13, 16, 22, 0.56), rgba(22, 16, 13, 0.22));
@@ -915,15 +913,15 @@ body.intro-complete .floating-whatsapp {
 .intro-screen__host-card {
   position: absolute;
   left: auto;
-  right: clamp(2.8rem, 6vw, 5.6rem);
-  top: clamp(8.9rem, 18vh, 10.8rem);
+  right: clamp(4rem, 8vw, 7rem);
+  top: clamp(7.4rem, 15vh, 9.2rem);
   bottom: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
   align-items: center;
   justify-items: center;
-  width: clamp(238px, 20.5vw, 286px);
+  width: clamp(254px, 22.6vw, 298px);
   max-width: calc(100vw - 1.5rem);
   padding: 0;
   opacity: 0;
@@ -933,13 +931,14 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro {
-  width: clamp(232px, 20vw, 276px);
+  width: clamp(246px, 21.8vw, 288px);
   max-width: calc(100vw - 1.5rem);
   transform: translateY(22px) scale(0.96);
 }
 
 .fabian-intro.is-swapped {
-  right: clamp(1.8rem, 4vw, 3.8rem);
+  left: auto;
+  right: clamp(1rem, 4vw, 3.2rem);
 }
 
 .intro-screen__host-card--hero {
@@ -961,7 +960,7 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-stage--hero {
   width: 100%;
-  min-height: clamp(232px, 20vw, 276px);
+  min-height: clamp(246px, 21.8vw, 288px);
 }
 
 .intro-screen__host-mural {
@@ -1112,12 +1111,6 @@ body.intro-complete .floating-whatsapp {
   background-color: transparent !important;
 }
 
-.fabian-intro.is-visible .intro-screen__host-stage {
-  animation:
-    intro-host-idle 3.2s ease-in-out infinite,
-    intro-host-orbit 12s ease-in-out infinite;
-}
-
 @keyframes intro-host-cinematic-zoom {
   0% {
     transform: scale(0.94);
@@ -1130,22 +1123,6 @@ body.intro-complete .floating-whatsapp {
   }
   100% {
     transform: scale(1.04);
-  }
-}
-
-@keyframes intro-host-orbit {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  25% {
-    transform: translate3d(-4px, -3px, 0) rotate(-1deg);
-  }
-  50% {
-    transform: translate3d(2px, -6px, 0) rotate(1deg);
-  }
-  75% {
-    transform: translate3d(-2px, -2px, 0) rotate(-0.8deg);
   }
 }
 
@@ -4294,25 +4271,22 @@ td {
   }
 
   .intro-screen__headline {
-    left: clamp(2.4rem, 8vw, 5.2rem);
-    top: clamp(7.6rem, 15vh, 9.5rem);
-    max-width: min(30rem, 33vw);
-    transform: none;
+    left: 31%;
+    top: clamp(6.5rem, 14vh, 8.6rem);
+    max-width: min(34rem, 38vw);
+    transform: translateX(-50%);
     text-align: left;
   }
 
   .intro-screen__story {
-    left: 50%;
-    right: auto;
-    top: clamp(25.5rem, 56vh, 29rem);
-    width: clamp(14rem, 17vw, 16rem);
-    transform: translateX(-50%);
+    right: clamp(2.8rem, 5.8vw, 5rem);
+    top: clamp(21rem, 48vh, 24.8rem);
+    width: clamp(16rem, 19vw, 18rem);
   }
 
   .intro-screen__actions {
     bottom: clamp(1.5rem, 5vh, 2.8rem);
-    left: clamp(2.4rem, 8vw, 5.2rem);
-    width: min(34rem, calc(100vw - 8rem));
+    width: min(100% - 2rem, 34rem);
   }
 
   .intro-screen__btn {
@@ -4320,9 +4294,9 @@ td {
   }
 
   .intro-screen__media-reserve {
-    top: clamp(9.8rem, 20vh, 12rem);
-    width: clamp(12rem, 15.5vw, 14.5rem);
-    transform: translateX(-50%);
+    top: clamp(12rem, 27vh, 15rem);
+    width: clamp(11.5rem, 15vw, 14rem);
+    transform: translateX(-66%);
   }
 
   .header-inner {
@@ -4516,7 +4490,7 @@ td {
     left: auto;
     right: 0.6rem;
     top: auto;
-    bottom: calc(var(--intro-actions-space) + 5.9rem);
+    bottom: calc(var(--intro-actions-space) + 5.8rem);
     width: clamp(165px, 29vw, 205px);
     max-width: none;
     text-align: center;
@@ -4612,7 +4586,7 @@ td {
 
   .intro-screen__headline {
     left: 50%;
-    top: 0.95rem;
+    top: 1rem;
     max-width: min(82vw, 18rem);
     transform: translateX(-50%);
     text-align: center;
@@ -4676,13 +4650,11 @@ td {
   }
 
   .intro-screen__story {
-    left: auto;
     right: 0.7rem;
     bottom: calc(var(--intro-actions-space) + 0.2rem);
     width: min(13rem, calc(100% - 1.2rem));
     padding-right: 0;
     padding-top: 0;
-    transform: none;
   }
 
   .intro-screen__promo-slot {
@@ -4878,12 +4850,10 @@ td {
   }
 
   .intro-screen__story {
-    left: auto;
     right: 0.55rem;
     bottom: calc(var(--intro-actions-space) + 0.15rem);
     width: min(11rem, calc(100% - 1rem));
     padding-top: 0;
-    transform: none;
   }
 
   .fabian-intro {
