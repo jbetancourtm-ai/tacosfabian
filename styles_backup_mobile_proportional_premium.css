@@ -6578,54 +6578,30 @@ body::after {
 
 @media (max-width: 599px) {
   .site-header {
-    top: 0;
-    width: 100%;
-    border-radius: 0 0 18px 18px;
-  }
-
-  .header-inner {
-    gap: 0.48rem;
-    padding: 0.56rem 0;
-  }
-
-  .brand {
-    gap: 0.58rem;
-  }
-
-  .brand-orbit {
-    width: 48px;
-    height: 48px;
-  }
-
-  .brand-mark {
-    width: 46px;
-    height: 46px;
-    border-radius: 11px;
+    top: 0.4rem;
   }
 
   .hero-actions--header {
-    gap: 0.42rem;
+    gap: 0.5rem;
   }
 
   .hero-actions--header .btn,
   .hero-actions--header .btn-install-app {
-    min-height: 2.58rem;
-    padding-inline: 0.58rem;
-    font-size: 0.8rem;
+    min-height: 2.72rem;
+    padding-inline: 0.65rem;
   }
 
   .hero {
-    padding-top: 3.25rem;
+    padding-top: 4.05rem;
   }
 
   .hero-content h1 {
-    margin-top: 0.66rem;
-    font-size: clamp(1.82rem, 6.9vw, 2.34rem);
-    line-height: 1.02;
+    margin-top: 0.92rem;
+    font-size: clamp(2.2rem, 8.4vw, 3rem);
   }
 
   .menu-carousel--hero .slide-visual {
-    height: 236px;
+    height: 214px;
   }
 
   .menu-carousel--hero .slide-copy {
@@ -6637,7 +6613,7 @@ body::after {
   }
 
   .hero-primary-actions {
-    gap: 0.48rem;
+    gap: 0.58rem;
   }
 
   .btn-whatsapp--hero,
@@ -6772,15 +6748,13 @@ body::after {
 /* Mobile cleanup for primary sales screen */
 @media (max-width: 599px) {
   .header-cta-group {
-    gap: 0.42rem;
+    gap: 0.5rem;
   }
 
   .header-cta-group > .btn-whatsapp {
     order: 2;
     width: 100%;
-    min-height: 2.72rem;
-    padding-inline: 0.86rem;
-    font-size: 0.84rem;
+    min-height: 3rem;
   }
 
   .hero-actions--header {
@@ -6794,7 +6768,7 @@ body::after {
   }
 
   .hero-actions--header .btn {
-    min-height: 2.72rem;
+    min-height: 3rem;
     width: 100%;
   }
 
@@ -6803,30 +6777,19 @@ body::after {
   }
 
   .hero {
-    padding-top: 3.05rem;
+    padding-top: 3.9rem;
   }
 
   .hero-grid {
-    gap: 0.68rem;
+    gap: 1rem;
   }
 
   .hero-content {
     gap: 0;
   }
 
-  .hero-proof {
-    gap: 0.34rem;
-    margin-bottom: 0.28rem;
-  }
-
-  .hero-proof-pill {
-    padding: 0.34rem 0.54rem;
-    font-size: 0.69rem;
-    letter-spacing: 0.02em;
-  }
-
   .menu-carousel--hero {
-    margin-top: 0;
+    margin-top: 0.2rem;
   }
 
   .menu-carousel--hero .carousel-viewport {
@@ -6834,12 +6797,12 @@ body::after {
   }
 
   .menu-carousel--hero .carousel-slide {
-    padding: 0.72rem 0.72rem 0.82rem;
-    gap: 0.42rem;
+    padding: 0.82rem 0.82rem 0.95rem;
+    gap: 0.55rem;
   }
 
   .menu-carousel--hero .slide-visual {
-    height: 296px;
+    height: 276px;
     border-radius: 20px;
   }
 
@@ -6863,99 +6826,99 @@ body::after {
   }
 
   .hero-content h1 {
-    margin-top: 0.52rem;
-    font-size: clamp(1.78rem, 6.7vw, 2.22rem);
-    max-width: 11.8ch;
+    margin-top: 0.7rem;
+    font-size: clamp(2rem, 7.2vw, 2.7rem);
+    max-width: 9.8ch;
   }
 
   .hero-content p {
-    margin-top: 0.36rem;
-    max-width: 30ch;
-    font-size: 0.82rem;
-    line-height: 1.42;
+    margin-top: 0.48rem;
+    max-width: 31ch;
+    font-size: 0.9rem;
+    line-height: 1.5;
   }
 
   .hero-app-badges {
-    margin-top: 0.56rem;
-    gap: 0.36rem;
+    margin-top: 0.72rem;
+    gap: 0.45rem;
   }
 
   .hero-app-badge {
-    font-size: 0.67rem;
-    padding: 0.24rem 0.46rem;
+    font-size: 0.72rem;
+    padding: 0.28rem 0.54rem;
   }
 
   .hero-side-stack {
     padding-top: 0;
-    gap: 0.58rem;
+    gap: 0.72rem;
   }
 
   .hero-side--spotlight {
-    padding: 0.82rem;
+    padding: 0.95rem;
   }
 
   .hero-side--spotlight h2 {
-    font-size: 1.08rem;
+    font-size: 1.2rem;
   }
 
   .hero-reviews-card--hero-flow {
-    margin-top: 0.58rem;
+    margin-top: 0.8rem;
   }
 
   .floating-fabian-host,
   .fabian-main {
-    right: 0.08rem;
-    bottom: 3.45rem;
-    width: 72px;
+    right: 0.22rem;
+    bottom: 4.7rem;
+    width: 92px;
   }
 
   .floating-fabian-host__stage {
-    width: 72px;
-    height: 92px;
+    width: 92px;
+    height: 116px;
   }
 
   .floating-fabian-host__shadow {
-    transform: translateY(60px);
+    transform: translateY(77px);
   }
 }
 
 @media (max-width: 599px) {
   .header-inner {
-    gap: 0.42rem;
+    gap: 0.62rem;
   }
 
   .header-cta-group > .btn-whatsapp,
   .hero-actions--header .btn {
-    min-height: 2.62rem;
-    font-size: 0.81rem;
+    min-height: 2.82rem;
+    font-size: 0.86rem;
   }
 
   .menu-carousel--hero .slide-visual {
-    height: 286px;
+    height: 248px;
   }
 
   .hero-content h1 {
-    font-size: clamp(1.72rem, 6.5vw, 2.08rem);
+    font-size: clamp(1.86rem, 7.4vw, 2.45rem);
   }
 
   .hero-content p {
-    max-width: 29ch;
-    font-size: 0.8rem;
+    max-width: 28ch;
+    font-size: 0.84rem;
   }
 
   .floating-fabian-host,
   .fabian-main {
-    right: 0.08rem;
-    bottom: 3.3rem;
-    width: 68px;
+    right: 0.12rem;
+    bottom: 4.25rem;
+    width: 82px;
   }
 
   .floating-fabian-host__stage {
-    width: 68px;
-    height: 88px;
+    width: 82px;
+    height: 104px;
   }
 
   .floating-fabian-host__shadow {
-    transform: translateY(58px);
+    transform: translateY(69px);
   }
 }
