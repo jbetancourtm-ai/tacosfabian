@@ -54,26 +54,6 @@ function createFireTexture() {
 function createTaqueriaGroup() {
   const group = new THREE.Group();
 
-  const backWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(8.2, 4.8),
-    new THREE.MeshStandardMaterial({
-      color: "#2d1d16",
-      roughness: 0.92,
-      metalness: 0.02,
-      emissive: "#2b1710",
-      emissiveIntensity: 0.12,
-    })
-  );
-  backWall.position.set(0, 2.05, -0.65);
-  group.add(backWall);
-
-  const floorEdge = new THREE.Mesh(
-    new THREE.BoxGeometry(5.6, 0.12, 1.4),
-    new THREE.MeshStandardMaterial({ color: "#4f3021", roughness: 0.84, metalness: 0.03 })
-  );
-  floorEdge.position.set(0, 0.03, 1.05);
-  group.add(floorEdge);
-
   const base = new THREE.Mesh(
     new THREE.BoxGeometry(3.4, 1.7, 2.3),
     new THREE.MeshStandardMaterial({ color: "#2b1b17", roughness: 0.76, metalness: 0.08 })
@@ -101,27 +81,6 @@ function createTaqueriaGroup() {
   );
   sign.position.set(0, 1.92, 1.18);
   group.add(sign);
-
-  const awningBar = new THREE.Mesh(
-    new THREE.BoxGeometry(3.5, 0.14, 0.16),
-    new THREE.MeshStandardMaterial({ color: "#6b2713", roughness: 0.54, metalness: 0.06 })
-  );
-  awningBar.position.set(0, 1.72, 1.3);
-  group.add(awningBar);
-
-  [-1.2, -0.6, 0, 0.6, 1.2].forEach((x, index) => {
-    const stripe = new THREE.Mesh(
-      new THREE.BoxGeometry(0.54, 0.46, 0.06),
-      new THREE.MeshStandardMaterial({
-        color: index % 2 === 0 ? "#ff8f3d" : "#f5d2ad",
-        roughness: 0.56,
-        metalness: 0.04,
-      })
-    );
-    stripe.position.set(x, 1.46, 1.31);
-    stripe.rotation.x = -0.16;
-    group.add(stripe);
-  });
 
   const windowMaterial = new THREE.MeshStandardMaterial({
     color: "#ffd397",
@@ -162,20 +121,6 @@ function createTaqueriaGroup() {
   );
   counter.position.set(0, 0.44, 1.8);
   group.add(counter);
-
-  [-1.5, 1.5].forEach((x) => {
-    const lantern = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 16, 16),
-      new THREE.MeshStandardMaterial({
-        color: "#fff0d6",
-        emissive: "#ffbf76",
-        emissiveIntensity: 1.1,
-        roughness: 0.22,
-      })
-    );
-    lantern.position.set(x, 1.78, 1.28);
-    group.add(lantern);
-  });
 
   const tacoShellMaterial = new THREE.MeshStandardMaterial({ color: "#f1c261", roughness: 0.75 });
   const tacoTopMaterial = new THREE.MeshStandardMaterial({ color: "#56aa40", roughness: 0.9 });
@@ -363,14 +308,14 @@ export async function initIntroExperience({
   camera.position.set(0, 2.1, 10.4);
   camera.lookAt(0, 1.4, 0);
 
-  const ambientLight = new THREE.AmbientLight("#8f5b39", 0.5);
+  const ambientLight = new THREE.AmbientLight("#815031", 0.42);
   scene.add(ambientLight);
 
-  const rimLight = new THREE.PointLight("#ffab54", 4, 20, 2);
+  const rimLight = new THREE.PointLight("#ffab54", 3.5, 20, 2);
   rimLight.position.set(0, 5.2, 4.8);
   scene.add(rimLight);
 
-  const signLight = new THREE.PointLight("#ff7a1a", 5.1, 18, 2);
+  const signLight = new THREE.PointLight("#ff7a1a", 4.4, 18, 2);
   signLight.position.set(0, 2.7, 3.8);
   scene.add(signLight);
 
@@ -415,7 +360,7 @@ export async function initIntroExperience({
 
   const { group: taqueria, doorPivotLeft, doorPivotRight } = createTaqueriaGroup();
   taqueria.position.set(0, -0.2, 0.2);
-  taqueria.scale.setScalar(0.82);
+  taqueria.scale.setScalar(0.72);
   scene.add(taqueria);
 
   const textureLoader = new THREE.TextureLoader();
