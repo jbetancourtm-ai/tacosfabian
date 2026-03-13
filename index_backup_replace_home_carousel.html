@@ -306,99 +306,34 @@
         <div class="container hero-grid">
           <div class="hero-content">
             <span class="eyebrow">Recomendado en Texcoco</span>
-            <div
-              id="menuCarousel"
-              class="menu-carousel menu-carousel--hero"
-              role="region"
-              aria-label="Carrusel de productos destacados"
-              tabindex="0"
-            >
-              <button id="menuPrev" class="carousel-arrow" type="button" aria-label="Slide anterior">&#10094;</button>
-
-              <div class="carousel-viewport" aria-live="polite">
-                <div id="menuTrack" class="carousel-track">
-                  <article class="carousel-slide" aria-label="Suadero destacado">
-                    <div class="slide-visual taco slide-visual--photo">
-                      <img src="/images/tacossuadero.jpg" alt="tacos de suadero en texcoco" />
-                    </div>
-                    <div class="slide-copy">
-                      <h3>Suadero</h3>
-                      <p>Jugoso, doradito y al momento.</p>
-                      <strong>Desde $16 MXN</strong>
-                    </div>
-                  </article>
-
-                  <article class="carousel-slide" aria-label="Trocitos destacados">
-                    <div class="slide-visual trocitos slide-visual--photo">
-                      <img src="/images/trozo.jpg" alt="tacos mexicanos especialidad de la casa en texcoco" />
-                    </div>
-                    <div class="slide-copy">
-                      <h3>Trocitos / Trozos</h3>
-                      <p>Especialidad de la casa, sabor intenso.</p>
-                      <strong>Desde $24 MXN</strong>
-                    </div>
-                  </article>
-
-                  <article class="carousel-slide" aria-label="Bebidas destacadas">
-                    <div class="slide-visual drink" aria-hidden="true"></div>
-                    <div class="slide-copy">
-                      <h3>Bebidas</h3>
-                      <p>Refrescos y aguas para acompanar.</p>
-                      <strong>Desde $30 MXN</strong>
-                    </div>
-                  </article>
-
-                  <article class="carousel-slide" aria-label="Combo destacado">
-                    <div class="slide-visual combo" aria-hidden="true"></div>
-                    <div class="slide-copy">
-                      <h3>Especialidad de la casa</h3>
-                      <p>Taco de trocitos + bebida para cerrar el antojo.</p>
-                      <strong>Desde $54 MXN</strong>
-                    </div>
-                  </article>
-
-                  <article class="carousel-slide" aria-label="Tacos destacados">
-                    <div class="slide-visual tacos" aria-hidden="true"></div>
-                    <div class="slide-copy">
-                      <h3>Tacos</h3>
-                      <p>Pastor, suadero, longaniza y mas variedades.</p>
-                      <strong>Desde $16 MXN</strong>
-                    </div>
-                  </article>
-
-                  <article class="carousel-slide" aria-label="Suadero por kilo destacado">
-                    <div class="slide-visual suadero-kg" aria-hidden="true"></div>
-                    <div class="slide-copy">
-                      <h3>Suadero 1kg</h3>
-                      <p>Ideal para compartir en familia o evento.</p>
-                      <strong>$500 MXN</strong>
-                    </div>
-                  </article>
-
-                  <article class="carousel-slide" aria-label="Tostadas destacadas">
-                    <div class="slide-visual tostadas" aria-hidden="true"></div>
-                    <div class="slide-copy">
-                      <h3>Tostadas</h3>
-                      <p>Crujientes y bien servidas con tu carne favorita.</p>
-                      <strong>Desde $17 MXN</strong>
-                    </div>
-                  </article>
-
-                  <article class="carousel-slide" aria-label="Tortas destacadas">
-                    <div class="slide-visual tortas" aria-hidden="true"></div>
-                    <div class="slide-copy">
-                      <h3>Tortas</h3>
-                      <p>Pan doradito con porcion llenadora.</p>
-                      <strong>Desde $68 MXN</strong>
-                    </div>
-                  </article>
-                </div>
+            <div id="heroGallery" class="hero-gallery" aria-label="Galeria destacada de tacos">
+              <figure class="hero-gallery-item is-active">
+                <img
+                  src="/images/tacossuadero.jpg"
+                  alt="tacos de suadero en texcoco recien preparados"
+                />
+                <span class="hero-gallery-garnish" aria-hidden="true"></span>
+              </figure>
+              <figure class="hero-gallery-item">
+                <img
+                  src="/images/trozo.jpg"
+                  alt="tacos mexicanos de trocitos dorados en texcoco"
+                />
+                <span class="hero-gallery-garnish" aria-hidden="true"></span>
+              </figure>
+              <figure class="hero-gallery-item">
+                <img
+                  src="/images/trozo1.jpg"
+                  alt="especialidad de tacos mexicanos en texcoco"
+                />
+                <span class="hero-gallery-garnish" aria-hidden="true"></span>
+              </figure>
+              <div class="hero-gallery__controls" aria-label="Controles del carrusel principal">
+                <button id="heroGalleryPrev" class="hero-gallery__arrow hero-gallery__arrow--prev" type="button" aria-label="Imagen anterior">‹</button>
+                <div id="heroGalleryDots" class="hero-gallery__dots" aria-label="Indicadores del carrusel"></div>
+                <button id="heroGalleryNext" class="hero-gallery__arrow hero-gallery__arrow--next" type="button" aria-label="Imagen siguiente">›</button>
               </div>
-
-              <button id="menuNext" class="carousel-arrow" type="button" aria-label="Siguiente slide">&#10095;</button>
             </div>
-
-            <div id="menuDots" class="carousel-dots carousel-dots--hero" aria-label="Navegacion del carrusel"></div>
             <h1>Tacos que se antojan desde la primera mordida</h1>
             <p>Suadero jugoso, trocitos doraditos y sabor unico.</p>
             <div class="hero-app-badges" aria-label="Datos destacados">
@@ -441,6 +376,111 @@
         <div class="container hero-proof" aria-live="polite">
           <span id="heroProofAvg" class="hero-proof-pill">★ 4.8 calificacion promedio</span>
           <span id="heroProofCount" class="hero-proof-pill hero-proof-pill--soft">+120 clientes satisfechos</span>
+        </div>
+      </section>
+
+      <section class="section section-soft" aria-label="Menu destacado">
+        <div class="container">
+          <div class="section-head">
+            <h2>Menu destacado</h2>
+            <p>Sabores clasicos, precios claros y porciones cumplidoras. <span class="fire-accent" aria-hidden="true">🔥</span></p>
+          </div>
+
+          <p class="menu-kicker" aria-hidden="true">Preparados al instante · Sabor real · Calle premium</p>
+
+          <div
+            id="menuCarousel"
+            class="menu-carousel"
+            role="region"
+            aria-label="Carrusel de productos destacados"
+            tabindex="0"
+          >
+            <button id="menuPrev" class="carousel-arrow" type="button" aria-label="Slide anterior">&#10094;</button>
+
+            <div class="carousel-viewport" aria-live="polite">
+              <div id="menuTrack" class="carousel-track">
+                <article class="carousel-slide" aria-label="Suadero destacado">
+                  <div class="slide-visual taco slide-visual--photo">
+                    <img src="/images/tacossuadero.jpg" alt="tacos de suadero en texcoco" />
+                  </div>
+                  <div class="slide-copy">
+                    <h3>Suadero</h3>
+                    <p>Jugoso, doradito y al momento.</p>
+                    <strong>Desde $16 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Trocitos destacados">
+                  <div class="slide-visual trocitos slide-visual--photo">
+                    <img src="/images/trozo.jpg" alt="tacos mexicanos especialidad de la casa en texcoco" />
+                  </div>
+                  <div class="slide-copy">
+                    <h3>Trocitos / Trozos</h3>
+                    <p>Especialidad de la casa, sabor intenso.</p>
+                    <strong>Desde $24 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Bebidas destacadas">
+                  <div class="slide-visual drink" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Bebidas</h3>
+                    <p>Refrescos y aguas para acompanar.</p>
+                    <strong>Desde $30 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Combo destacado">
+                  <div class="slide-visual combo" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Especialidad de la casa</h3>
+                    <p>Taco de trocitos + bebida para cerrar el antojo.</p>
+                    <strong>Desde $54 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Tacos destacados">
+                  <div class="slide-visual tacos" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Tacos</h3>
+                    <p>Pastor, suadero, longaniza y mas variedades.</p>
+                    <strong>Desde $16 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Suadero por kilo destacado">
+                  <div class="slide-visual suadero-kg" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Suadero 1kg</h3>
+                    <p>Ideal para compartir en familia o evento.</p>
+                    <strong>$500 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Tostadas destacadas">
+                  <div class="slide-visual tostadas" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Tostadas</h3>
+                    <p>Crujientes y bien servidas con tu carne favorita.</p>
+                    <strong>Desde $17 MXN</strong>
+                  </div>
+                </article>
+
+                <article class="carousel-slide" aria-label="Tortas destacadas">
+                  <div class="slide-visual tortas" aria-hidden="true"></div>
+                  <div class="slide-copy">
+                    <h3>Tortas</h3>
+                    <p>Pan doradito con porcion llenadora.</p>
+                    <strong>Desde $68 MXN</strong>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <button id="menuNext" class="carousel-arrow" type="button" aria-label="Siguiente slide">&#10095;</button>
+          </div>
+
+          <div id="menuDots" class="carousel-dots" aria-label="Navegacion del carrusel"></div>
         </div>
       </section>
 
