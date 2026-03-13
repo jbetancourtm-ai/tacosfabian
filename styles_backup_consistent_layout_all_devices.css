@@ -6349,34 +6349,6 @@ body::after {
   justify-self: start;
 }
 
-.hero-content > .hero-proof {
-  order: 1;
-}
-
-.hero-content > .menu-carousel--hero {
-  order: 2;
-}
-
-.hero-content > .carousel-dots--hero {
-  order: 3;
-}
-
-.hero-content > h1 {
-  order: 4;
-}
-
-.hero-content > p {
-  order: 5;
-}
-
-.hero-content > .hero-app-badges {
-  order: 6;
-}
-
-.hero-content > .hero-reviews-card--hero-flow {
-  order: 7;
-}
-
 .menu-carousel--hero {
   margin-top: 0.2rem;
   max-width: min(62rem, 100%);
