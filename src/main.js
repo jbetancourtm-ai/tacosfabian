@@ -11,6 +11,8 @@ const reviewsAverageBadge = document.querySelector("#reviewsAverageBadge");
 const reviewsSatisfied = document.querySelector("#reviewsSatisfied");
 const heroProofAvg = document.querySelector("#heroProofAvg");
 const heroProofCount = document.querySelector("#heroProofCount");
+const heroProofAvgLabel = "★ 5.0 calificación promedio";
+const heroProofCountLabel = "+216 clientes satisfechos";
 const heroReviewsCard = document.querySelector("#heroReviewsCard");
 const heroReviewsAvg = document.querySelector("#heroReviewsAvg");
 const heroReviewsCount = document.querySelector("#heroReviewsCount");
@@ -884,8 +886,8 @@ function paintReviews(items) {
     if (reviewsAverage) reviewsAverage.textContent = "Promedio: --/5";
     if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 -- promedio";
     if (reviewsSatisfied) reviewsSatisfied.textContent = "+0 clientes satisfechos";
-    if (heroProofAvg) heroProofAvg.textContent = "\u2605 4.8 calificación promedio";
-    if (heroProofCount) heroProofCount.textContent = "+120 clientes satisfechos";
+    if (heroProofAvg) heroProofAvg.textContent = heroProofAvgLabel;
+    if (heroProofCount) heroProofCount.textContent = heroProofCountLabel;
     paintHeroReviews([]);
     reviewsList.innerHTML = "";
     return;
@@ -897,8 +899,8 @@ function paintReviews(items) {
   if (reviewsAverage) reviewsAverage.textContent = `Promedio: ${avg.toFixed(1)}/5`;
   if (reviewsAverageBadge) reviewsAverageBadge.textContent = `\u2605 ${avg.toFixed(1)} promedio`;
   if (reviewsSatisfied) reviewsSatisfied.textContent = `+${satisfied} clientes satisfechos`;
-  if (heroProofAvg) heroProofAvg.textContent = `\u2605 ${avg.toFixed(1)} calificación promedio`;
-  if (heroProofCount) heroProofCount.textContent = `+${satisfied} clientes satisfechos`;
+  if (heroProofAvg) heroProofAvg.textContent = heroProofAvgLabel;
+  if (heroProofCount) heroProofCount.textContent = heroProofCountLabel;
   paintHeroReviews(items);
 
   [reviewsAverageBadge, reviewsSatisfied, heroProofAvg, heroProofCount].forEach((node) => {
