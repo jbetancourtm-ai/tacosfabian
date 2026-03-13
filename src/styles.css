@@ -6314,15 +6314,6 @@ body::after {
   gap: 0.58rem;
 }
 
-.header-premium-copy {
-  margin: 0;
-  color: #7d553b;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .hero-actions--header {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -6510,10 +6501,6 @@ body::after {
     justify-content: center;
   }
 
-  .header-premium-copy {
-    text-align: center;
-  }
-
   .hero-actions--header {
     width: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -6563,11 +6550,6 @@ body::after {
 @media (max-width: 599px) {
   .site-header {
     top: 0.4rem;
-  }
-
-  .header-premium-copy {
-    font-size: 0.66rem;
-    letter-spacing: 0.1em;
   }
 
   .hero-actions--header {
