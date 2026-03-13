@@ -6596,6 +6596,12 @@ body::after {
 }
 
 @media (min-width: 600px) and (max-width: 1024px) {
+  .hero-content h1 {
+    max-width: none;
+    white-space: nowrap;
+    font-size: clamp(1.95rem, 3.8vw, 3.25rem);
+  }
+
   .site-header {
     top: 0.45rem;
     width: min(1220px, calc(100vw - 1rem));
@@ -6701,6 +6707,13 @@ body::after {
 
   .floating-fabian-host__shadow {
     transform: translateY(80px);
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-content h1 {
+    max-width: none;
+    white-space: nowrap;
   }
 }
 
