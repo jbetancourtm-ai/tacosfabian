@@ -305,17 +305,10 @@ export async function initIntroExperience({
   const audioFallbackSrc =
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4" : "";
   const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
-  const ambientIntro = !isStandaloneMode ? new Audio("/audio/ambient-intro.mp3.mp3") : null;
   if (fallbackAudio) {
     fallbackAudio.preload = "auto";
     fallbackAudio.loop = false;
     fallbackAudio.volume = 0.88;
-  }
-  if (ambientIntro) {
-    ambientIntro.preload = "auto";
-    ambientIntro.loop = true;
-    ambientIntro.volume = 0.01;
-    ambientIntro.crossOrigin = "anonymous";
   }
   if (hostVideo instanceof HTMLVideoElement) {
     if (!isStandaloneMode && visualFallbackSrc) {
@@ -347,7 +340,6 @@ export async function initIntroExperience({
   let audioMode = "idle";
   let audioToken = 0;
   let usingFallbackAudio = false;
-  let ambientEnabled = false;
   const exitDurationMs = reducedMotion ? 120 : 980;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
@@ -592,43 +584,6 @@ export async function initIntroExperience({
     }
   };
 
-  const fadeAmbientTo = (volume, duration = 0.55) => {
-    if (!ambientIntro) return;
-    gsap.killTweensOf(ambientIntro);
-    gsap.to(ambientIntro, {
-      volume,
-      duration,
-      ease: "sine.inOut",
-      overwrite: true,
-    });
-  };
-
-  const stopAmbientIntro = ({ reset = false } = {}) => {
-    if (!ambientIntro) return;
-    ambientIntro.pause();
-    if (reset) {
-      try {
-        ambientIntro.currentTime = 0;
-      } catch {
-        // Ignore reset issues if the track has not buffered enough yet.
-      }
-    }
-    ambientEnabled = false;
-  };
-
-  const ensureAmbientIntro = async ({ force = false } = {}) => {
-    if (!ambientIntro || closed) return false;
-    if (!force && ambientEnabled && !ambientIntro.paused) return true;
-    try {
-      await ambientIntro.play();
-      ambientEnabled = true;
-      return true;
-    } catch {
-      ambientEnabled = false;
-      return false;
-    }
-  };
-
   const swapHostVideoSource = (src) => {
     if (!(hostVideo instanceof HTMLVideoElement) || !src) return false;
     const resolvedSrc = hostVideo.dataset.resolvedSrc || hostVideo.currentSrc || hostVideo.src;
@@ -700,7 +655,6 @@ export async function initIntroExperience({
       hostVideo.defaultMuted = muted;
       hostVideo.volume = muted ? 0 : 0.88;
       await hostVideo.play();
-      hostCard?.classList.add("is-playing");
       const progressed = await waitForVideoProgress(preferFallback ? 1500 : 1200);
       if (progressed) hostVideo.classList.add("is-ready");
       if (!progressed && visualFallbackSrc && !preferFallback && swapHostVideoSource(visualFallbackSrc)) {
@@ -708,7 +662,6 @@ export async function initIntroExperience({
       }
       return progressed;
     } catch {
-      hostCard?.classList.remove("is-playing");
       if (visualFallbackSrc && !preferFallback && swapHostVideoSource(visualFallbackSrc)) {
         return ensureVisualPlayback({ restart: true, muted, preferFallback: true });
       }
@@ -803,7 +756,6 @@ export async function initIntroExperience({
 
     try {
       stopFallbackAudio({ reset: true });
-      await ensureAmbientIntro({ force: restart });
       hostVideo.pause();
       hostVideo.currentTime = 0;
       hostVideo.muted = false;
@@ -827,13 +779,8 @@ export async function initIntroExperience({
       if (token !== audioToken) return false;
       hostVideo.classList.add("is-ready");
       fadeHostVideoTo(0.88, 0.55);
-      if (ambientEnabled) fadeAmbientTo(0.06, 0.65);
       audioMode = "media";
-      if (ambientEnabled || isStandaloneMode) {
-        introSoundBtn?.classList.add("is-hidden");
-      } else {
-        introSoundBtn?.classList.remove("is-hidden");
-      }
+      introSoundBtn?.classList.add("is-hidden");
       removeIntroAudioUnlockListeners();
       return true;
     } catch {
@@ -844,8 +791,6 @@ export async function initIntroExperience({
         const visualStarted = await ensureVisualPlayback({ restart: true, muted: true });
         if (!visualStarted) throw new Error("visual-playback-failed");
         if (token !== audioToken) return false;
-        await ensureAmbientIntro({ force: restart });
-        if (ambientEnabled) fadeAmbientTo(0.085, 0.6);
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
         armIntroAudioUnlockListeners();
@@ -859,7 +804,6 @@ export async function initIntroExperience({
         hostVideo.muted = true;
         hostVideo.defaultMuted = true;
         hostVideo.volume = 0;
-        stopAmbientIntro({ reset: true });
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
         armIntroAudioUnlockListeners();
@@ -930,16 +874,13 @@ export async function initIntroExperience({
 
     if (speakingTimer) window.clearTimeout(speakingTimer);
     hostCard?.classList.remove("is-speaking");
-    hostCard?.classList.remove("is-playing");
     audioToken += 1;
     audioMode = "idle";
     fadeHostVideoTo(0, 0.35);
-    fadeAmbientTo(0.01, 0.25);
     window.setTimeout(() => {
       if (!(hostVideo instanceof HTMLVideoElement)) return;
       usingFallbackAudio = false;
       stopFallbackAudio({ reset: true });
-      stopAmbientIntro({ reset: true });
       hostVideo.pause();
       hostVideo.currentTime = 0;
       hostVideo.volume = 0.88;
@@ -970,15 +911,8 @@ export async function initIntroExperience({
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
-  introSoundBtn?.addEventListener("click", async () => {
-    if (audioMode === "media" && hostVideo instanceof HTMLVideoElement && !hostVideo.paused) {
-      const ambientStarted = await ensureAmbientIntro({ force: true });
-      if (ambientStarted) {
-        fadeAmbientTo(0.06, 0.5);
-        introSoundBtn?.classList.add("is-hidden");
-      }
-      return;
-    }
+  introSoundBtn?.addEventListener("click", () => {
+    if (audioMode === "media" && hostVideo instanceof HTMLVideoElement && !hostVideo.paused) return;
     void restartIntroExperience();
   });
   hostVideo?.addEventListener("timeupdate", () => syncFallbackAudioTime());
@@ -987,9 +921,6 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("pause", () => {
     if (!usingFallbackAudio) return;
     stopFallbackAudio();
-  });
-  hostVideo?.addEventListener("play", () => {
-    hostCard?.classList.add("is-playing");
   });
   hostVideo?.addEventListener("stalled", () => {
     if (closed || isStandaloneMode) return;
@@ -1001,7 +932,6 @@ export async function initIntroExperience({
     void ensureVisualPlayback({ restart: true, muted: audioMode !== "media", preferFallback: true });
   });
   hostVideo?.addEventListener("ended", () => {
-    hostCard?.classList.remove("is-playing");
     finishIntro();
   });
   fallbackAudio?.addEventListener("ended", () => {

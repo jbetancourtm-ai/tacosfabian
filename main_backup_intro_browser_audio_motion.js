@@ -465,17 +465,6 @@ function setupFabianVideos() {
 
   const prepareVideo = (video) => {
     if (!(video instanceof HTMLVideoElement)) return;
-    const introManaged = video.dataset.introManaged === "true";
-    if (introManaged) {
-      video.playsInline = true;
-      video.setAttribute("playsinline", "");
-      video.setAttribute("webkit-playsinline", "");
-      video.autoplay = true;
-      video.loop = false;
-      video.preload = "auto";
-      video.controls = false;
-      return;
-    }
     const bestSource = pickBestSource(video);
     if (bestSource && !video.dataset.resolvedSrc) {
       video.src = bestSource.src;
