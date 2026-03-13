@@ -1189,7 +1189,13 @@ export async function initIntroExperience({
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
   }
 
-  void tryPlayNarrationAudio();
+  if (isStandaloneMode) {
+    void tryPlayNarrationAudio();
+  } else {
+    void ensureVisualPlayback({ restart: true, muted: true }).then(() => {
+      void tryPlayNarrationAudio();
+    });
+  }
   scheduleFinishFromMedia();
   render();
 }
