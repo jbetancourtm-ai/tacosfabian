@@ -307,16 +307,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__ui::before {
-  inset: 11% 18% 16% 14%;
-  border-radius: 44px;
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255, 176, 94, 0.12), transparent 30%),
-    radial-gradient(circle at 66% 56%, rgba(255, 232, 210, 0.1), transparent 28%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012)),
-    linear-gradient(180deg, rgba(95, 56, 35, 0.1), rgba(12, 9, 8, 0.06));
-  border: 1px solid rgba(255, 219, 187, 0.08);
-  filter: blur(0.5px);
-  opacity: 0.96;
+  display: none;
 }
 
 .intro-screen__ui::after {
@@ -790,6 +781,8 @@ body.intro-complete .floating-whatsapp {
   height: 100%;
   border-radius: 30px;
   overflow: visible;
+  background: transparent;
+  box-shadow: none;
 }
 
 .intro-screen__media-glow,
@@ -800,32 +793,21 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__media-glow {
-  inset: 2%;
-  background:
-    radial-gradient(circle at 50% 46%, rgba(255, 176, 101, 0.14), rgba(255, 128, 36, 0.06) 48%, transparent 76%);
-  filter: blur(26px);
+  display: none;
 }
 
 .intro-screen__media-frame {
-  border: 1px solid rgba(255, 208, 172, 0.12);
-  background:
-    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.08), transparent 38%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01)),
-    linear-gradient(180deg, rgba(20, 16, 15, 0.3), rgba(11, 13, 18, 0.08));
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-    0 24px 58px rgba(0, 0, 0, 0.24);
-  backdrop-filter: blur(12px);
+  display: none;
 }
 
 .intro-screen__promo-slot {
   position: absolute;
-  inset: 0.95rem;
+  inset: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 0.72rem;
-  padding: 0.2rem;
-  border-radius: 24px;
+  padding: 0;
+  border-radius: 0;
 }
 
 .intro-screen__promo-video {
@@ -835,9 +817,7 @@ body.intro-complete .floating-whatsapp {
   object-fit: cover;
   object-position: center center;
   border-radius: 22px;
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.34),
-    inset 0 0 0 1px rgba(255, 247, 238, 0.08);
+  box-shadow: none;
   filter: saturate(1.06) contrast(1.02) brightness(0.96);
 }
 
