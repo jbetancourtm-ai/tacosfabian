@@ -246,17 +246,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .intro-screen__render::after {
-  inset: auto 0 0;
-  height: 42%;
-  background:
-    linear-gradient(180deg, rgba(255, 198, 129, 0), rgba(255, 198, 129, 0.08) 24%, rgba(14, 9, 8, 0.6) 100%),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 225, 192, 0.055) 0 8%,
-      rgba(118, 76, 49, 0.02) 8% 16%
-    );
-  mix-blend-mode: screen;
-  opacity: 0.34;
+  display: none;
 }
 
 .intro-screen__canvas {
