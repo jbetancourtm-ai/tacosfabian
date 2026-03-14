@@ -6928,6 +6928,70 @@ body::after {
   }
 }
 
+@keyframes floating-fabian-grow {
+  0%,
+  84%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  92% {
+    transform: scale(1.1) translateY(-4px);
+  }
+}
+
+.floating-fabian-host,
+.fabian-main {
+  right: 0.2rem;
+  bottom: 7.35rem;
+  width: 126px;
+}
+
+.floating-fabian-host__stage {
+  width: 126px;
+  height: 168px;
+  animation: floating-fabian-grow 5s ease-in-out infinite;
+}
+
+.floating-fabian-host__shadow {
+  transform: translateY(108px);
+}
+
+@media (max-width: 899px) {
+  .floating-fabian-host,
+  .fabian-main {
+    right: 0.12rem;
+    bottom: 6.3rem;
+    width: 92px;
+  }
+
+  .floating-fabian-host__stage {
+    width: 92px;
+    height: 120px;
+  }
+
+  .floating-fabian-host__shadow {
+    transform: translateY(78px);
+  }
+}
+
+@media (max-width: 599px) {
+  .floating-fabian-host,
+  .fabian-main {
+    right: 0.08rem;
+    bottom: 5.7rem;
+    width: 78px;
+  }
+
+  .floating-fabian-host__stage {
+    width: 78px;
+    height: 100px;
+  }
+
+  .floating-fabian-host__shadow {
+    transform: translateY(65px);
+  }
+}
+
 /* Mobile cleanup for primary sales screen */
 @media (max-width: 599px) {
   .header-cta-group {
