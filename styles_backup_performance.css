@@ -76,15 +76,6 @@ body::after {
   animation: drift-b 26s ease-in-out infinite alternate;
 }
 
-#especialidad,
-#ubicacion,
-#resenas,
-#referencias,
-.site-footer {
-  content-visibility: auto;
-  contain-intrinsic-size: 760px;
-}
-
 @keyframes drift-a {
   from {
     transform: translateY(0) translateX(0);
@@ -818,10 +809,6 @@ body.intro-complete .floating-whatsapp {
   border-radius: 22px;
   box-shadow: none;
   filter: saturate(1.06) contrast(1.02) brightness(0.96);
-}
-
-.intro-screen__promo-video:not([src]) {
-  background: linear-gradient(135deg, rgba(20, 14, 12, 0.92), rgba(49, 26, 16, 0.82));
 }
 
 .intro-screen__promo-caption {
@@ -6963,41 +6950,6 @@ body::after {
   width: 126px;
   height: 168px;
   animation: floating-fabian-grow 5s ease-in-out infinite;
-}
-
-@media (max-width: 899px), (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after,
-  .intro-screen__corner-light,
-  .intro-screen__brand-beam,
-  .floating-fabian-host__stage {
-    animation: none;
-  }
-
-  .intro-screen__noise {
-    opacity: 0.03;
-  }
-
-  .intro-screen__btn,
-  .intro-screen__promo-video,
-  .menu-carousel--hero .slide-visual--photo img {
-    transition-duration: 0.18s;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .intro-screen,
-  .intro-screen__render,
-  .intro-screen__ui,
-  body.intro-complete .site-header,
-  body.intro-complete main,
-  body.intro-complete .site-footer,
-  body.intro-complete .social-floating-links,
-  body.intro-complete .floating-fabian-host,
-  body.intro-complete .floating-whatsapp {
-    animation: none !important;
-    transition: none !important;
-  }
 }
 
 .floating-fabian-host__shadow {

@@ -63,15 +63,6 @@ let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 let heroGalleryTimer = 0;
 
-function scheduleIdleWork(callback, timeout = 900) {
-  if (typeof callback !== "function") return;
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(() => callback(), { timeout });
-    return;
-  }
-  window.setTimeout(callback, Math.min(timeout, 240));
-}
-
 function showToast(message, type = "info") {
   if (!toastRegion) return;
 
@@ -173,7 +164,7 @@ function setupSiteAmbientAudio() {
   const ensureAmbientAudio = () => {
     if (siteAmbientAudio) return siteAmbientAudio;
     siteAmbientAudio = new Audio();
-    siteAmbientAudio.preload = "metadata";
+    siteAmbientAudio.preload = "auto";
     siteAmbientAudio.playsInline = true;
     siteAmbientAudio.loop = true;
     siteAmbientAudio.volume = 0;
@@ -202,6 +193,7 @@ function setupSiteAmbientAudio() {
     }
     ambientAudioSourceIndex = index;
     audio.src = nextSrc;
+    audio.load();
     return true;
   };
 
@@ -449,13 +441,11 @@ function setupPwaSupport() {
   if (!("serviceWorker" in navigator)) return;
 
   window.addEventListener("load", async () => {
-    scheduleIdleWork(async () => {
-      try {
-        await navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" });
-      } catch (error) {
-        console.error("No se pudo registrar el service worker", error);
-      }
-    }, 1600);
+    try {
+      await navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" });
+    } catch (error) {
+      console.error("No se pudo registrar el service worker", error);
+    }
   });
 }
 
@@ -511,7 +501,7 @@ function setupFabianVideos() {
       video.setAttribute("webkit-playsinline", "");
       video.autoplay = true;
       video.loop = false;
-      video.preload = "metadata";
+      video.preload = "auto";
       video.controls = false;
       return;
     }
@@ -527,7 +517,7 @@ function setupFabianVideos() {
     video.setAttribute("webkit-playsinline", "");
     video.autoplay = true;
     video.loop = false;
-    video.preload = "metadata";
+    video.preload = "auto";
     video.controls = false;
     video.muted = !isStandaloneMode();
     video.defaultMuted = !isStandaloneMode();
@@ -544,44 +534,6 @@ function setupFabianVideos() {
     video.addEventListener("stalled", () => swapToFallback(video));
     prepareVideo(video);
   });
-}
-
-function setupDeferredIntroPromo() {
-  const promoVideo = document.querySelector(".intro-screen__promo-video");
-  if (!(promoVideo instanceof HTMLVideoElement)) return;
-
-  const source = promoVideo.querySelector("source[data-src]");
-  if (!(source instanceof HTMLSourceElement)) return;
-
-  let hydrated = false;
-
-  const hydratePromo = () => {
-    if (hydrated) return;
-    hydrated = true;
-    source.src = source.dataset.src || "";
-    source.removeAttribute("data-src");
-    promoVideo.load();
-    const startPlayback = promoVideo.play();
-    if (startPlayback && typeof startPlayback.catch === "function") {
-      startPlayback.catch(() => {});
-    }
-  };
-
-  if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        hydratePromo();
-      },
-      { threshold: 0.01 }
-    );
-    observer.observe(promoVideo);
-  } else {
-    scheduleIdleWork(hydratePromo, 1200);
-  }
-
-  scheduleIdleWork(hydratePromo, 1800);
 }
 
 function setupWhatsappAudio() {
@@ -757,28 +709,22 @@ function setupIntroScreen() {
     return;
   }
 
-  const startIntro = () => {
-    import("./intro-experience.js")
-      .then(({ initIntroExperience }) =>
-        initIntroExperience({
-          introScreen,
-          introSkipBtn,
-        })
-      )
-      .catch(() => {
-        window.setTimeout(() => {
-          introScreen.classList.add("is-hidden");
-          introScreen.setAttribute("aria-hidden", "true");
-          document.body.classList.remove("intro-active");
-          document.body.classList.add("intro-complete");
-          window.setTimeout(() => introScreen.remove(), 700);
-        }, 1200);
-      });
-  };
-
-  window.requestAnimationFrame(() => {
-    scheduleIdleWork(startIntro, 700);
-  });
+  import("./intro-experience.js")
+    .then(({ initIntroExperience }) =>
+      initIntroExperience({
+        introScreen,
+        introSkipBtn,
+      })
+    )
+    .catch(() => {
+      window.setTimeout(() => {
+        introScreen.classList.add("is-hidden");
+        introScreen.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("intro-active");
+        document.body.classList.add("intro-complete");
+        window.setTimeout(() => introScreen.remove(), 700);
+      }, 1200);
+    });
 }
 
 function setupVisitCounter() {
@@ -1430,7 +1376,6 @@ function optimizeMainPageMedia() {
 }
 
 optimizeMainPageMedia();
-setupDeferredIntroPromo();
 setupCommentCounter();
 setupReviewsForm();
 setupMenuCarousel();

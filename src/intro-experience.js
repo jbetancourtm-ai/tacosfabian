@@ -275,6 +275,18 @@ function inferSteamQuality(reducedMotion) {
   return "full";
 }
 
+function isLowEndDevice() {
+  const isMobileViewport = window.innerWidth <= 899;
+  const lowMemory =
+    typeof navigator.deviceMemory === "number" && navigator.deviceMemory > 0 && navigator.deviceMemory <= 4;
+  const lowCpu =
+    typeof navigator.hardwareConcurrency === "number" &&
+    navigator.hardwareConcurrency > 0 &&
+    navigator.hardwareConcurrency <= 4;
+
+  return isMobileViewport || lowMemory || lowCpu;
+}
+
 function buildSpeechQueue() {
   return {
     speak() {},
@@ -296,6 +308,7 @@ export async function initIntroExperience({
   const isStandaloneMode =
     window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lowEndDevice = isLowEndDevice();
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
   const visualFallbackSrc =
@@ -304,15 +317,16 @@ export async function initIntroExperience({
       : "";
   const audioFallbackSrc =
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4" : "";
-  const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
+  const fallbackAudio =
+    audioFallbackSrc && audioFallbackSrc !== visualFallbackSrc ? new Audio(audioFallbackSrc) : null;
   const ambientIntro = !isStandaloneMode ? new Audio("/audio/ambient-intro.mp3.mp3") : null;
   if (fallbackAudio) {
-    fallbackAudio.preload = "auto";
+    fallbackAudio.preload = "metadata";
     fallbackAudio.loop = false;
     fallbackAudio.volume = 0.88;
   }
   if (ambientIntro) {
-    ambientIntro.preload = "auto";
+    ambientIntro.preload = "metadata";
     ambientIntro.loop = true;
     ambientIntro.volume = 0.01;
     ambientIntro.crossOrigin = "anonymous";
@@ -324,7 +338,7 @@ export async function initIntroExperience({
       hostVideo.dataset.resolvedType = "video/mp4";
     }
     hostVideo.autoplay = true;
-    hostVideo.preload = "auto";
+    hostVideo.preload = "metadata";
     hostVideo.playsInline = true;
     hostVideo.setAttribute("playsinline", "");
     hostVideo.setAttribute("webkit-playsinline", "");
@@ -358,11 +372,12 @@ export async function initIntroExperience({
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
-    antialias: true,
+    antialias: !lowEndDevice,
     alpha: true,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+  const maxPixelRatio = reducedMotion ? 1 : lowEndDevice ? 1.15 : 1.6;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -514,7 +529,7 @@ export async function initIntroExperience({
   scene.add(steam);
 
   const particlesGeometry = new THREE.BufferGeometry();
-  const particleCount = 120;
+  const particleCount = lowEndDevice ? 56 : 120;
   const particlePositions = new Float32Array(particleCount * 3);
   for (let index = 0; index < particleCount; index += 1) {
     particlePositions[index * 3] = (Math.random() - 0.5) * 18;
@@ -569,7 +584,7 @@ export async function initIntroExperience({
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
   };
   window.addEventListener("resize", resize);
 
@@ -1138,8 +1153,16 @@ export async function initIntroExperience({
     .to(titlePlane.material, { opacity: 0.24, duration: 0.95 }, 12.95);
 
   const clock = new THREE.Clock();
+  let lastFrameTime = 0;
+  const minFrameGap = reducedMotion ? 48 : lowEndDevice ? 34 : 0;
   const render = () => {
     if (closed) return;
+    const now = performance.now();
+    if (minFrameGap && now - lastFrameTime < minFrameGap) {
+      rafId = window.requestAnimationFrame(render);
+      return;
+    }
+    lastFrameTime = now;
     const elapsed = clock.getElapsedTime();
 
     spotLeft.position.x = -6.5 + Math.sin(elapsed * 0.7) * 2.1;

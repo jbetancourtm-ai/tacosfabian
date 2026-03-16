@@ -175,14 +175,14 @@
             <div class="intro-screen__promo-slot">
               <video
                 class="intro-screen__promo-video"
+                autoplay
                 muted
                 loop
                 playsinline
-                preload="none"
-                poster="/images/tacossuadero.jpg"
+                preload="metadata"
                 aria-hidden="true"
               >
-                <source data-src="/audio/tacosv.mp4" type="video/mp4" />
+                <source src="/audio/tacosv.mp4" type="video/mp4" />
               </video>
               <span class="intro-screen__promo-caption">Espacio reservado para video promocional</span>
             </div>
@@ -218,7 +218,7 @@
                   class="intro-screen__host-video"
                   autoplay
                   playsinline
-                  preload="metadata"
+                  preload="auto"
                   data-intro-managed="true"
                   data-preferred-visual="/images/fabian_transparente_mejor.webm"
                   data-browser-fallback="/images/fabian_web_audio5.mp4"
@@ -859,9 +859,6 @@
           alt=""
           loading="lazy"
           decoding="async"
-          fetchpriority="low"
-          width="352"
-          height="470"
         />
         <span class="floating-fabian-host__mouth"></span>
         <span class="floating-fabian-host__wave"></span>
