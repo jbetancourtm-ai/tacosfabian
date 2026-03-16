@@ -1,5 +1,6 @@
-const STATIC_CACHE = "tfabian-static-v4";
-const RUNTIME_CACHE = "tfabian-runtime-v4";
+const SW_VERSION = "2026-03-16-cache-v5";
+const STATIC_CACHE = `tfabian-static-${SW_VERSION}`;
+const RUNTIME_CACHE = `tfabian-runtime-${SW_VERSION}`;
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
@@ -8,6 +9,25 @@ const APP_SHELL = [
   "/icons/icon-192.png",
   "/icons/icon-512.png"
 ];
+const RUNTIME_CACHE_LIMIT = 40;
+
+async function trimRuntimeCache() {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const requests = await cache.keys();
+  const overflow = requests.length - RUNTIME_CACHE_LIMIT;
+  if (overflow <= 0) return;
+
+  await Promise.all(requests.slice(0, overflow).map((request) => cache.delete(request)));
+}
+
+function canBeCached(request, response) {
+  if (!response || !response.ok) return false;
+  if (request.method !== "GET") return false;
+  if (response.type === "error") return false;
+  const cacheControl = response.headers.get("cache-control") || "";
+  if (/no-store|private/i.test(cacheControl)) return false;
+  return true;
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -15,14 +35,23 @@ self.addEventListener("install", (event) => {
   );
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((key) => ![STATIC_CACHE, RUNTIME_CACHE].includes(key)).map((key) => caches.delete(key)))
-      )
-      .then(() => self.clients.claim())
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter((key) => ![STATIC_CACHE, RUNTIME_CACHE].includes(key)).map((key) => caches.delete(key)));
+      if ("navigationPreload" in self.registration) {
+        await self.registration.navigationPreload.enable();
+      }
+      await trimRuntimeCache();
+      await self.clients.claim();
+    })()
   );
 });
 
@@ -38,13 +67,28 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+      (async () => {
+        try {
+          const preloadResponse = await event.preloadResponse;
+          if (preloadResponse) {
+            if (canBeCached(request, preloadResponse)) {
+              const cache = await caches.open(RUNTIME_CACHE);
+              await cache.put(request, preloadResponse.clone());
+            }
+            return preloadResponse;
+          }
+
+          const response = await fetch(request, { cache: "no-store" });
+          if (canBeCached(request, response)) {
+            const cache = await caches.open(RUNTIME_CACHE);
+            await cache.put(request, response.clone());
+            void trimRuntimeCache();
+          }
           return response;
-        })
-        .catch(async () => (await caches.match(request)) || caches.match("/"))
+        } catch {
+          return (await caches.match(request)) || caches.match("/");
+        }
+      })()
     );
     return;
   }
@@ -53,29 +97,33 @@ self.addEventListener("fetch", (event) => {
 
   if (isStaticAsset) {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        const networkFetch = fetch(request)
-          .then((response) => {
-            if (response && response.ok) {
-              const clone = response.clone();
-              caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+      (async () => {
+        const cached = await caches.match(request);
+
+        const networkFetch = fetch(request, { cache: "no-store" })
+          .then(async (response) => {
+            if (canBeCached(request, response)) {
+              const cache = await caches.open(RUNTIME_CACHE);
+              await cache.put(request, response.clone());
+              void trimRuntimeCache();
             }
             return response;
           })
           .catch(() => cached);
 
         return cached || networkFetch;
-      })
+      })()
     );
     return;
   }
 
   event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (response && response.ok) {
-          const clone = response.clone();
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+    fetch(request, { cache: "no-store" })
+      .then(async (response) => {
+        if (canBeCached(request, response)) {
+          const cache = await caches.open(RUNTIME_CACHE);
+          await cache.put(request, response.clone());
+          void trimRuntimeCache();
         }
         return response;
       })

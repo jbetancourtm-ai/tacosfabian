@@ -62,7 +62,6 @@ let ambientAudioSourceIndex = 0;
 let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 let heroGalleryTimer = 0;
-let swRefreshPending = false;
 
 function scheduleIdleWork(callback, timeout = 900) {
   if (typeof callback !== "function") return;
@@ -147,7 +146,7 @@ function setupHeaderEffects() {
 
 function setupSiteAmbientAudio() {
   const storageKey = "tacos_fabian_premium_ambient";
-  const ambientSources = ["/audio/ambient-main.mp3.mp3", "/audio/taqueria-ambient-night.wav"];
+  const ambientSources = ["/audio/ambient-main.mp3.mp3", "/audio/ambient-main.mp3", "/audio/taqueria-ambient-night.wav"];
   const targetVolume = 0.038;
   const introExitDelayMs = 520;
   let ambientEnabled = false;
@@ -449,45 +448,10 @@ function setupPwaSupport() {
 
   if (!("serviceWorker" in navigator)) return;
 
-  const refreshForUpdatedServiceWorker = () => {
-    if (swRefreshPending) return;
-    swRefreshPending = true;
-    window.location.reload();
-  };
-
-  const requestWaitingWorkerActivation = (registration) => {
-    registration?.waiting?.postMessage({ type: "SKIP_WAITING" });
-  };
-
-  const watchServiceWorkerRegistration = (registration) => {
-    if (!registration) return;
-
-    if (registration.waiting) {
-      requestWaitingWorkerActivation(registration);
-    }
-
-    registration.addEventListener("updatefound", () => {
-      const installingWorker = registration.installing;
-      if (!installingWorker) return;
-      installingWorker.addEventListener("statechange", () => {
-        if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
-          requestWaitingWorkerActivation(registration);
-        }
-      });
-    });
-  };
-
-  navigator.serviceWorker.addEventListener("controllerchange", refreshForUpdatedServiceWorker, { once: true });
-
   window.addEventListener("load", async () => {
     scheduleIdleWork(async () => {
       try {
-        const registration = await navigator.serviceWorker.register("/sw.js", {
-          scope: "/",
-          updateViaCache: "none",
-        });
-        watchServiceWorkerRegistration(registration);
-        void registration.update();
+        await navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" });
       } catch (error) {
         console.error("No se pudo registrar el service worker", error);
       }
