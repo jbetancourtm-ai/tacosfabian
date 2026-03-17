@@ -1547,14 +1547,20 @@ setupMenuSpotlightModal();
 setupRevealAnimations();
 setupHeaderEffects();
 setupIntroScreen();
-setupPwaSupport();
-setupFabianVideos();
-setupSiteAmbientAudio();
+scheduleIdleWork(() => {
+  setupPwaSupport();
+}, 220);
 setupFloatingWhatsapp();
-setupWhatsappAudio();
-setupVisitCounter();
+scheduleIdleWork(() => {
+  setupFabianVideos();
+  setupSiteAmbientAudio();
+  setupWhatsappAudio();
+  setupVisitCounter();
+}, 650);
 setupMenuDestacadoButton();
-setupHeroGalleryCarousel();
+scheduleIdleWork(() => {
+  setupHeroGalleryCarousel();
+}, 900);
 scheduleIdleWork(() => {
   loadReviews();
 }, 450);
