@@ -317,16 +317,15 @@ export async function initIntroExperience({
       : "";
   const audioFallbackSrc =
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4" : "";
-  const fallbackAudio =
-    audioFallbackSrc && audioFallbackSrc !== visualFallbackSrc ? new Audio(audioFallbackSrc) : null;
+  const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
   const ambientIntro = !isStandaloneMode ? new Audio("/audio/ambient-intro.mp3.mp3") : null;
   if (fallbackAudio) {
-    fallbackAudio.preload = "metadata";
+    fallbackAudio.preload = "auto";
     fallbackAudio.loop = false;
     fallbackAudio.volume = 0.88;
   }
   if (ambientIntro) {
-    ambientIntro.preload = "metadata";
+    ambientIntro.preload = "auto";
     ambientIntro.loop = true;
     ambientIntro.volume = 0.01;
     ambientIntro.crossOrigin = "anonymous";
@@ -338,7 +337,7 @@ export async function initIntroExperience({
       hostVideo.dataset.resolvedType = "video/mp4";
     }
     hostVideo.autoplay = true;
-    hostVideo.preload = "metadata";
+    hostVideo.preload = "auto";
     hostVideo.playsInline = true;
     hostVideo.setAttribute("playsinline", "");
     hostVideo.setAttribute("webkit-playsinline", "");

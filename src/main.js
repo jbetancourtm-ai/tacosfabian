@@ -793,28 +793,22 @@ function setupIntroScreen() {
     return;
   }
 
-  const startIntro = () => {
-    import("./intro-experience.js")
-      .then(({ initIntroExperience }) =>
-        initIntroExperience({
-          introScreen,
-          introSkipBtn,
-        })
-      )
-      .catch(() => {
-        window.setTimeout(() => {
-          introScreen.classList.add("is-hidden");
-          introScreen.setAttribute("aria-hidden", "true");
-          document.body.classList.remove("intro-active");
-          document.body.classList.add("intro-complete");
-          window.setTimeout(() => introScreen.remove(), 700);
-        }, 1200);
-      });
-  };
-
-  window.requestAnimationFrame(() => {
-    scheduleIdleWork(startIntro, 700);
-  });
+  import("./intro-experience.js")
+    .then(({ initIntroExperience }) =>
+      initIntroExperience({
+        introScreen,
+        introSkipBtn,
+      })
+    )
+    .catch(() => {
+      window.setTimeout(() => {
+        introScreen.classList.add("is-hidden");
+        introScreen.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("intro-active");
+        document.body.classList.add("intro-complete");
+        window.setTimeout(() => introScreen.remove(), 700);
+      }, 1200);
+    });
 }
 
 function setupVisitCounter() {
