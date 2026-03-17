@@ -12,8 +12,8 @@ const reviewsAverageBadge = document.querySelector("#reviewsAverageBadge");
 const reviewsSatisfied = document.querySelector("#reviewsSatisfied");
 const heroProofAvg = document.querySelector("#heroProofAvg");
 const heroProofCount = document.querySelector("#heroProofCount");
-const heroProofAvgLabel = "★ 5.0 calificación promedio";
-const heroProofCountLabel = "+216 clientes satisfechos";
+const heroProofAvgLabel = "\u2605 5.0 sabor recomendado";
+const heroProofCountLabel = "+216 pedidos con antojo resuelto";
 const heroReviewsCard = document.querySelector("#heroReviewsCard");
 const heroReviewsAvg = document.querySelector("#heroReviewsAvg");
 const heroReviewsCount = document.querySelector("#heroReviewsCount");
@@ -38,6 +38,7 @@ const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
 const installAppButtons = Array.from(document.querySelectorAll("#installAppBtn, #introInstallAppBtn"));
+const exitAppButtons = Array.from(document.querySelectorAll("#exitAppBtn"));
 const ambientAudioToggle = document.querySelector("#ambientAudioToggle");
 
 const menuCarousel = document.querySelector("#menuCarousel");
@@ -374,7 +375,17 @@ function setupPwaSupport() {
     });
   };
 
+  const syncExitButton = (visible) => {
+    exitAppButtons.forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      button.hidden = !visible;
+      button.setAttribute("aria-hidden", visible ? "false" : "true");
+      button.disabled = !visible;
+    });
+  };
+
   syncInstallButton(false);
+  syncExitButton(isStandaloneMode());
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
@@ -387,6 +398,7 @@ function setupPwaSupport() {
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
     syncInstallButton(false);
+    syncExitButton(true);
   });
 
   if (hasIosInstallPath) {
@@ -394,9 +406,45 @@ function setupPwaSupport() {
   }
 
   window.matchMedia("(display-mode: standalone)").addEventListener?.("change", (event) => {
-    if (!event.matches) return;
-    deferredInstallPrompt = null;
-    syncInstallButton(false);
+    if (event.matches) {
+      deferredInstallPrompt = null;
+      syncInstallButton(false);
+      syncExitButton(true);
+      return;
+    }
+    syncExitButton(false);
+  });
+
+  const handleExitAppClick = () => {
+    if (!isStandaloneMode()) return;
+
+    document.body.classList.add("app-exit-pending");
+
+    window.setTimeout(() => {
+      try {
+        window.open("", "_self");
+      } catch {}
+
+      try {
+        window.close();
+      } catch {}
+    }, 60);
+
+    window.setTimeout(() => {
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+
+      try {
+        window.location.replace("about:blank");
+      } catch {}
+    }, 180);
+  };
+
+  exitAppButtons.forEach((button) => {
+    if (!(button instanceof HTMLButtonElement)) return;
+    button.addEventListener("click", handleExitAppClick);
   });
 
   const handleInstallClick = async (event) => {
@@ -1353,13 +1401,13 @@ function setupMenuSpotlightModal() {
 
 function setupRevealAnimations() {
   const groups = [
-    ".hero-content, .hero-side, .hero-proof",
-    "#especialidad .card",
+    ".hero-premium .hero-content, .hero-premium .hero-side, .hero-premium .hero-proof, .trust-card",
+    "#especialidad .card, .featured-product, .story-copy, .story-highlight",
     "#menu .carousel-slide",
     "#menu .menu-item",
     "#ubicacion .location-copy, #ubicacion .map-wrap",
     "#resenas .review-item, #resenas .review-form-wrap, #resenas .cta-final, #resenas .review-trust",
-    "#referencias .card",
+    "#referencias .card, .final-cta-banner",
   ];
 
   const items = document.querySelectorAll(groups.join(", "));
@@ -1508,4 +1556,6 @@ setupVisitCounter();
 setupMenuDestacadoButton();
 setupHeroGalleryCarousel();
 loadReviews();
+
+
 
