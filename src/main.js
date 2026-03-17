@@ -26,7 +26,6 @@ const commentCounter = document.querySelector("#commentCounter");
 const toastRegion = document.querySelector("#toastRegion");
 const floatingFabianHost = document.querySelector("#fabianMain");
 const floatingFabianSprite = floatingFabianHost?.querySelector(".floating-fabian-host__sprite");
-const floatingFabianFigure = floatingFabianHost?.querySelector(".floating-fabian-host__figure");
 const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
@@ -677,22 +676,29 @@ function setupFloatingWhatsapp() {
   }
 
   const floatingFabianFrames = ["/images/fabian.png", "/images/favio.png"];
+  const floatingFabianFigure = floatingFabianHost?.querySelector(".floating-fabian-host__figure");
   let floatingFabianFrameIndex = 0;
   let floatingFabianSwapTimer = 0;
+
+  floatingFabianFrames.forEach((src) => {
+    const preloadImage = new Image();
+    preloadImage.src = src;
+  });
 
   const applyFloatingFabianFrame = (index) => {
     if (!(floatingFabianFigure instanceof HTMLImageElement)) return;
     const safeIndex = ((index % floatingFabianFrames.length) + floatingFabianFrames.length) % floatingFabianFrames.length;
     floatingFabianFrameIndex = safeIndex;
+    floatingFabianFigure.removeAttribute("loading");
+    floatingFabianFigure.decoding = "async";
     floatingFabianFigure.src = floatingFabianFrames[safeIndex];
     floatingFabianFigure.setAttribute("src", floatingFabianFrames[safeIndex]);
   };
 
   const scheduleFloatingFabianSwap = () => {
-    window.clearTimeout(floatingFabianSwapTimer);
-    floatingFabianSwapTimer = window.setTimeout(() => {
+    if (floatingFabianSwapTimer) window.clearInterval(floatingFabianSwapTimer);
+    floatingFabianSwapTimer = window.setInterval(() => {
       applyFloatingFabianFrame(floatingFabianFrameIndex + 1);
-      scheduleFloatingFabianSwap();
     }, 10000);
   };
 
