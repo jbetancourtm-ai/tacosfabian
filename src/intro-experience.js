@@ -312,6 +312,8 @@ export async function initIntroExperience({
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
   const introOutroBufferMs = isStandaloneMode ? 1200 : 850;
+  const preferredVisualSrc =
+    hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.preferredVisual || "/images/fabian_transparente_mejor.webm" : "";
   const visualFallbackSrc =
     hostVideo instanceof HTMLVideoElement
       ? hostVideo.dataset.browserFallback || hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4"
@@ -332,10 +334,17 @@ export async function initIntroExperience({
     ambientIntro.crossOrigin = "anonymous";
   }
   if (hostVideo instanceof HTMLVideoElement) {
-    if (!isStandaloneMode && visualFallbackSrc) {
+    if (isStandaloneMode && preferredVisualSrc) {
+      hostVideo.src = preferredVisualSrc;
+      hostVideo.dataset.resolvedSrc = preferredVisualSrc;
+      hostVideo.dataset.resolvedType =
+        preferredVisualSrc.endsWith(".mp4") ? "video/mp4" : 'video/webm; codecs="vp9,opus"';
+      hostVideo.load();
+    } else if (!isStandaloneMode && visualFallbackSrc) {
       hostVideo.src = visualFallbackSrc;
       hostVideo.dataset.resolvedSrc = visualFallbackSrc;
       hostVideo.dataset.resolvedType = "video/mp4";
+      hostVideo.load();
     }
     hostVideo.autoplay = true;
     hostVideo.preload = "auto";

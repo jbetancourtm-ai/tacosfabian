@@ -497,7 +497,7 @@ function setupPwaSupport() {
 }
 
 function setupFabianVideos() {
-  const fabianVideos = Array.from(document.querySelectorAll(".intro-screen__host-video"));
+  const fabianVideos = Array.from(document.querySelectorAll(".intro-screen__host-video:not([data-intro-managed='true'])"));
   if (!fabianVideos.length) return;
 
   const isStandaloneMode = () =>
