@@ -3910,7 +3910,8 @@ td {
   transform-origin: center 22%;
   animation:
     floating-fabian-idle 3s ease-in-out infinite,
-    floating-fabian-head 2.5s ease-in-out infinite;
+    floating-fabian-head 2.5s ease-in-out infinite,
+    floating-fabian-grow 5s ease-in-out infinite;
 }
 
 .floating-fabian-host__figure.is-hidden {
@@ -6981,9 +6982,7 @@ body::after {
 .floating-fabian-host__stage {
   width: 126px;
   height: 168px;
-  animation:
-    floating-fabian-grow 5s ease-in-out infinite,
-    floating-fabian-turn-premium 5s ease-in-out infinite;
+  animation: floating-fabian-turn-premium 5s ease-in-out infinite;
 }
 
 @media (max-width: 899px), (prefers-reduced-motion: reduce) {
