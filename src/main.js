@@ -1,4 +1,5 @@
 import { gsap } from "gsap";
+import { initIntroExperience } from "./intro-experience.js";
 
 const menuBtn = document.querySelector("#menuBtn");
 const navMenu = document.querySelector("#navMenu");
@@ -793,8 +794,8 @@ function setupIntroScreen() {
     return;
   }
 
-  import("./intro-experience.js")
-    .then(({ initIntroExperience }) =>
+  Promise.resolve()
+    .then(() =>
       initIntroExperience({
         introScreen,
         introSkipBtn,

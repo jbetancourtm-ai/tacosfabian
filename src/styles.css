@@ -928,7 +928,7 @@ body.intro-complete .floating-whatsapp {
 }
 
 .fabian-intro {
-  width: clamp(232px, 20vw, 276px);
+  width: min(calc(clamp(232px, 20vw, 276px) + 4cm), calc(100vw - 1.5rem));
   max-width: calc(100vw - 1.5rem);
   transform: translateY(22px) scale(0.96);
 }
@@ -957,7 +957,7 @@ body.intro-complete .floating-whatsapp {
 
 .intro-screen__host-stage--hero {
   width: 100%;
-  min-height: clamp(232px, 20vw, 276px);
+  min-height: min(calc(clamp(232px, 20vw, 276px) + 4cm), calc(100vw - 1.5rem));
 }
 
 .intro-screen__host-mural {

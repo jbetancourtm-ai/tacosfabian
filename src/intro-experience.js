@@ -311,6 +311,7 @@ export async function initIntroExperience({
   const lowEndDevice = isLowEndDevice();
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
+  const introOutroBufferMs = isStandaloneMode ? 1200 : 850;
   const visualFallbackSrc =
     hostVideo instanceof HTMLVideoElement
       ? hostVideo.dataset.browserFallback || hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4"
@@ -915,6 +916,7 @@ export async function initIntroExperience({
       hostVideo.classList.add("is-ready");
       if (ambientEnabled) fadeAmbientTo(0.06, 0.65);
       audioMode = "media";
+      scheduleFinishFromMedia();
       if (ambientEnabled || isStandaloneMode) {
         introSoundBtn?.classList.add("is-hidden");
       } else {
@@ -971,7 +973,7 @@ export async function initIntroExperience({
 
     const durationSeconds = usingFallbackAudio && fallbackAudio ? fallbackAudio.duration : hostVideo.duration;
     if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
-      const remainingMs = Math.max(900, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + 250);
+      const remainingMs = Math.max(1800, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + introOutroBufferMs);
       scheduleFinish(remainingMs);
       return;
     }
@@ -989,10 +991,7 @@ export async function initIntroExperience({
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
     const started = await tryPlayNarrationAudio({ restart: true });
 
-    if (started) {
-      scheduleFinishFromMedia();
-      pulseSpeaking(2600);
-    }
+    if (started) pulseSpeaking(2600);
 
     return started;
   };
@@ -1108,6 +1107,7 @@ export async function initIntroExperience({
     void ensureVisualPlayback({ restart: true, muted: audioMode !== "media", preferFallback: true });
   });
   hostVideo?.addEventListener("ended", () => {
+    if (usingFallbackAudio && fallbackAudio && !fallbackAudio.ended) return;
     hostCard?.classList.remove("is-playing");
     finishIntro();
   });
@@ -1128,7 +1128,7 @@ export async function initIntroExperience({
 
   timeline = gsap.timeline({
     defaults: { ease: "power2.inOut" },
-    onComplete: finishIntro,
+    onComplete: scheduleFinishFromMedia,
   });
 
   timeline
@@ -1253,6 +1253,5 @@ export async function initIntroExperience({
   }
 
   void tryPlayNarrationAudio();
-  scheduleFinishFromMedia();
   render();
 }
