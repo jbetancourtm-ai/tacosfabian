@@ -980,6 +980,30 @@ export async function initIntroExperience({
       return;
     }
 
+    if (audioMode === "media") {
+      if (usingFallbackAudio && fallbackAudio) {
+        const fallbackDuration = fallbackAudio.duration;
+        if (Number.isFinite(fallbackDuration) && fallbackDuration > 0) {
+          const fallbackRemainingMs = Math.max(
+            3200,
+            Math.round((fallbackDuration - fallbackAudio.currentTime) * 1000) + introOutroBufferMs + 900
+          );
+          scheduleFinish(fallbackRemainingMs);
+          return;
+        }
+      }
+
+      const hostDuration = hostVideo.duration;
+      if (Number.isFinite(hostDuration) && hostDuration > 0) {
+        const hostRemainingMs = Math.max(
+          3200,
+          Math.round((hostDuration - hostVideo.currentTime) * 1000) + introOutroBufferMs + 900
+        );
+        scheduleFinish(hostRemainingMs);
+        return;
+      }
+    }
+
     const durationSeconds = usingFallbackAudio && fallbackAudio ? fallbackAudio.duration : hostVideo.duration;
     if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
       const remainingMs = Math.max(1800, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + introOutroBufferMs);

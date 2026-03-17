@@ -4890,10 +4890,10 @@ td {
 
   .fabian-intro {
     left: auto;
-    right: 0.4rem;
+    right: 0.05rem;
     top: auto;
-    bottom: calc(var(--intro-actions-space) + 5.1rem);
-    width: min(calc(var(--intro-fabian-width) + 1cm), calc(100vw - 0.6rem));
+    bottom: calc(var(--intro-actions-space) + 4.2rem);
+    width: min(calc(var(--intro-fabian-width) + 2cm), calc(100vw - 0.2rem));
     transform: translateY(22px) scale(0.96);
   }
 
@@ -4903,11 +4903,11 @@ td {
 
   .fabian-intro.is-swapped {
     left: auto;
-    right: 0.2rem;
+    right: 0.05rem;
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: min(calc(clamp(138px, 40vw, 170px) + 1cm), calc(100vw - 0.9rem));
+    min-height: min(calc(clamp(138px, 40vw, 170px) + 2cm), calc(100vw - 0.3rem));
   }
 
   .intro-screen__btn {
