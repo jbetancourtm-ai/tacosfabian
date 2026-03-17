@@ -1555,7 +1555,9 @@ setupWhatsappAudio();
 setupVisitCounter();
 setupMenuDestacadoButton();
 setupHeroGalleryCarousel();
-loadReviews();
+scheduleIdleWork(() => {
+  loadReviews();
+}, 450);
 
 
 
