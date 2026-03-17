@@ -662,6 +662,14 @@ export async function initIntroExperience({
     }, delay);
   };
 
+  const isUsingAudioFallbackVideoSource = () => {
+    if (!(hostVideo instanceof HTMLVideoElement) || !audioFallbackSrc) return false;
+    const resolvedSrc = hostVideo.dataset.resolvedSrc || hostVideo.currentSrc || hostVideo.src;
+    if (!resolvedSrc) return false;
+    const absoluteAudioFallback = new URL(audioFallbackSrc, window.location.origin).href;
+    return resolvedSrc === audioFallbackSrc || resolvedSrc === absoluteAudioFallback;
+  };
+
   const swapHostVideoSource = (src) => {
     if (!(hostVideo instanceof HTMLVideoElement) || !src) return false;
     const resolvedSrc = hostVideo.dataset.resolvedSrc || hostVideo.currentSrc || hostVideo.src;
@@ -887,7 +895,7 @@ export async function initIntroExperience({
       hostVideo.defaultMuted = false;
       hostVideo.volume = 0;
       await hostVideo.play();
-      if (!mediaHasUsableAudio() && fallbackAudio) {
+      if (!isUsingAudioFallbackVideoSource() && !mediaHasUsableAudio() && fallbackAudio) {
         usingFallbackAudio = true;
         hostVideo.muted = true;
         hostVideo.defaultMuted = true;
@@ -895,6 +903,7 @@ export async function initIntroExperience({
         fallbackAudio.volume = 0;
         await fallbackAudio.play();
       }
+      fadeHostVideoTo(0.88, 0.18);
       await ensureAmbientIntro({ force: restart });
       const visualReady = await waitForVideoProgress(1200);
       if (!visualReady && visualFallbackSrc && swapHostVideoSource(visualFallbackSrc)) {
@@ -904,7 +913,6 @@ export async function initIntroExperience({
       }
       if (token !== audioToken) return false;
       hostVideo.classList.add("is-ready");
-      fadeHostVideoTo(0.88, 0.55);
       if (ambientEnabled) fadeAmbientTo(0.06, 0.65);
       audioMode = "media";
       if (ambientEnabled || isStandaloneMode) {
