@@ -3907,7 +3907,7 @@ td {
     drop-shadow(0 16px 20px rgba(54, 27, 12, 0.22))
     brightness(1.01)
     contrast(1.02);
-  transform-origin: center 22%;
+  transform-origin: center bottom;
   animation:
     floating-fabian-idle 3s ease-in-out infinite,
     floating-fabian-head 2.5s ease-in-out infinite,
@@ -6965,17 +6965,17 @@ body::after {
   0%,
   84%,
   100% {
-    transform: scale(1) translateY(0) rotate(0deg);
+    transform: scale(1) translateY(0);
   }
   92% {
-    transform: scale(1.55) translateY(-11px) rotate(10deg);
+    transform: scale(1.55) translateY(-16px);
   }
 }
 
 .floating-fabian-host,
 .fabian-main {
   right: 0.2rem;
-  bottom: 7.35rem;
+  bottom: 4.2rem;
   width: 126px;
 }
 
@@ -7028,7 +7028,7 @@ body::after {
   .floating-fabian-host,
   .fabian-main {
     right: 0.12rem;
-    bottom: 6.3rem;
+    bottom: 3.75rem;
     width: 92px;
   }
 
@@ -7046,7 +7046,7 @@ body::after {
   .floating-fabian-host,
   .fabian-main {
     right: 0.08rem;
-    bottom: 5.7rem;
+    bottom: 3.35rem;
     width: 78px;
   }
 
