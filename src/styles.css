@@ -4893,7 +4893,7 @@ td {
     right: 0.4rem;
     top: auto;
     bottom: calc(var(--intro-actions-space) + 5.1rem);
-    width: var(--intro-fabian-width);
+    width: min(calc(var(--intro-fabian-width) + 4cm), calc(100vw - 0.6rem));
     transform: translateY(22px) scale(0.96);
   }
 
@@ -4907,7 +4907,7 @@ td {
   }
 
   .fabian-intro .intro-screen__host-stage {
-    min-height: clamp(138px, 40vw, 170px);
+    min-height: min(calc(clamp(138px, 40vw, 170px) + 4cm), calc(100vw - 0.9rem));
   }
 
   .intro-screen__btn {
@@ -6967,7 +6967,7 @@ body::after {
     transform: scale(1) translateY(0);
   }
   92% {
-    transform: scale(1.32) translateY(-9px);
+    transform: scale(1.72) translateY(-14px);
   }
 }
 
@@ -6981,7 +6981,7 @@ body::after {
 .floating-fabian-host__stage {
   width: 126px;
   height: 168px;
-  animation: floating-fabian-grow 5s ease-in-out infinite;
+  animation: floating-fabian-grow 300s ease-in-out infinite;
 }
 
 @media (max-width: 899px), (prefers-reduced-motion: reduce) {
