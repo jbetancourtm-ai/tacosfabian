@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { gsap } from "gsap";
 
 const SCRIPT_SEGMENTS = [
-  "Hola, bienvenido a Taqueria Fabian en Texcoco.",
+  "Hola, bienvenido a Tacos Fabian en Texcoco.",
   "Aqui preparamos tacos que se antojan desde la primera mordida.",
   "Prueba nuestros tacos de suadero, trocitos y tostadas, siempre preparados con sabor autentico.",
   "Revisa el menu o haz tu pedido por WhatsApp."
