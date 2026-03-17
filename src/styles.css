@@ -7027,8 +7027,8 @@ body::after {
 @media (max-width: 899px) {
   .floating-fabian-host,
   .fabian-main {
-    right: 0.12rem;
-    bottom: 3.75rem;
+    right: calc(1rem - 18px);
+    bottom: calc(1.05rem + 54px);
     width: 92px;
   }
 
@@ -7045,8 +7045,8 @@ body::after {
 @media (max-width: 599px) {
   .floating-fabian-host,
   .fabian-main {
-    right: 0.08rem;
-    bottom: 3.35rem;
+    right: calc(1rem - 11px);
+    bottom: calc(1.05rem + 52px);
     width: 78px;
   }
 
