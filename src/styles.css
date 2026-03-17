@@ -6311,7 +6311,26 @@ body::after {
   width: 100%;
   min-width: 0;
   justify-content: center;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.16;
+  min-height: 3.35rem;
+  padding-inline: 0.88rem;
+}
+
+#heroMenuDestacadoBtn,
+#installAppBtn {
+  overflow-wrap: anywhere;
+}
+
+#installAppBtn {
+  gap: 0.42rem;
+}
+
+.btn-install-app__text {
+  white-space: normal;
+  text-align: center;
+  line-height: 1.12;
 }
 
 .hero {
@@ -6948,7 +6967,7 @@ body::after {
     transform: scale(1) translateY(0);
   }
   92% {
-    transform: scale(1.1) translateY(-4px);
+    transform: scale(1.32) translateY(-9px);
   }
 }
 
