@@ -13,10 +13,6 @@ const heroProofAvg = document.querySelector("#heroProofAvg");
 const heroProofCount = document.querySelector("#heroProofCount");
 const heroProofAvgLabel = "\u2605 5.0 sabor recomendado";
 const heroProofCountLabel = "+216 pedidos con antojo resuelto";
-const heroReviewsCard = document.querySelector("#heroReviewsCard");
-const heroReviewsAvg = document.querySelector("#heroReviewsAvg");
-const heroReviewsCount = document.querySelector("#heroReviewsCount");
-const heroReviewsPreview = document.querySelector("#heroReviewsPreview");
 const reviewsList = document.querySelector("#reviewsList");
 const reviewsSection = document.querySelector("#resenas");
 const reviewForm = document.querySelector("#reviewForm");
@@ -30,10 +26,6 @@ const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
 const visitCounter = document.querySelector("#visitCounter");
 const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
-const heroGallery = document.querySelector("#heroGallery");
-const heroGalleryPrev = document.querySelector("#heroGalleryPrev");
-const heroGalleryNext = document.querySelector("#heroGalleryNext");
-const heroGalleryDots = document.querySelector("#heroGalleryDots");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
@@ -54,16 +46,12 @@ const menuModalTitle = document.querySelector("#menuModalTitle");
 const menuModalDescription = document.querySelector("#menuModalDescription");
 const menuModalPrice = document.querySelector("#menuModalPrice");
 const menuCards = Array.from(document.querySelectorAll(".menu-item"));
-let heroReviewsRotationTimer = 0;
-let heroReviewsCache = [];
-let heroReviewsStartIndex = 0;
 let siteAmbientAudio = null;
 let siteAmbientStarting = false;
 let siteAmbientObserver = null;
 let ambientAudioSourceIndex = 0;
 let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
-let heroGalleryTimer = 0;
 let swRefreshPending = false;
 let reviewsLoaded = false;
 
@@ -980,98 +968,6 @@ function truncateReview(text, maxLength = 96) {
   return `${cleanText.slice(0, maxLength).trimEnd()}...`;
 }
 
-function getHeroReviewVisibleCount() {
-  return 2;
-}
-
-function stopHeroReviewsRotation() {
-  if (!heroReviewsRotationTimer) return;
-  window.clearInterval(heroReviewsRotationTimer);
-  heroReviewsRotationTimer = 0;
-}
-
-function renderHeroReviewSlice(items) {
-  if (!heroReviewsPreview) return;
-
-  const visibleCount = getHeroReviewVisibleCount();
-  const safeItems = Array.isArray(items) ? items : [];
-
-  if (!safeItems.length) {
-    heroReviewsPreview.innerHTML = `
-      <article class="hero-reviews-card__item hero-reviews-card__item--empty">
-        <p>Sé la primera persona en dejar una reseña.</p>
-      </article>
-    `;
-    return;
-  }
-
-  const currentItems = Array.from({ length: Math.min(visibleCount, safeItems.length) }, (_, offset) => {
-    const index = (heroReviewsStartIndex + offset) % safeItems.length;
-    return safeItems[index];
-  });
-
-  heroReviewsPreview.innerHTML = currentItems
-    .map((item) => {
-      const name = escapeHtml(item.name || "Anonimo");
-      const stars = Math.max(1, Math.min(5, Number(item.stars) || 0));
-      const comment = escapeHtml(truncateReview(item.comment || "", 88));
-      return `
-        <article class="hero-reviews-card__item">
-          <div class="hero-reviews-card__item-head">
-            <strong>${name}</strong>
-            <span aria-label="${stars} de 5 estrellas">${"&#9733;".repeat(stars)}${"&#9734;".repeat(5 - stars)}</span>
-          </div>
-          <p>${comment}</p>
-        </article>
-      `;
-    })
-    .join("");
-}
-
-function syncHeroReviewsRotation() {
-  if (!heroReviewsPreview) return;
-
-  stopHeroReviewsRotation();
-  renderHeroReviewSlice(heroReviewsCache);
-
-  const visibleCount = getHeroReviewVisibleCount();
-  if (heroReviewsCache.length <= visibleCount) return;
-
-  heroReviewsRotationTimer = window.setInterval(() => {
-    heroReviewsPreview.classList.add("is-switching");
-
-    window.setTimeout(() => {
-      heroReviewsStartIndex = (heroReviewsStartIndex + visibleCount) % heroReviewsCache.length;
-      renderHeroReviewSlice(heroReviewsCache);
-      heroReviewsPreview.classList.remove("is-switching");
-    }, 220);
-  }, 5000);
-}
-
-function paintHeroReviews(items) {
-  if (!heroReviewsCard || !heroReviewsAvg || !heroReviewsCount || !heroReviewsPreview) return;
-
-  if (!Array.isArray(items) || items.length === 0) {
-    stopHeroReviewsRotation();
-    heroReviewsCache = [];
-    heroReviewsStartIndex = 0;
-    heroReviewsAvg.innerHTML = "&#9733; --";
-    heroReviewsCount.textContent = "Sin reseñas aún";
-    renderHeroReviewSlice([]);
-    return;
-  }
-
-  const avg = items.reduce((sum, item) => sum + (Number(item.stars) || 0), 0) / items.length;
-  heroReviewsCache = [...items]
-    .sort((a, b) => (Number(b.stars) || 0) - (Number(a.stars) || 0))
-    .slice(0, 6);
-  heroReviewsStartIndex = 0;
-
-  heroReviewsAvg.innerHTML = `&#9733; ${avg.toFixed(1)}`;
-  heroReviewsCount.textContent = `${items.length} reseña${items.length === 1 ? "" : "s"}`;
-  syncHeroReviewsRotation();
-}
-
 function paintReviews(items) {
   if (!Array.isArray(items) || items.length === 0) {
     reviewsStatus.textContent = "Aún no hay reseñas. Sé la primera persona en opinar.";
@@ -1080,7 +976,6 @@ function paintReviews(items) {
     if (reviewsSatisfied) reviewsSatisfied.textContent = "+0 clientes satisfechos";
     if (heroProofAvg) heroProofAvg.textContent = heroProofAvgLabel;
     if (heroProofCount) heroProofCount.textContent = heroProofCountLabel;
-    paintHeroReviews([]);
     reviewsList.innerHTML = "";
     return;
   }
@@ -1093,7 +988,6 @@ function paintReviews(items) {
   if (reviewsSatisfied) reviewsSatisfied.textContent = `+${satisfied} clientes satisfechos`;
   if (heroProofAvg) heroProofAvg.textContent = heroProofAvgLabel;
   if (heroProofCount) heroProofCount.textContent = heroProofCountLabel;
-  paintHeroReviews(items);
 
   [reviewsAverageBadge, reviewsSatisfied, heroProofAvg, heroProofCount].forEach((node) => {
     if (!node) return;
@@ -1136,15 +1030,6 @@ async function loadReviews() {
   if (reviewsAverage) reviewsAverage.textContent = "Promedio: calculando...";
   if (reviewsAverageBadge) reviewsAverageBadge.textContent = "\u2605 Calculando promedio...";
   if (reviewsSatisfied) reviewsSatisfied.textContent = "Cargando clientes satisfechos...";
-  stopHeroReviewsRotation();
-  if (heroReviewsAvg) heroReviewsAvg.innerHTML = "&#9733; --";
-  if (heroReviewsCount) heroReviewsCount.textContent = "Cargando...";
-  if (heroReviewsPreview) {
-    heroReviewsPreview.innerHTML = `
-      <article class="hero-reviews-card__item is-loading"></article>
-      <article class="hero-reviews-card__item is-loading"></article>
-    `;
-  }
   reviewsList.innerHTML = `
     <li class="review-item review-skeleton"></li>
     <li class="review-item review-skeleton"></li>
@@ -1164,7 +1049,6 @@ async function loadReviews() {
     paintReviews(payload.items || []);
   } catch {
     reviewsStatus.textContent = "No fue posible cargar reseñas. Intenta más tarde.";
-    paintHeroReviews([]);
     showToast("No pudimos cargar reseñas por el momento.", "error");
   }
 }
@@ -1469,85 +1353,6 @@ function setupRevealAnimations() {
   });
 }
 
-function setupHeroGalleryCarousel() {
-  if (!heroGallery || !heroGalleryDots) return;
-
-  const slides = Array.from(heroGallery.querySelectorAll(".hero-gallery-item"));
-  if (slides.length <= 1) return;
-
-  let currentIndex = slides.findIndex((slide) => slide.classList.contains("is-active"));
-  if (currentIndex < 0) currentIndex = 0;
-
-  const stopAuto = () => {
-    if (!heroGalleryTimer) return;
-    window.clearInterval(heroGalleryTimer);
-    heroGalleryTimer = 0;
-  };
-
-  const render = () => {
-    slides.forEach((slide, index) => {
-      slide.classList.toggle("is-active", index === currentIndex);
-    });
-
-    const dots = Array.from(heroGalleryDots.children);
-    dots.forEach((dot, index) => {
-      dot.setAttribute("aria-current", index === currentIndex ? "true" : "false");
-    });
-  };
-
-  const startAuto = () => {
-    stopAuto();
-    heroGalleryTimer = window.setInterval(() => {
-      currentIndex = (currentIndex + 1) % slides.length;
-      render();
-    }, 3000);
-  };
-
-  heroGalleryDots.innerHTML = "";
-  slides.forEach((_, index) => {
-    const dot = document.createElement("button");
-    dot.type = "button";
-    dot.className = "hero-gallery__dot";
-    dot.setAttribute("aria-label", `Ver imagen ${index + 1}`);
-    dot.setAttribute("aria-current", index === currentIndex ? "true" : "false");
-    dot.addEventListener("click", () => {
-      currentIndex = index;
-      render();
-      startAuto();
-    });
-    heroGalleryDots.appendChild(dot);
-  });
-
-  heroGalleryPrev?.addEventListener("click", () => {
-    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-    render();
-    startAuto();
-  });
-
-  heroGalleryNext?.addEventListener("click", () => {
-    currentIndex = (currentIndex + 1) % slides.length;
-    render();
-    startAuto();
-  });
-
-  heroGallery.addEventListener("pointerenter", stopAuto);
-  heroGallery.addEventListener("pointerleave", startAuto);
-
-  render();
-  startAuto();
-}
-
-if (heroReviewsCard) {
-  let resizeTimer = 0;
-  window.addEventListener("resize", () => {
-    if (!heroReviewsCache.length) return;
-    window.clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => {
-      syncHeroReviewsRotation();
-    }, 120);
-  });
-}
-
 function optimizeMainPageMedia() {
   const heroPriorityImage = document.querySelector(".menu-carousel--hero .carousel-slide:first-child img");
   if (heroPriorityImage instanceof HTMLImageElement) {
@@ -1557,7 +1362,7 @@ function optimizeMainPageMedia() {
   }
 
   const deferredImages = document.querySelectorAll(
-    "#menu img, #especialidad img, #ubicacion img, #referencias img, .hero-gallery-item img:not(:first-child)"
+    "#menu img, #especialidad img, #ubicacion img, #referencias img"
   );
   deferredImages.forEach((image) => {
     if (!(image instanceof HTMLImageElement)) return;
@@ -1587,10 +1392,9 @@ scheduleIdleWork(() => {
   setupVisitCounter();
 }, 650);
 setupMenuDestacadoButton();
-scheduleIdleWork(() => {
-  setupHeroGalleryCarousel();
-}, 900);
+
 setupDeferredReviews();
+
 
 
 
