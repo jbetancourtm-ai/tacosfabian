@@ -7011,6 +7011,19 @@ body::after {
 }
 
 /* Home redesign */
+main#contenido {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-showcase-section {
+  order: -2;
+}
+
+.hero-premium {
+  order: -1;
+}
+
 .hero-premium {
   position: relative;
   overflow: clip;
