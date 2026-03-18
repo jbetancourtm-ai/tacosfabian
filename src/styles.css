@@ -7196,6 +7196,10 @@ main#contenido {
   z-index: 1;
 }
 
+.hero-side-stack--solo {
+  grid-column: 1 / -1;
+}
+
 .hero-kicker,
 .section-kicker {
   margin: 0 0 0.7rem;
