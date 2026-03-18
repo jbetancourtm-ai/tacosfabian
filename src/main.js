@@ -1,5 +1,4 @@
 import { gsap } from "gsap";
-import { initIntroExperience } from "./intro-experience.js";
 
 const menuBtn = document.querySelector("#menuBtn");
 const navMenu = document.querySelector("#navMenu");
@@ -19,6 +18,7 @@ const heroReviewsAvg = document.querySelector("#heroReviewsAvg");
 const heroReviewsCount = document.querySelector("#heroReviewsCount");
 const heroReviewsPreview = document.querySelector("#heroReviewsPreview");
 const reviewsList = document.querySelector("#reviewsList");
+const reviewsSection = document.querySelector("#resenas");
 const reviewForm = document.querySelector("#reviewForm");
 const formStatus = document.querySelector("#formStatus");
 const commentInput = document.querySelector("#comment");
@@ -65,6 +65,7 @@ let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 let heroGalleryTimer = 0;
 let swRefreshPending = false;
+let reviewsLoaded = false;
 
 function scheduleIdleWork(callback, timeout = 900) {
   if (typeof callback !== "function") return;
@@ -873,7 +874,8 @@ function setupIntroScreen() {
   }
 
   Promise.resolve()
-    .then(() =>
+    .then(() => import("./intro-experience.js"))
+    .then(({ initIntroExperience }) =>
       initIntroExperience({
         introScreen,
         introSkipBtn,
@@ -888,6 +890,33 @@ function setupIntroScreen() {
         window.setTimeout(() => introScreen.remove(), 700);
       }, 1200);
     });
+}
+
+function setupDeferredReviews() {
+  if (!reviewsSection || reviewsLoaded) return;
+
+  const hydrateReviews = () => {
+    if (reviewsLoaded) return;
+    reviewsLoaded = true;
+    void loadReviews();
+  };
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        hydrateReviews();
+      },
+      { rootMargin: "0px 0px 320px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(reviewsSection);
+    scheduleIdleWork(hydrateReviews, 2400);
+    return;
+  }
+
+  scheduleIdleWork(hydrateReviews, 1600);
 }
 
 function setupVisitCounter() {
@@ -1561,9 +1590,7 @@ setupMenuDestacadoButton();
 scheduleIdleWork(() => {
   setupHeroGalleryCarousel();
 }, 900);
-scheduleIdleWork(() => {
-  loadReviews();
-}, 450);
+setupDeferredReviews();
 
 
 
