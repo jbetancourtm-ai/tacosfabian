@@ -294,172 +294,226 @@ function buildSpeechQueue() {
   };
 }
 
-function createIntroShatterTimeline(introScreen, reducedMotion) {
+function readStoredFlag(key) {
+  try {
+    return window.localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeStoredFlag(key, value) {
+  try {
+    window.localStorage.setItem(key, value ? "1" : "0");
+  } catch {
+    // Ignore storage write failures.
+  }
+}
+
+function getIntroRevealTargets() {
+  return [
+    document.querySelector(".site-header"),
+    document.querySelector("main"),
+    document.querySelector(".site-footer"),
+    document.querySelector(".social-floating-links"),
+    document.querySelector(".floating-fabian-host"),
+    document.querySelector(".floating-whatsapp"),
+  ].filter(Boolean);
+}
+
+function createIntroCubeTransition({ introScreen, reducedMotion, lowEndDevice, skipPremium }) {
   if (!(introScreen instanceof HTMLElement)) return null;
 
-  const overlay = document.createElement("div");
-  overlay.className = "intro-screen__shatter-overlay";
-  overlay.setAttribute("aria-hidden", "true");
+  const pageTargets = getIntroRevealTargets();
+  const body = document.body;
 
-  const flash = document.createElement("span");
-  flash.className = "intro-screen__shatter-flash";
-  overlay.appendChild(flash);
+  if (reducedMotion || skipPremium || lowEndDevice || pageTargets.length === 0) {
+    body.classList.add("intro-transitioning-quick");
+    gsap.set(pageTargets, {
+      opacity: 0,
+      y: 24,
+      scale: 0.985,
+      filter: "blur(10px)",
+      willChange: "transform, opacity, filter",
+    });
 
-  const ring = document.createElement("span");
-  ring.className = "intro-screen__impact-ring";
-  overlay.appendChild(ring);
+    const timeline = gsap.timeline({ defaults: { overwrite: true } });
+    timeline
+      .to(
+        introScreen,
+        {
+          opacity: 0,
+          y: -10,
+          scale: 0.985,
+          duration: reducedMotion ? 0.18 : 0.24,
+          ease: "power2.inOut",
+        },
+        0
+      )
+      .to(
+        pageTargets,
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: reducedMotion ? 0.18 : 0.32,
+          ease: "power2.out",
+          stagger: 0.03,
+          clearProps: "willChange",
+        },
+        reducedMotion ? 0 : 0.08
+      );
 
-  const crackPolygons = [
-    "polygon(0 0, 48% 0, 42% 32%, 0 38%)",
-    "polygon(48% 0, 100% 0, 100% 32%, 58% 36%, 42% 32%)",
-    "polygon(0 38%, 42% 32%, 36% 58%, 0 100%)",
-    "polygon(42% 32%, 58% 36%, 64% 58%, 36% 58%)",
-    "polygon(58% 36%, 100% 32%, 100% 100%, 64% 58%)",
-  ];
-
-  const shardConfigs = [
-    { x: -220, y: -160, rotate: -18, scale: 0.9, duration: 0.46, delay: 0.02 },
-    { x: 250, y: -190, rotate: 22, scale: 0.86, duration: 0.48, delay: 0.04 },
-    { x: -240, y: 210, rotate: -26, scale: 0.88, duration: 0.52, delay: 0.06 },
-    { x: 0, y: 250, rotate: 12, scale: 0.82, duration: 0.56, delay: 0.08 },
-    { x: 250, y: 180, rotate: 28, scale: 0.84, duration: 0.54, delay: 0.1 },
-  ];
-
-  crackPolygons.forEach((polygon, index) => {
-    const shard = document.createElement("span");
-    shard.className = "intro-screen__shard";
-    shard.style.clipPath = polygon;
-    shard.style.webkitClipPath = polygon;
-    shard.style.setProperty("--shard-delay", `${index * 26}ms`);
-    overlay.appendChild(shard);
-  });
-
-  const crackPaths = [
-    "polygon(49% 8%, 51% 8%, 53% 32%, 51% 50%, 54% 70%, 51% 92%, 49% 92%, 46% 70%, 49% 50%, 47% 32%)",
-    "polygon(15% 48%, 15.8% 46%, 48% 49%, 72% 38%, 92% 31%, 92.8% 33%, 73% 41%, 49% 51%, 16% 49.8%)",
-    "polygon(19% 20%, 21% 18%, 49% 46%, 77% 71%, 75% 73%, 48% 48%)",
-  ];
-
-  crackPaths.forEach((polygon, index) => {
-    const crack = document.createElement("span");
-    crack.className = "intro-screen__crack";
-    crack.style.clipPath = polygon;
-    crack.style.webkitClipPath = polygon;
-    crack.style.setProperty("--crack-delay", `${index * 34}ms`);
-    overlay.appendChild(crack);
-  });
-
-  introScreen.appendChild(overlay);
-  introScreen.classList.add("is-shattering");
-
-  if (reducedMotion) {
-    gsap.set(overlay, { opacity: 0 });
     return {
-      durationMs: 160,
+      durationMs: reducedMotion ? 180 : 300,
       cleanup() {
-        overlay.remove();
+        timeline.kill();
+        body.classList.remove("intro-transitioning-quick");
+        gsap.set(pageTargets, { clearProps: "opacity,transform,filter,willChange" });
       },
     };
   }
 
-  const shards = Array.from(overlay.querySelectorAll(".intro-screen__shard"));
-  const cracks = Array.from(overlay.querySelectorAll(".intro-screen__crack"));
-  const render = introScreen.querySelector(".intro-screen__render");
-  const ui = introScreen.querySelector(".intro-screen__ui");
+  body.classList.add("intro-transitioning-3d");
+  introScreen.classList.add("is-cube-transition");
 
-  gsap.set(overlay, { opacity: 1 });
-  gsap.set(flash, { scale: 0.2, opacity: 0 });
-  gsap.set(ring, { scale: 0.3, opacity: 0 });
-  gsap.set(cracks, { opacity: 0, scale: 0.9 });
-  gsap.set(shards, { x: 0, y: 0, rotate: 0, scale: 1, opacity: 0.96, transformOrigin: "50% 50%" });
+  const introRender = introScreen.querySelector(".intro-screen__render");
+  const introUi = introScreen.querySelector(".intro-screen__ui");
+  const introLayers = [introScreen, introRender, introUi].filter(Boolean);
+  const pagePanel = document.createElement("div");
+  pagePanel.className = "intro-page-panel";
+  pagePanel.setAttribute("aria-hidden", "true");
+  body.appendChild(pagePanel);
+
+  const sheen = document.createElement("span");
+  sheen.className = "intro-cube-sheen";
+  pagePanel.appendChild(sheen);
+
+  gsap.set(introScreen, {
+    transformOrigin: "left center",
+    transformPerspective: 1800,
+    rotationY: 0,
+    z: 0,
+    xPercent: 0,
+    scale: 1,
+    opacity: 1,
+    boxShadow: "0 0 0 rgba(0,0,0,0)",
+    willChange: "transform, opacity, filter",
+  });
+  gsap.set([introRender, introUi].filter(Boolean), {
+    transformOrigin: "center center",
+    willChange: "transform, opacity, filter",
+  });
+  gsap.set(pagePanel, {
+    transformOrigin: "right center",
+    transformPerspective: 1800,
+    rotationY: 88,
+    xPercent: -50,
+    z: -140,
+    opacity: 0.82,
+    willChange: "transform, opacity, filter",
+  });
+  gsap.set(sheen, {
+    opacity: 0,
+    xPercent: -28,
+    willChange: "transform, opacity",
+  });
+  gsap.set(pageTargets, {
+    opacity: 0,
+    rotationY: 88,
+    xPercent: -4,
+    z: -140,
+    scale: 1.04,
+    filter: "blur(9px) brightness(1.08)",
+    transformOrigin: "right center",
+    transformPerspective: 1800,
+    willChange: "transform, opacity, filter",
+  });
 
   const timeline = gsap.timeline({ defaults: { overwrite: true } });
-
   timeline
     .to(
-      cracks,
+      introLayers,
+      {
+        rotateY: -91,
+        xPercent: 12,
+        z: -170,
+        opacity: 0.12,
+        scale: 0.985,
+        filter: "brightness(1.12) blur(4px)",
+        duration: 0.98,
+        ease: "power2.inOut",
+        stagger: 0.015,
+      },
+      0
+    )
+    .to(
+      introScreen,
+      {
+        boxShadow: "0 40px 90px rgba(0,0,0,0.34)",
+        duration: 0.36,
+        ease: "power2.out",
+      },
+      0
+    )
+    .to(
+      pagePanel,
+      {
+        rotationY: 0,
+        xPercent: 0,
+        z: 0,
+        opacity: 1,
+        duration: 0.98,
+        ease: "power2.inOut",
+      },
+      0
+    )
+    .to(
+      pageTargets,
       {
         opacity: 1,
+        rotationY: 0,
+        xPercent: 0,
+        z: 0,
         scale: 1,
-        duration: 0.09,
-        stagger: 0.02,
-        ease: "power2.out",
+        filter: "blur(0px) brightness(1)",
+        duration: 0.9,
+        ease: "power2.inOut",
+        stagger: 0.025,
       },
-      0
+      0.08
     )
     .to(
-      flash,
+      sheen,
       {
-        opacity: 1,
-        scale: 1.18,
-        duration: 0.12,
-        ease: "power2.out",
-        yoyo: true,
-        repeat: 1,
-      },
-      0
-    )
-    .to(
-      ring,
-      {
-        opacity: 0.9,
-        scale: 1.08,
-        duration: 0.24,
-        ease: "power3.out",
-      },
-      0.02
-    )
-    .to(
-      [render, ui].filter(Boolean),
-      {
-        scale: 1.03,
-        filter: "brightness(1.18) blur(1.6px)",
-        duration: 0.15,
-        ease: "power2.out",
-      },
-      0
-    )
-    .to(
-      shards,
-      {
-        x: (index) => shardConfigs[index]?.x || 0,
-        y: (index) => shardConfigs[index]?.y || 0,
-        rotate: (index) => shardConfigs[index]?.rotate || 0,
-        scale: (index) => shardConfigs[index]?.scale || 0.85,
-        opacity: 0,
-        duration: (index) => shardConfigs[index]?.duration || 0.5,
-        delay: (index) => shardConfigs[index]?.delay || 0,
-        ease: "power4.in",
-      },
-      0.1
-    )
-    .to(
-      [render, ui].filter(Boolean),
-      {
-        scale: 1.08,
-        opacity: 0.16,
-        filter: "brightness(1.22) blur(8px)",
-        duration: 0.46,
-        ease: "power3.in",
+        opacity: 0.72,
+        xPercent: 112,
+        duration: 0.54,
+        ease: "power2.inOut",
       },
       0.16
     )
     .to(
-      overlay,
+      sheen,
       {
         opacity: 0,
-        duration: 0.22,
-        ease: "power1.out",
+        duration: 0.2,
+        ease: "sine.out",
       },
-      0.46
+      0.62
     );
 
   return {
-    durationMs: 760,
+    durationMs: 980,
     cleanup() {
       timeline.kill();
-      overlay.remove();
-      introScreen.classList.remove("is-shattering");
+      pagePanel.remove();
+      introScreen.classList.remove("is-cube-transition");
+      body.classList.remove("intro-transitioning-3d");
+      gsap.set(introLayers, { clearProps: "transform,opacity,filter,willChange,boxShadow" });
+      gsap.set(pageTargets, { clearProps: "transform,opacity,filter,willChange" });
+      gsap.set(sheen, { clearProps: "transform,opacity,willChange" });
     },
   };
 }
@@ -479,6 +533,8 @@ export async function initIntroExperience({
     window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lowEndDevice = isLowEndDevice();
+  const introTransitionSeenKey = "tacos_fabian_intro_cube_seen";
+  const skipPremiumIntroTransition = readStoredFlag(introTransitionSeenKey);
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 500 : 15000;
   const introOutroBufferMs = isStandaloneMode ? 1200 : 850;
@@ -544,7 +600,7 @@ export async function initIntroExperience({
   let ambientEnabled = false;
   let autoplayRetryTimer = 0;
   let autoplayRetryCount = 0;
-  const exitDurationMs = reducedMotion ? 160 : 760;
+  const exitDurationMs = reducedMotion ? 180 : skipPremiumIntroTransition || lowEndDevice ? 300 : 980;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
   let viewportRepairTimer = 0;
@@ -1242,10 +1298,19 @@ export async function initIntroExperience({
     }, 360);
     removeIntroAudioUnlockListeners();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
-    const shatterTransition = createIntroShatterTimeline(introScreen, reducedMotion);
+    const cubeTransition = createIntroCubeTransition({
+      introScreen,
+      reducedMotion,
+      lowEndDevice,
+      skipPremium: skipPremiumIntroTransition,
+    });
     introScreen.setAttribute("aria-hidden", "true");
     document.body.classList.remove("intro-active");
+    document.body.classList.add("intro-transition-static");
     document.body.classList.add("intro-complete");
+    if (!skipPremiumIntroTransition && !reducedMotion && !lowEndDevice) {
+      writeStoredFlag(introTransitionSeenKey, true);
+    }
 
     timeline.kill();
     window.cancelAnimationFrame(rafId);
@@ -1262,11 +1327,11 @@ export async function initIntroExperience({
     emberGeometry.dispose();
 
     window.setTimeout(() => {
-      shatterTransition?.cleanup?.();
+      cubeTransition?.cleanup?.();
       introScreen.classList.add("is-hidden");
       introScreen.remove();
       if (introSkipBtn instanceof HTMLElement) introSkipBtn.blur();
-    }, shatterTransition?.durationMs ?? exitDurationMs);
+    }, cubeTransition?.durationMs ?? exitDurationMs);
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
