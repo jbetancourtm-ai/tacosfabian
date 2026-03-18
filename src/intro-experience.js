@@ -294,6 +294,176 @@ function buildSpeechQueue() {
   };
 }
 
+function createIntroShatterTimeline(introScreen, reducedMotion) {
+  if (!(introScreen instanceof HTMLElement)) return null;
+
+  const overlay = document.createElement("div");
+  overlay.className = "intro-screen__shatter-overlay";
+  overlay.setAttribute("aria-hidden", "true");
+
+  const flash = document.createElement("span");
+  flash.className = "intro-screen__shatter-flash";
+  overlay.appendChild(flash);
+
+  const ring = document.createElement("span");
+  ring.className = "intro-screen__impact-ring";
+  overlay.appendChild(ring);
+
+  const crackPolygons = [
+    "polygon(0 0, 48% 0, 42% 32%, 0 38%)",
+    "polygon(48% 0, 100% 0, 100% 32%, 58% 36%, 42% 32%)",
+    "polygon(0 38%, 42% 32%, 36% 58%, 0 100%)",
+    "polygon(42% 32%, 58% 36%, 64% 58%, 36% 58%)",
+    "polygon(58% 36%, 100% 32%, 100% 100%, 64% 58%)",
+  ];
+
+  const shardConfigs = [
+    { x: -220, y: -160, rotate: -18, scale: 0.9, duration: 0.46, delay: 0.02 },
+    { x: 250, y: -190, rotate: 22, scale: 0.86, duration: 0.48, delay: 0.04 },
+    { x: -240, y: 210, rotate: -26, scale: 0.88, duration: 0.52, delay: 0.06 },
+    { x: 0, y: 250, rotate: 12, scale: 0.82, duration: 0.56, delay: 0.08 },
+    { x: 250, y: 180, rotate: 28, scale: 0.84, duration: 0.54, delay: 0.1 },
+  ];
+
+  crackPolygons.forEach((polygon, index) => {
+    const shard = document.createElement("span");
+    shard.className = "intro-screen__shard";
+    shard.style.clipPath = polygon;
+    shard.style.webkitClipPath = polygon;
+    shard.style.setProperty("--shard-delay", `${index * 26}ms`);
+    overlay.appendChild(shard);
+  });
+
+  const crackPaths = [
+    "polygon(49% 8%, 51% 8%, 53% 32%, 51% 50%, 54% 70%, 51% 92%, 49% 92%, 46% 70%, 49% 50%, 47% 32%)",
+    "polygon(15% 48%, 15.8% 46%, 48% 49%, 72% 38%, 92% 31%, 92.8% 33%, 73% 41%, 49% 51%, 16% 49.8%)",
+    "polygon(19% 20%, 21% 18%, 49% 46%, 77% 71%, 75% 73%, 48% 48%)",
+  ];
+
+  crackPaths.forEach((polygon, index) => {
+    const crack = document.createElement("span");
+    crack.className = "intro-screen__crack";
+    crack.style.clipPath = polygon;
+    crack.style.webkitClipPath = polygon;
+    crack.style.setProperty("--crack-delay", `${index * 34}ms`);
+    overlay.appendChild(crack);
+  });
+
+  introScreen.appendChild(overlay);
+  introScreen.classList.add("is-shattering");
+
+  if (reducedMotion) {
+    gsap.set(overlay, { opacity: 0 });
+    return {
+      durationMs: 160,
+      cleanup() {
+        overlay.remove();
+      },
+    };
+  }
+
+  const shards = Array.from(overlay.querySelectorAll(".intro-screen__shard"));
+  const cracks = Array.from(overlay.querySelectorAll(".intro-screen__crack"));
+  const render = introScreen.querySelector(".intro-screen__render");
+  const ui = introScreen.querySelector(".intro-screen__ui");
+
+  gsap.set(overlay, { opacity: 1 });
+  gsap.set(flash, { scale: 0.2, opacity: 0 });
+  gsap.set(ring, { scale: 0.3, opacity: 0 });
+  gsap.set(cracks, { opacity: 0, scale: 0.9 });
+  gsap.set(shards, { x: 0, y: 0, rotate: 0, scale: 1, opacity: 0.96, transformOrigin: "50% 50%" });
+
+  const timeline = gsap.timeline({ defaults: { overwrite: true } });
+
+  timeline
+    .to(
+      cracks,
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.09,
+        stagger: 0.02,
+        ease: "power2.out",
+      },
+      0
+    )
+    .to(
+      flash,
+      {
+        opacity: 1,
+        scale: 1.18,
+        duration: 0.12,
+        ease: "power2.out",
+        yoyo: true,
+        repeat: 1,
+      },
+      0
+    )
+    .to(
+      ring,
+      {
+        opacity: 0.9,
+        scale: 1.08,
+        duration: 0.24,
+        ease: "power3.out",
+      },
+      0.02
+    )
+    .to(
+      [render, ui].filter(Boolean),
+      {
+        scale: 1.03,
+        filter: "brightness(1.18) blur(1.6px)",
+        duration: 0.15,
+        ease: "power2.out",
+      },
+      0
+    )
+    .to(
+      shards,
+      {
+        x: (index) => shardConfigs[index]?.x || 0,
+        y: (index) => shardConfigs[index]?.y || 0,
+        rotate: (index) => shardConfigs[index]?.rotate || 0,
+        scale: (index) => shardConfigs[index]?.scale || 0.85,
+        opacity: 0,
+        duration: (index) => shardConfigs[index]?.duration || 0.5,
+        delay: (index) => shardConfigs[index]?.delay || 0,
+        ease: "power4.in",
+      },
+      0.1
+    )
+    .to(
+      [render, ui].filter(Boolean),
+      {
+        scale: 1.08,
+        opacity: 0.16,
+        filter: "brightness(1.22) blur(8px)",
+        duration: 0.46,
+        ease: "power3.in",
+      },
+      0.16
+    )
+    .to(
+      overlay,
+      {
+        opacity: 0,
+        duration: 0.22,
+        ease: "power1.out",
+      },
+      0.46
+    );
+
+  return {
+    durationMs: 760,
+    cleanup() {
+      timeline.kill();
+      overlay.remove();
+      introScreen.classList.remove("is-shattering");
+    },
+  };
+}
+
 export async function initIntroExperience({
   introScreen,
   introSkipBtn,
@@ -374,7 +544,7 @@ export async function initIntroExperience({
   let ambientEnabled = false;
   let autoplayRetryTimer = 0;
   let autoplayRetryCount = 0;
-  const exitDurationMs = reducedMotion ? 120 : 980;
+  const exitDurationMs = reducedMotion ? 160 : 760;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
   let viewportRepairTimer = 0;
@@ -1072,7 +1242,7 @@ export async function initIntroExperience({
     }, 360);
     removeIntroAudioUnlockListeners();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
-    introScreen.classList.add("is-exiting");
+    const shatterTransition = createIntroShatterTimeline(introScreen, reducedMotion);
     introScreen.setAttribute("aria-hidden", "true");
     document.body.classList.remove("intro-active");
     document.body.classList.add("intro-complete");
@@ -1092,10 +1262,11 @@ export async function initIntroExperience({
     emberGeometry.dispose();
 
     window.setTimeout(() => {
+      shatterTransition?.cleanup?.();
       introScreen.classList.add("is-hidden");
       introScreen.remove();
       if (introSkipBtn instanceof HTMLElement) introSkipBtn.blur();
-    }, exitDurationMs);
+    }, shatterTransition?.durationMs ?? exitDurationMs);
   };
 
   introSkipBtn?.addEventListener("click", finishIntro);
