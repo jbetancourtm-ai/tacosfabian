@@ -7041,6 +7041,494 @@ body::after {
   }
 }
 
+/* CRO landing override */
+body {
+  background:
+    radial-gradient(circle at top, rgba(255, 145, 45, 0.14), transparent 28%),
+    linear-gradient(180deg, #fff7ef 0%, #fff3e6 38%, #ffffff 100%);
+}
+
+.social-floating-links,
+.floating-fabian-host,
+#historia,
+#resenas,
+#referencias,
+#especialidad.section-featured {
+  display: none !important;
+}
+
+.site-header {
+  border-bottom: 1px solid rgba(222, 176, 132, 0.42);
+  background: rgba(255, 248, 241, 0.88);
+}
+
+.header-inner {
+  gap: 0.85rem;
+  padding: 0.72rem 0 0.9rem;
+}
+
+.header-cta-group {
+  gap: 0.58rem;
+}
+
+.header-cta-group .btn-whatsapp {
+  width: auto;
+  min-height: 3rem;
+  padding-inline: 1.2rem;
+  border-color: rgba(255, 166, 113, 0.55);
+  box-shadow: 0 16px 30px rgba(255, 106, 0, 0.16);
+}
+
+.hero-actions--header {
+  margin-left: auto;
+}
+
+.hero-actions--header .btn:not(.btn-install-app):not(.btn-exit-app) {
+  min-height: 3rem;
+}
+
+.hero {
+  min-height: min(100vh, 920px);
+  padding: clamp(6.8rem, 9vw, 8.4rem) 0 2.6rem;
+}
+
+.hero-premium {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(110deg, rgba(20, 11, 6, 0.82) 0%, rgba(20, 11, 6, 0.54) 40%, rgba(20, 11, 6, 0.14) 76%),
+    radial-gradient(circle at 72% 28%, rgba(255, 169, 90, 0.32), transparent 24%);
+  z-index: 0;
+}
+
+.hero-grid--premium {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+  align-items: center;
+  gap: clamp(1.4rem, 3vw, 2.8rem);
+}
+
+.hero-content--premium {
+  max-width: 34rem;
+  gap: 1rem;
+}
+
+.hero-kicker {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 211, 177, 0.3);
+  color: #fff3e7;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-content--premium h1 {
+  color: #fff9f4;
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  line-height: 0.94;
+  max-width: 7ch;
+  text-wrap: balance;
+}
+
+.hero-lead {
+  max-width: 22ch;
+  color: rgba(255, 243, 233, 0.92);
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.2;
+}
+
+.hero-primary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.btn-whatsapp--hero,
+.hero-primary-actions__menu {
+  min-height: 3.45rem;
+  padding-inline: 1.4rem;
+}
+
+.btn-whatsapp--hero {
+  min-width: min(100%, 18rem);
+}
+
+.hero-proof--premium,
+.hero-app-badges {
+  gap: 0.65rem;
+}
+
+.hero-proof-pill,
+.hero-app-badge {
+  min-height: 2.5rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.hero-proof-pill {
+  background: rgba(255, 247, 240, 0.92);
+  color: #7a3412;
+}
+
+.hero-proof-pill--soft,
+.hero-app-badge {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 218, 194, 0.3);
+  color: #fff6f0;
+}
+
+.hero-side-stack--premium {
+  gap: 0.75rem;
+}
+
+.menu-carousel--hero {
+  border-radius: 2rem;
+  overflow: hidden;
+  background: rgba(26, 14, 9, 0.8);
+  border: 1px solid rgba(255, 212, 173, 0.24);
+  box-shadow: 0 26px 70px rgba(44, 22, 10, 0.3);
+}
+
+.menu-carousel--hero .carousel-slide {
+  min-height: 28rem;
+}
+
+.menu-carousel--hero .slide-visual {
+  min-height: 18rem;
+}
+
+.menu-carousel--hero .slide-copy {
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+.menu-carousel--hero .slide-copy p {
+  max-width: 24ch;
+}
+
+.section-specialties,
+.menu-showcase-section,
+.location-section-premium,
+.final-cta-section {
+  padding-block: clamp(3rem, 7vw, 5rem);
+}
+
+.section-head,
+.section-head--premium {
+  align-items: flex-start;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.section-head h2,
+.section-head--premium h2 {
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 0.98;
+}
+
+.section-head p:last-child,
+.section-head--premium p:last-child {
+  max-width: 28ch;
+  font-size: 1rem;
+  color: #6f6258;
+}
+
+.featured-products {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.featured-product {
+  overflow: hidden;
+  border-radius: 1.6rem;
+  border: 1px solid rgba(235, 203, 175, 0.8);
+  box-shadow: 0 16px 34px rgba(110, 65, 30, 0.08);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.featured-product > img {
+  width: 100%;
+  aspect-ratio: 1 / 0.9;
+  object-fit: cover;
+}
+
+.featured-product__copy {
+  padding: 1rem 1rem 1.15rem;
+}
+
+.featured-product__copy p {
+  font-size: 0.96rem;
+  line-height: 1.35;
+  color: #6f6258;
+}
+
+.featured-product__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.featured-product__meta a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff6a00, #ff8f46);
+  color: #fff;
+  font-weight: 800;
+}
+
+.cards.two-col.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.menu-item {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(237, 205, 176, 0.86);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 14px 30px rgba(113, 72, 40, 0.08);
+}
+
+.menu-item-media {
+  border-radius: 1.2rem;
+  overflow: hidden;
+  min-height: 12rem;
+}
+
+.menu-item-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-item-note {
+  font-size: 0.95rem;
+}
+
+.menu-item-price {
+  margin-top: -0.15rem;
+  font-size: 1.4rem;
+  color: #a64000;
+}
+
+.menu-item-cta {
+  display: none;
+}
+
+.menu-item .price-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-item .price-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.72rem 0.82rem;
+  border-radius: 0.95rem;
+  background: #fff7f0;
+  border: 1px solid rgba(244, 214, 186, 0.86);
+}
+
+.location-grid {
+  grid-template-columns: minmax(0, 0.95fr) minmax(280px, 1.05fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.location-copy,
+.map-wrap {
+  border-radius: 1.6rem;
+  border: 1px solid rgba(237, 205, 176, 0.86);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 34px rgba(113, 72, 40, 0.08);
+}
+
+.location-copy {
+  padding: 1.3rem;
+}
+
+.location-copy .section-head {
+  margin-bottom: 1rem;
+}
+
+.location-copy .section-head p:last-child {
+  max-width: none;
+}
+
+.location-facts {
+  gap: 0.6rem;
+}
+
+.location-facts span {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.62rem 0.8rem;
+  border-radius: 999px;
+  background: #fff5ed;
+  border: 1px solid rgba(241, 210, 182, 0.95);
+  color: #7a4b2b;
+  font-weight: 700;
+}
+
+.location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.location-actions .btn {
+  min-height: 3rem;
+}
+
+.map-wrap {
+  padding: 0.8rem;
+}
+
+.map-wrap iframe {
+  min-height: 100%;
+  border-radius: 1.2rem;
+}
+
+.final-cta-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 1.8rem);
+  border-radius: 1.8rem;
+  background:
+    linear-gradient(135deg, rgba(73, 29, 7, 0.96), rgba(156, 60, 12, 0.92)),
+    linear-gradient(180deg, rgba(255, 140, 53, 0.3), transparent);
+  box-shadow: 0 24px 52px rgba(95, 39, 10, 0.24);
+}
+
+.final-cta-banner h2,
+.final-cta-banner p,
+.final-cta-banner .section-kicker {
+  color: #fff8f2;
+}
+
+.final-cta-banner .btn {
+  min-width: 18rem;
+  min-height: 3.4rem;
+}
+
+.site-footer {
+  padding-block: 2rem 6.5rem;
+  background: #1b120d;
+}
+
+.footer-grid {
+  gap: 1rem;
+}
+
+.floating-whatsapp {
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.3rem;
+  height: 4.3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1fb760, #12a150);
+  box-shadow: 0 18px 38px rgba(16, 122, 60, 0.34);
+}
+
+.floating-whatsapp__icon {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+@media (max-width: 960px) {
+  .hero-grid--premium,
+  .featured-products,
+  .cards.two-col.menu-grid,
+  .location-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: auto;
+    padding-top: 6.6rem;
+  }
+
+  .hero-content--premium {
+    max-width: none;
+  }
+
+  .menu-carousel--hero .carousel-slide {
+    min-height: 24rem;
+  }
+
+  .final-cta-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .final-cta-banner .btn {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 680px) {
+  .header-cta-group {
+    align-items: stretch;
+  }
+
+  .header-cta-group .btn-whatsapp,
+  .hero-actions--header,
+  .hero-actions--header .btn,
+  .hero-primary-actions,
+  .hero-primary-actions .btn {
+    width: 100%;
+  }
+
+  .hero-content--premium h1 {
+    max-width: 8ch;
+  }
+
+  .hero-proof--premium,
+  .hero-app-badges {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .menu-item .price-list li {
+    font-size: 0.95rem;
+  }
+
+  .location-facts span {
+    width: 100%;
+  }
+}
+
 /* Final hero premium visibility fix */
 .hero-content--premium {
   display: grid;

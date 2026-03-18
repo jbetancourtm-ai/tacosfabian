@@ -267,11 +267,10 @@
 
         <nav aria-label="Navegacion principal">
           <ul id="navMenu" class="menu">
-            <li><a href="#especialidad">Especialidad</a></li>
-            <li class="menu-item--desktop-hidden"><a href="#menu">Menú</a></li>
-            <li class="menu-item--desktop-hidden"><a href="#ubicacion">Ubicación</a></li>
-            <li><a href="#resenas">Reseñas</a></li>
-            <li><a href="#referencias">Referencias</a></li>
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#especialidad">Más pedidos</a></li>
+            <li><a href="#menu">Menú</a></li>
+            <li><a href="#ubicacion">Ubicación</a></li>
           </ul>
         </nav>
         <div id="navOverlay" class="nav-overlay" aria-hidden="true"></div>
@@ -293,8 +292,7 @@
           </a>
           <div class="hero-actions hero-actions--header">
             <a class="btn btn-primary" href="#menu">Ver menú</a>
-            <a id="heroMenuDestacadoBtn" class="btn btn-secondary btn-hero-highlight" href="#menuCarousel">Ver Especialidad</a>
-            <a class="btn btn-secondary" href="#ubicacion">Ubicación</a>
+            <a class="btn btn-secondary" href="#ubicacion">Cómo llegar</a>
             <button
               id="installAppBtn"
               class="btn btn-install-app"
@@ -339,17 +337,29 @@
         <div class="hero-premium__glow hero-premium__glow--right" aria-hidden="true"></div>
         <div class="container hero-grid hero-grid--premium">
           <div class="hero-content hero-content--premium">
-            <p class="hero-kicker">Taquería en Texcoco para cenar rico y pedir rápido</p>
+            <p class="hero-kicker">Tacos Fabian · Texcoco</p>
+            <h1>Tacos que sí antojan</h1>
+            <p class="hero-lead">Pide rápido o cáele a Texcoco</p>
             <div class="hero-proof hero-proof--premium" aria-live="polite">
-              <span id="heroProofAvg" class="hero-proof-pill">★ 5.0 sabor recomendado</span>
-              <span id="heroProofCount" class="hero-proof-pill hero-proof-pill--soft">+216 pedidos con antojo resuelto</span>
+              <span class="hero-proof-pill">Tacos al momento</span>
+              <span class="hero-proof-pill hero-proof-pill--soft">Servicio rápido</span>
             </div>
             <div class="hero-app-badges hero-app-badges--premium" aria-label="Datos destacados">
-              <span class="hero-app-badge">Abierto por la noche</span>
-              <span class="hero-app-badge">Pedidos por WhatsApp</span>
-              <span class="hero-app-badge">Especialidad en trozos</span>
+              <span class="hero-app-badge">Texcoco</span>
+              <span class="hero-app-badge">WhatsApp directo</span>
+              <span class="hero-app-badge">Sabor que sí llena</span>
             </div>
-
+            <div class="hero-primary-actions">
+              <a
+                class="btn btn-primary btn-whatsapp--hero"
+                href="https://wa.me/525615496107?text=Hola%20Tacos%20Fabian%2C%20quiero%20hacer%20un%20pedido."
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                Pedir por WhatsApp
+              </a>
+              <a class="btn btn-secondary hero-primary-actions__menu" href="#menu">Ver menú</a>
+            </div>
           </div>
 
           <aside class="hero-side-stack hero-side-stack--premium" aria-label="Productos destacados">
@@ -418,10 +428,9 @@
       <section id="menu" class="section section-soft menu-showcase-section">
         <div class="container">
           <div class="section-head">
-            <p class="section-kicker">Menú destacado</p>
-            <h2>Menu Completo</h2>
-            <p>Tacos Fabian: suadero, pastor y trozos al momento</p>
-            <p>Sabor autentico: <span class="fire-accent" aria-hidden="true">🔥</span></p>
+            <p class="section-kicker">Menú rápido</p>
+            <h2>Precios claros</h2>
+            <p>Elige fácil y pide en segundos.</p>
           </div>
 
           <div class="cards two-col menu-grid">
@@ -431,7 +440,7 @@
                 <img src="/images/tacossuadero.jpg" alt="tacos de suadero en texcoco con cilantro y salsa" loading="lazy" decoding="async" />
               </div>
               <h3>Tacos</h3>
-              <p class="menu-item-note">Pastor, suadero y mas opciones al momento con tortillas calientes.</p>
+              <p class="menu-item-note">Pastor, suadero y campechano.</p>
               <p class="menu-item-price">$16 MXN</p>
               <span class="menu-item-cta" aria-hidden="true">Pedir ahora</span>
               <ul class="price-list">
@@ -459,7 +468,7 @@
                 <img src="/images/trozo.jpg" alt="tostadas y tacos mexicanos en texcoco" loading="lazy" decoding="async" />
               </div>
               <h3>Tostadas</h3>
-              <p class="menu-item-note">Crujientes y llenadoras, servidas con carne dorada y salsas caseras.</p>
+              <p class="menu-item-note">Crujientes, rápidas y llenadoras.</p>
               <p class="menu-item-price">$17 MXN</p>
               <span class="menu-item-cta" aria-hidden="true">Ver detalle</span>
               <ul class="price-list">
@@ -479,7 +488,7 @@
                 <img src="/images/trozo1.jpg" alt="tortas y tacos mexicanos de la casa en texcoco" />
               </div>
               <h3>Tortas</h3>
-              <p class="menu-item-note">Pan doradito, porcion abundante y sabor intenso en cada mordida.</p>
+              <p class="menu-item-note">Bien servidas y directas al antojo.</p>
               <p class="menu-item-price">$68 MXN</p>
               <span class="menu-item-cta" aria-hidden="true">Lo quiero</span>
               <ul class="price-list">
@@ -500,7 +509,7 @@
                 <img src="/images/tacossuadero.jpg" alt="tacos mexicanos y bebidas en texcoco" />
               </div>
               <h3>Bebidas</h3>
-              <p class="menu-item-note">Refrescos y aguas para completar tu pedido sin complicaciones.</p>
+              <p class="menu-item-note">Completa tu pedido.</p>
               <p class="menu-item-price">$30 MXN</p>
               <span class="menu-item-cta" aria-hidden="true">Agregar bebida</span>
               <ul class="price-list">
@@ -511,7 +520,7 @@
               </ul>
             </article>
           </div>
-          <p class="muted small">Precios en MXN. Sujetos a cambio sin previo aviso.</p>
+          <p class="muted small">Precios en MXN.</p>
         </div>
       </section>
 
@@ -555,18 +564,18 @@
       <section class="section section-specialties">
         <div class="container">
           <div class="section-head section-head--premium">
-            <p class="section-kicker">Especialidades</p>
-            <h2>Los pedidos que más salen</h2>
-            <p>Una selección corta para decidir rápido, antojarte más y brincar al WhatsApp sin pensarlo demasiado.</p>
+            <p class="section-kicker">Más pedidos</p>
+            <h2>Elige y pide</h2>
+            <p>Lo que más sale cada noche.</p>
           </div>
 
           <div class="featured-products">
             <article class="card featured-product">
-              <span class="menu-badge badge-top">Más pedido</span>
+              <span class="menu-badge badge-top">🔥 Más pedido</span>
               <img src="/images/trozo.jpg" alt="Orden de trozos dorados especialidad de Tacos Fabian" loading="lazy" decoding="async" />
               <div class="featured-product__copy">
                 <h3>Trozos de la casa</h3>
-                <p>Dorados al punto, con sabor intenso y textura que aguanta perfecto en taco o torta.</p>
+                <p>Dorados y bien servidos.</p>
                 <div class="featured-product__meta">
                   <strong>$80 MXN</strong>
                   <a href="https://wa.me/525615496107?text=Hola%20Tacos%20Fabian%2C%20quiero%20pedir%20trozos%20de%20la%20casa." target="_blank" rel="noreferrer noopener">Pedir por WhatsApp</a>
@@ -574,11 +583,11 @@
               </div>
             </article>
             <article class="card featured-product">
-              <span class="menu-badge badge-house">Especialidad</span>
+              <span class="menu-badge badge-house">🔥 Más pedido</span>
               <img src="/images/tacossuadero.jpg" alt="Tacos de suadero con cilantro y cebolla en Texcoco" loading="lazy" decoding="async" />
               <div class="featured-product__copy">
                 <h3>Tacos de suadero</h3>
-                <p>Jugosos, doraditos y listos para pedir por pieza, con el sabor clásico que nunca falla.</p>
+                <p>Suadero recién hecho.</p>
                 <div class="featured-product__meta">
                   <strong>$16 MXN</strong>
                   <a href="https://wa.me/525615496107?text=Hola%20Tacos%20Fabian%2C%20quiero%20pedir%20tacos%20de%20suadero." target="_blank" rel="noreferrer noopener">Pedir por WhatsApp</a>
@@ -586,11 +595,11 @@
               </div>
             </article>
             <article class="card featured-product">
-              <span class="menu-badge badge-reco">Favorito</span>
+              <span class="menu-badge badge-reco">🔥 Más pedido</span>
               <img src="/images/trozo1.jpg" alt="Torta de carne bien servida en Tacos Fabian" loading="lazy" decoding="async" />
               <div class="featured-product__copy">
                 <h3>Torta bien servida</h3>
-                <p>Para cuando quieres cenar fuerte: pan doradito, carne abundante y mucho más llenadora.</p>
+                <p>Pan doradito y carne abundante.</p>
                 <div class="featured-product__meta">
                   <strong>$68 MXN</strong>
                   <a href="https://wa.me/525615496107?text=Hola%20Tacos%20Fabian%2C%20quiero%20pedir%20una%20torta." target="_blank" rel="noreferrer noopener">Pedir por WhatsApp</a>
@@ -605,15 +614,15 @@
         <div class="container location-grid">
           <div class="location-copy">
             <div class="section-head">
-              <p class="section-kicker">Visítanos</p>
-              <h2>Tu parada de tacos en Texcoco</h2>
-              <p>Ideal para llegar, recoger o sentarte a cenar sin complicarte. Si andas cerca de Colón 216, ya tienes plan.</p>
+              <p class="section-kicker">Ubicación</p>
+              <h2>Estamos en Texcoco</h2>
+              <p>Listos para atenderte.</p>
             </div>
             <p class="address"><span aria-hidden="true">&#128205;</span> Colón 216, CP 56226, Texcoco de Mora, Estado de México, México</p>
             <div class="location-facts">
               <span>Horario: Lun-Sab 5:00 pm a 1:00 am</span>
               <span>WhatsApp: 56 15 49 61 07</span>
-              <span>[TODO: agregar referencia local exacta del negocio]</span>
+              <span>Tacos al momento</span>
             </div>
             <div class="location-actions">
               <a
@@ -630,7 +639,7 @@
                 target="_blank"
                 rel="noreferrer noopener"
               >
-                Confirmar ubicación
+                Pedir por WhatsApp
               </a>
             </div>
           </div>
@@ -798,9 +807,17 @@
           <article class="final-cta-banner">
             <div>
               <p class="section-kicker">Último empujón</p>
-              <h2>Suadero, pastor o trozos: hoy se cena en Tacos Fabian</h2>
-              <p>Pide por WhatsApp en segundos o lánzate al local en Texcoco para comerlos recién hechos.</p>
+              <h2>¿Ya se te antojaron?</h2>
+              <p>Pide ahora por WhatsApp.</p>
             </div>
+            <a
+              class="btn btn-primary"
+              href="https://wa.me/525615496107?text=Hola%20Tacos%20Fabian%2C%20quiero%20hacer%20un%20pedido."
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Pide ahora por WhatsApp
+            </a>
           </article>
         </div>
       </section>
