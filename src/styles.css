@@ -1169,6 +1169,17 @@ body.intro-transitioning-3d .floating-whatsapp {
   box-shadow: none;
 }
 
+.intro-screen__host-image {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition: opacity 0.28s ease;
+}
+
+.intro-screen__host-video.is-ready + .intro-screen__host-image {
+  opacity: 0;
+}
+
 .fabian-intro .intro-screen__host-video {
   background-color: transparent !important;
 }

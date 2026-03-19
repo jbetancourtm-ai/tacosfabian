@@ -536,8 +536,8 @@ export async function initIntroExperience({
   const introTransitionSeenKey = "tacos_fabian_intro_cube_seen";
   const skipPremiumIntroTransition = readStoredFlag(introTransitionSeenKey);
   const steamQuality = inferSteamQuality(reducedMotion);
-  const autoDismissMs = reducedMotion ? 500 : 15000;
-  const introOutroBufferMs = isStandaloneMode ? 1200 : 850;
+  const autoDismissMs = reducedMotion ? 650 : 17000;
+  const introOutroBufferMs = isStandaloneMode ? 1400 : 1100;
   const preferredVisualSrc =
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.preferredVisual || "/images/fabian_transparente_mejor.webm" : "";
   const visualFallbackSrc =
@@ -1211,7 +1211,7 @@ export async function initIntroExperience({
         const fallbackDuration = fallbackAudio.duration;
         if (Number.isFinite(fallbackDuration) && fallbackDuration > 0) {
           const fallbackRemainingMs = Math.max(
-            3200,
+            4600,
             Math.round((fallbackDuration - fallbackAudio.currentTime) * 1000) + introOutroBufferMs + 900
           );
           scheduleFinish(fallbackRemainingMs);
@@ -1222,7 +1222,7 @@ export async function initIntroExperience({
       const hostDuration = hostVideo.duration;
       if (Number.isFinite(hostDuration) && hostDuration > 0) {
         const hostRemainingMs = Math.max(
-          3200,
+          4600,
           Math.round((hostDuration - hostVideo.currentTime) * 1000) + introOutroBufferMs + 900
         );
         scheduleFinish(hostRemainingMs);
@@ -1232,7 +1232,7 @@ export async function initIntroExperience({
 
     const durationSeconds = usingFallbackAudio && fallbackAudio ? fallbackAudio.duration : hostVideo.duration;
     if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
-      const remainingMs = Math.max(1800, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + introOutroBufferMs);
+      const remainingMs = Math.max(3200, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + introOutroBufferMs);
       scheduleFinish(remainingMs);
       return;
     }
