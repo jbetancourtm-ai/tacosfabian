@@ -705,161 +705,189 @@ function setupWhatsappAudio() {
 
 function setupFloatingWhatsapp() {
   if (!floatingWhatsapp) return;
-  floatingWhatsapp.classList.remove("is-hidden");
-  floatingFabianHost?.classList.remove("is-hidden");
+  let initialized = false;
 
-  if (floatingFabianHost) {
-    gsap.set(floatingFabianHost, { x: 0, y: 0, opacity: 1 });
-    floatingFabianHost.classList.remove("has-sprite", "is-walking");
-    if (floatingFabianSprite instanceof HTMLElement) floatingFabianSprite.style.backgroundImage = "";
-  }
+  const activateFloatingExperience = () => {
+    if (initialized) return;
+    initialized = true;
 
-  const floatingFabianFrames = ["/images/fabian.png", "/images/favio.png"];
-  const floatingFabianFigure = floatingFabianHost?.querySelector(".floating-fabian-host__figure");
-  let floatingFabianFrameIndex = 0;
-  let floatingFabianSwapTimer = 0;
+    floatingWhatsapp.classList.remove("is-hidden");
+    floatingFabianHost?.classList.remove("is-hidden");
 
-  floatingFabianFrames.forEach((src) => {
-    const preloadImage = new Image();
-    preloadImage.src = src;
-  });
+    if (floatingFabianHost) {
+      gsap.set(floatingFabianHost, { x: 0, y: 0, opacity: 1 });
+      floatingFabianHost.classList.remove("has-sprite", "is-walking");
+      if (floatingFabianSprite instanceof HTMLElement) floatingFabianSprite.style.backgroundImage = "";
+    }
 
-  const applyFloatingFabianFrame = (index) => {
-    if (!(floatingFabianFigure instanceof HTMLImageElement)) return;
-    const safeIndex = ((index % floatingFabianFrames.length) + floatingFabianFrames.length) % floatingFabianFrames.length;
-    floatingFabianFrameIndex = safeIndex;
-    floatingFabianFigure.removeAttribute("loading");
-    floatingFabianFigure.decoding = "async";
-    floatingFabianFigure.src = floatingFabianFrames[safeIndex];
-    floatingFabianFigure.setAttribute("src", floatingFabianFrames[safeIndex]);
+    const floatingFabianFrames = ["/images/fabian.png", "/images/favio.png"];
+    const floatingFabianFigure = floatingFabianHost?.querySelector(".floating-fabian-host__figure");
+    let floatingFabianFrameIndex = 0;
+    let floatingFabianSwapTimer = 0;
+
+    floatingFabianFrames.forEach((src) => {
+      const preloadImage = new Image();
+      preloadImage.src = src;
+    });
+
+    const applyFloatingFabianFrame = (index) => {
+      if (!(floatingFabianFigure instanceof HTMLImageElement)) return;
+      const safeIndex = ((index % floatingFabianFrames.length) + floatingFabianFrames.length) % floatingFabianFrames.length;
+      floatingFabianFrameIndex = safeIndex;
+      floatingFabianFigure.removeAttribute("loading");
+      floatingFabianFigure.decoding = "async";
+      floatingFabianFigure.src = floatingFabianFrames[safeIndex];
+      floatingFabianFigure.setAttribute("src", floatingFabianFrames[safeIndex]);
+    };
+
+    const scheduleFloatingFabianSwap = () => {
+      if (floatingFabianSwapTimer) window.clearInterval(floatingFabianSwapTimer);
+      floatingFabianSwapTimer = window.setInterval(() => {
+        applyFloatingFabianFrame(floatingFabianFrameIndex + 1);
+      }, 10000);
+    };
+
+    applyFloatingFabianFrame(0);
+    scheduleFloatingFabianSwap();
+
+    let celebrateTimer = 0;
+    let idleTimer = 0;
+
+    const clearFabianState = () => {
+      if (!floatingFabianHost) return;
+      floatingFabianHost.classList.remove("is-celebrating", "is-talking", "is-walking");
+      gsap.killTweensOf(floatingFabianHost);
+      gsap.set(floatingFabianHost, { clearProps: "x,y,scale,rotate" });
+    };
+
+    const playHoverReaction = () => {
+      if (!floatingFabianHost || floatingFabianHost.classList.contains("is-celebrating")) return;
+      window.clearTimeout(celebrateTimer);
+      gsap.killTweensOf(floatingFabianHost);
+      floatingFabianHost.classList.remove("is-celebrating", "is-walking");
+      floatingFabianHost.classList.add("is-talking");
+      gsap.fromTo(
+        floatingFabianHost,
+        { x: 0, y: 0, rotate: 0, scale: 1 },
+        {
+          keyframes: [
+            { y: -7, rotate: -4, duration: 0.16 },
+            { x: -3, y: -10, rotate: 4, duration: 0.14 },
+            { x: 0, y: -4, rotate: -2, duration: 0.14 },
+            { x: 0, y: 0, rotate: 0, scale: 1, duration: 0.16 },
+          ],
+          ease: "power2.out",
+          overwrite: true,
+          onComplete: () => {
+            floatingFabianHost.classList.remove("is-talking");
+          },
+        }
+      );
+    };
+
+    const playIdleReaction = () => {
+      if (!floatingFabianHost || floatingFabianHost.classList.contains("is-celebrating")) return;
+      gsap.killTweensOf(floatingFabianHost);
+      floatingFabianHost.classList.add("is-talking");
+      gsap.fromTo(
+        floatingFabianHost,
+        { x: 0, y: 0, rotate: 0, scale: 1 },
+        {
+          keyframes: [
+            { y: -5, rotate: -2, duration: 0.2 },
+            { x: -5, y: -8, rotate: 3, duration: 0.24 },
+            { x: 0, y: -3, rotate: -1, duration: 0.18 },
+            { x: 0, y: 0, rotate: 0, duration: 0.22 },
+          ],
+          ease: "sine.inOut",
+          overwrite: true,
+          onComplete: () => {
+            floatingFabianHost.classList.remove("is-talking");
+          },
+        }
+      );
+    };
+
+    const scheduleIdleReaction = () => {
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        playIdleReaction();
+        scheduleIdleReaction();
+      }, window.innerWidth >= 900 ? 13000 : 15000);
+    };
+
+    floatingFabianHost?.addEventListener("pointerenter", () => {
+      floatingFabianHost.classList.add("is-hovered");
+    });
+
+    floatingFabianHost?.addEventListener("pointerleave", () => {
+      floatingFabianHost.classList.remove("is-hovered");
+    });
+
+    floatingWhatsapp.addEventListener("pointerenter", playHoverReaction);
+    floatingWhatsapp.addEventListener(
+      "touchstart",
+      () => {
+        playHoverReaction();
+      },
+      { passive: true }
+    );
+
+    floatingWhatsapp.addEventListener("click", () => {
+      if (!floatingFabianHost) return;
+      window.clearTimeout(idleTimer);
+      clearFabianState();
+      window.clearTimeout(celebrateTimer);
+      floatingFabianHost.classList.add("is-celebrating");
+      gsap.fromTo(
+        floatingFabianHost,
+        { x: 0, y: 0, scale: 1, rotate: 0 },
+        {
+          keyframes: [
+            { y: -10, scale: 1.02, rotate: -4, duration: 0.16 },
+            { y: -24, scale: 1.04, rotate: 5, duration: 0.18 },
+            { y: -12, x: 6, scale: 1.03, rotate: -3, duration: 0.18 },
+            { y: -3, x: 0, scale: 1.01, rotate: 2, duration: 0.18 },
+            { x: 0, y: 0, scale: 1, rotate: 0, duration: 0.28 },
+          ],
+          ease: "power2.out",
+          overwrite: true,
+        }
+      );
+      celebrateTimer = window.setTimeout(() => {
+        floatingFabianHost.classList.remove("is-celebrating");
+        scheduleIdleReaction();
+      }, 1020);
+    });
+
+    scheduleIdleReaction();
   };
 
-  const scheduleFloatingFabianSwap = () => {
-    if (floatingFabianSwapTimer) window.clearInterval(floatingFabianSwapTimer);
-    floatingFabianSwapTimer = window.setInterval(() => {
-      applyFloatingFabianFrame(floatingFabianFrameIndex + 1);
-    }, 10000);
-  };
+  const waitForIntroCompletion = () => {
+    floatingWhatsapp.classList.add("is-hidden");
+    floatingFabianHost?.classList.add("is-hidden");
 
-  applyFloatingFabianFrame(0);
-  scheduleFloatingFabianSwap();
+    if (!document.body.classList.contains("intro-active") && !introScreen?.isConnected) {
+      activateFloatingExperience();
+      return;
+    }
 
-  let celebrateTimer = 0;
-  let idleTimer = 0;
-
-  const clearFabianState = () => {
-    if (!floatingFabianHost) return;
-    floatingFabianHost.classList.remove("is-celebrating", "is-talking", "is-walking");
-    gsap.killTweensOf(floatingFabianHost);
-    gsap.set(floatingFabianHost, { clearProps: "x,y,scale,rotate" });
-  };
-
-  const playHoverReaction = () => {
-    if (!floatingFabianHost || floatingFabianHost.classList.contains("is-celebrating")) return;
-    window.clearTimeout(celebrateTimer);
-    gsap.killTweensOf(floatingFabianHost);
-    floatingFabianHost.classList.remove("is-celebrating", "is-walking");
-    floatingFabianHost.classList.add("is-talking");
-    gsap.fromTo(
-      floatingFabianHost,
-      { x: 0, y: 0, rotate: 0, scale: 1 },
-      {
-        keyframes: [
-          { y: -7, rotate: -4, duration: 0.16 },
-          { x: -3, y: -10, rotate: 4, duration: 0.14 },
-          { x: 0, y: -4, rotate: -2, duration: 0.14 },
-          { x: 0, y: 0, rotate: 0, scale: 1, duration: 0.16 },
-        ],
-        ease: "power2.out",
-        overwrite: true,
-        onComplete: () => {
-          floatingFabianHost.classList.remove("is-talking");
-        },
-      }
+    window.addEventListener(
+      "intro:complete",
+      () => {
+        window.requestAnimationFrame(() => activateFloatingExperience());
+      },
+      { once: true }
     );
   };
 
-  const playIdleReaction = () => {
-    if (!floatingFabianHost || floatingFabianHost.classList.contains("is-celebrating")) return;
-    gsap.killTweensOf(floatingFabianHost);
-    floatingFabianHost.classList.add("is-talking");
-    gsap.fromTo(
-      floatingFabianHost,
-      { x: 0, y: 0, rotate: 0, scale: 1 },
-      {
-        keyframes: [
-          { y: -5, rotate: -2, duration: 0.2 },
-          { x: -5, y: -8, rotate: 3, duration: 0.24 },
-          { x: 0, y: -3, rotate: -1, duration: 0.18 },
-          { x: 0, y: 0, rotate: 0, duration: 0.22 },
-        ],
-        ease: "sine.inOut",
-        overwrite: true,
-        onComplete: () => {
-          floatingFabianHost.classList.remove("is-talking");
-        },
-      }
-    );
-  };
-
-  const scheduleIdleReaction = () => {
-    window.clearTimeout(idleTimer);
-    idleTimer = window.setTimeout(() => {
-      playIdleReaction();
-      scheduleIdleReaction();
-    }, window.innerWidth >= 900 ? 13000 : 15000);
-  };
-
-  floatingFabianHost?.addEventListener("pointerenter", () => {
-    floatingFabianHost.classList.add("is-hovered");
-  });
-
-  floatingFabianHost?.addEventListener("pointerleave", () => {
-    floatingFabianHost.classList.remove("is-hovered");
-  });
-
-  floatingWhatsapp.addEventListener("pointerenter", playHoverReaction);
-  floatingWhatsapp.addEventListener(
-    "touchstart",
-    () => {
-      playHoverReaction();
-    },
-    { passive: true }
-  );
-
-  floatingWhatsapp.addEventListener("click", () => {
-    if (!floatingFabianHost) return;
-    window.clearTimeout(idleTimer);
-    clearFabianState();
-    window.clearTimeout(celebrateTimer);
-    floatingFabianHost.classList.add("is-celebrating");
-    gsap.fromTo(
-      floatingFabianHost,
-      { x: 0, y: 0, scale: 1, rotate: 0 },
-      {
-        keyframes: [
-          { y: -10, scale: 1.02, rotate: -4, duration: 0.16 },
-          { y: -24, scale: 1.04, rotate: 5, duration: 0.18 },
-          { y: -12, x: 6, scale: 1.03, rotate: -3, duration: 0.18 },
-          { y: -3, x: 0, scale: 1.01, rotate: 2, duration: 0.18 },
-          { x: 0, y: 0, scale: 1, rotate: 0, duration: 0.28 },
-        ],
-        ease: "power2.out",
-        overwrite: true,
-      }
-    );
-    celebrateTimer = window.setTimeout(() => {
-      floatingFabianHost.classList.remove("is-celebrating");
-      scheduleIdleReaction();
-    }, 1020);
-  });
-
-  scheduleIdleReaction();
+  waitForIntroCompletion();
 }
 
 function setupIntroScreen() {
   if (!introScreen) {
     document.body.classList.remove("intro-active");
+    window.dispatchEvent(new CustomEvent("intro:complete"));
     return;
   }
 
@@ -877,7 +905,10 @@ function setupIntroScreen() {
         introScreen.setAttribute("aria-hidden", "true");
         document.body.classList.remove("intro-active");
         document.body.classList.add("intro-complete");
-        window.setTimeout(() => introScreen.remove(), 700);
+        window.setTimeout(() => {
+          introScreen.remove();
+          window.dispatchEvent(new CustomEvent("intro:complete"));
+        }, 700);
       }, 1200);
     });
 }

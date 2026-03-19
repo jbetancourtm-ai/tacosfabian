@@ -600,6 +600,7 @@ export async function initIntroExperience({
   let ambientEnabled = false;
   let autoplayRetryTimer = 0;
   let autoplayRetryCount = 0;
+  const introStartedAt = performance.now();
   const exitDurationMs = reducedMotion ? 180 : skipPremiumIntroTransition || lowEndDevice ? 300 : 980;
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
@@ -1195,9 +1196,16 @@ export async function initIntroExperience({
     }
   };
 
+  const getTimelineRemainingMs = () => {
+    if (!timeline) return 0;
+    const elapsed = performance.now() - introStartedAt;
+    return Math.max(0, Math.round(timeline.totalDuration() * 1000 - elapsed));
+  };
+
   const scheduleFinish = (delay = autoDismissMs) => {
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
-    autoDismissTimer = window.setTimeout(finishIntro, delay);
+    const safeDelay = Math.max(delay, getTimelineRemainingMs() + (reducedMotion ? 140 : 320));
+    autoDismissTimer = window.setTimeout(finishIntro, safeDelay);
   };
 
   const scheduleFinishFromMedia = () => {
@@ -1312,12 +1320,13 @@ export async function initIntroExperience({
       writeStoredFlag(introTransitionSeenKey, true);
     }
 
-    timeline.kill();
+    timeline?.kill();
     window.cancelAnimationFrame(rafId);
     window.removeEventListener("resize", resize);
     window.removeEventListener("orientationchange", scheduleViewportRepair);
     document.removeEventListener("visibilitychange", handleVisibilityChange);
     window.removeEventListener("pageshow", scheduleViewportRepair);
+    window.removeEventListener("keydown", handleIntroKeydown);
     renderer.dispose();
     smokeGeometry.dispose();
     smokeMaterial.dispose();
@@ -1330,6 +1339,7 @@ export async function initIntroExperience({
       cubeTransition?.cleanup?.();
       introScreen.classList.add("is-hidden");
       introScreen.remove();
+      window.dispatchEvent(new CustomEvent("intro:complete"));
       if (introSkipBtn instanceof HTMLElement) introSkipBtn.blur();
     }, cubeTransition?.durationMs ?? exitDurationMs);
   };
@@ -1378,19 +1388,20 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("ended", () => {
     if (usingFallbackAudio && fallbackAudio && !fallbackAudio.ended) return;
     hostCard?.classList.remove("is-playing");
-    finishIntro();
+    scheduleFinishFromMedia();
   });
   fallbackAudio?.addEventListener("ended", () => {
     if (!usingFallbackAudio) return;
-    finishIntro();
+    scheduleFinishFromMedia();
   });
-  window.addEventListener("keydown", (event) => {
+  const handleIntroKeydown = (event) => {
     if (event.key === "Escape") finishIntro();
-  });
+  };
   const handleVisibilityChange = () => {
     if (document.hidden) return;
     scheduleViewportRepair();
   };
+  window.addEventListener("keydown", handleIntroKeydown);
   window.addEventListener("orientationchange", scheduleViewportRepair);
   document.addEventListener("visibilitychange", handleVisibilityChange);
   window.addEventListener("pageshow", scheduleViewportRepair);
