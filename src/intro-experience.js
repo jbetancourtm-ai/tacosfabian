@@ -1399,8 +1399,13 @@ export async function initIntroExperience({
     .to([spotLeft, spotRight], { intensity: 2.65, duration: 1.05 }, 0)
     .to(signLight, { intensity: 5.8, duration: 1.2 }, 0.12)
     .to(titlePlane.material, { opacity: 0.5, duration: 1.12 }, 0.2)
-    .fromTo(hostCard, { x: -24, y: 28, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: 1.1, ease: "power2.out" }, 0.22)
-    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.28)
+    .fromTo(
+      hostCard,
+      { x: -12, y: 16, opacity: 0 },
+      { x: 0, y: 0, opacity: 1, duration: 0.62, ease: "power3.out" },
+      0.14
+    )
+    .call(() => setNarrationLine(SCRIPT_SEGMENTS[0]), null, 0.2)
     .to(camera.position, { z: 8.45, y: 2.28, duration: 2.9 }, 0.9)
     .to(taqueria.scale, { x: 0.96, y: 0.96, z: 0.96, duration: 2.9 }, 0.9)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[1]), null, 3.2)

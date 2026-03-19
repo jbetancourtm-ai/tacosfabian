@@ -986,16 +986,17 @@ body.intro-transitioning-3d .floating-whatsapp {
   width: var(--intro-fabian-width);
   max-width: calc(100vw - 1.5rem);
   padding: 0;
-  opacity: 0;
-  transform: translateY(22px) scale(0.96);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+  opacity: 1;
+  transform: translateZ(0);
+  transition: none;
+  backface-visibility: hidden;
   z-index: 6;
 }
 
 .fabian-intro {
   width: min(calc(clamp(232px, 20vw, 276px) + 4cm), calc(100vw - 1.5rem));
   max-width: calc(100vw - 1.5rem);
-  transform: translateY(22px) scale(0.96);
+  transform: translateZ(0);
 }
 
 .fabian-intro.is-swapped {
@@ -1009,7 +1010,7 @@ body.intro-transitioning-3d .floating-whatsapp {
 
 .fabian-intro.is-visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateZ(0);
 }
 
 .intro-screen__host-stage {
@@ -1017,6 +1018,7 @@ body.intro-transitioning-3d .floating-whatsapp {
   display: grid;
   place-items: end center;
   min-height: 262px;
+  transform: translateZ(0);
   animation: intro-host-idle 3.2s ease-in-out infinite;
 }
 
