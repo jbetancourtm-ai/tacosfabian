@@ -8282,3 +8282,92 @@ main#contenido {
     transform: translateY(56px);
   }
 }
+
+/* Final mobile safeguard: keep the top action bar fully scrollable */
+@media (max-width: 767px) {
+  .header-cta-group {
+    gap: 0.42rem;
+  }
+
+  .hero-actions--header {
+    order: 2;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    gap: 0.42rem;
+    padding: 0 0 0.18rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 0.2rem;
+  }
+
+  .hero-actions--header::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero-actions--header > * {
+    display: inline-flex !important;
+    flex: 0 0 auto;
+  }
+
+  .hero-actions--header .btn,
+  .hero-actions--header .btn-install-app,
+  .hero-actions--header .btn-exit-app {
+    width: auto;
+    min-width: max-content;
+    min-height: 2.56rem;
+    padding-inline: 0.74rem;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1.1;
+    font-size: clamp(0.72rem, 2.7vw, 0.82rem);
+  }
+
+  #heroMenuDestacadoBtn,
+  #installAppBtn,
+  #exitAppBtn,
+  .btn-install-app__text,
+  .btn-exit-app__text {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+}
+
+/* Final mobile safeguard: keep quick categories horizontal, readable and touch-friendly */
+@media (max-width: 767px) {
+  .quick-category-nav {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    gap: 0.42rem;
+    margin-top: 0.46rem;
+    padding: 0 0 0.18rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 0.2rem;
+    scroll-snap-type: x proximity;
+  }
+
+  .quick-category-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quick-category-nav__pill {
+    flex: 0 0 auto;
+    min-width: max-content;
+    min-height: 2.26rem;
+    padding: 0.58rem 0.84rem;
+    font-size: clamp(0.74rem, 2.6vw, 0.8rem);
+    line-height: 1;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+}
