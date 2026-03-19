@@ -27,9 +27,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Tacos Fabián" />
-    <link rel="preload" as="image" href="/images/tacossuadero.jpg" fetchpriority="high" />
-    <link rel="preload" as="image" href="/images/trozo.jpg" />
-    <link rel="preload" as="image" href="/images/trozo1.jpg" />
     <link rel="canonical" href="https://www.tacosfabiantexcoco.com.mx" />
     <script type="application/ld+json">
       {
@@ -281,6 +278,8 @@
             <li><a href="#especialidad">Especialidad</a></li>
             <li class="menu-item--desktop-hidden"><a href="#menu">Menú</a></li>
             <li class="menu-item--desktop-hidden"><a href="#ubicacion">Ubicación</a></li>
+            <li><a href="#resenas">Reseñas</a></li>
+            <li><a href="#referencias">Referencias</a></li>
           </ul>
         </nav>
         <div id="navOverlay" class="nav-overlay" aria-hidden="true"></div>
@@ -371,7 +370,7 @@
                   </article>
                   <article class="carousel-slide" aria-label="Trozos destacados">
                     <div class="slide-visual slide-visual--photo">
-                      <img src="/images/trozo.jpg" alt="Trozos de carne especialidad de Tacos Fabian" loading="eager" decoding="async" fetchpriority="high" />
+                      <img src="/images/trozo.jpg" alt="Trozos de carne especialidad de Tacos Fabian" loading="lazy" decoding="async" />
                     </div>
                     <div class="slide-copy">
                       <span class="slide-copy__badge">Especialidad</span>
@@ -382,7 +381,7 @@
                   </article>
                   <article class="carousel-slide" aria-label="Tortas destacadas">
                     <div class="slide-visual slide-visual--photo">
-                      <img src="/images/trozo1.jpg" alt="Tortas y tacos de la casa en Texcoco" loading="eager" decoding="async" fetchpriority="high" />
+                      <img src="/images/trozo1.jpg" alt="Tortas y tacos de la casa en Texcoco" loading="lazy" decoding="async" />
                     </div>
                     <div class="slide-copy">
                       <span class="slide-copy__badge">Favorito</span>
@@ -642,6 +641,128 @@
         </div>
       </section>
 
+      <section id="historia" class="section story-section section-soft">
+        <div class="container story-grid">
+          <div class="story-copy">
+            <p class="section-kicker">La tradición que se sirve en cada taco</p>
+            <h2>Una taquería que se siente real desde el primer bocado</h2>
+            <p>
+              Tacos Fabian no necesita disfrazarse de cadena ni de concepto de moda. Su fuerza está en el sabor directo, en la atención rápida y en el antojo que resuelve cuando cae la noche en Texcoco.
+            </p>
+            <p>Una taquería con más de 40 años de servicio y una calidad única en Texcoco, reconocida por su sabor constante y por atender con la misma seriedad a clientes de siempre y a quien llega por primera vez.</p>
+            <div class="story-points">
+              <span>Especialidad en trozos y suadero</span>
+              <span>Servicio para comer, recoger o pedir</span>
+              <span>Ubicación fácil de ubicar en Texcoco</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="resenas" class="section section-soft reviews-section">
+        <div class="container">
+          <div class="reviews-head">
+            <div class="section-head">
+              <p class="section-kicker">Prueba social</p>
+              <h2>Comentarios que ayudan a confiar y pedir</h2>
+              <p id="reviewsAverage" class="reviews-average muted" aria-live="polite">
+                Promedio: --/5
+              </p>
+              <div class="reviews-metrics" aria-live="polite">
+                <span id="reviewsAverageBadge" class="metric-pill">⭐ -- promedio</span>
+                <span id="reviewsSatisfied" class="metric-pill metric-pill--soft">+0 clientes satisfechos</span>
+              </div>
+            </div>
+            <div class="reviews-head__actions">
+              <a class="btn btn-secondary" href="/admin">Ver panel admin</a>
+              <span class="reviews-head__note">[TODO: reemplazar con reseñas reales de Google o Facebook destacadas.]</span>
+            </div>
+          </div>
+
+          <div id="reviewsStatus" class="muted" aria-live="polite">Cargando reseñas...</div>
+          <ul id="reviewsList" class="reviews-list" aria-label="Lista de reseñas"></ul>
+
+          <div class="review-trust" aria-hidden="true">
+            <span class="review-trust__dot"></span>
+            Opiniones verificadas de clientes
+          </div>
+
+          <article class="card review-form-wrap">
+            <h3>Agrega tu reseña</h3>
+            <form id="reviewForm" class="review-form" novalidate>
+              <label for="name">Nombre</label>
+              <input id="name" name="name" type="text" maxlength="60" required />
+
+              <label for="stars">Estrellas</label>
+              <select id="stars" name="stars" required>
+                <option value="">Selecciona</option>
+                <option value="5">5 - Excelente</option>
+                <option value="4">4 - Muy bueno</option>
+                <option value="3">3 - Bueno</option>
+                <option value="2">2 - Regular</option>
+                <option value="1">1 - Malo</option>
+              </select>
+
+              <label for="comment">Comentario</label>
+              <textarea id="comment" name="comment" rows="4" maxlength="300" required></textarea>
+              <p id="commentCounter" class="counter" aria-live="polite">0 / 300</p>
+
+              <button class="btn btn-primary" type="submit">Enviar reseña</button>
+              <p id="formStatus" class="muted" aria-live="polite"></p>
+            </form>
+          </article>
+
+        </div>
+      </section>
+
+      <section id="referencias" class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-kicker">Marca y confianza</p>
+            <h2>Canales reales para conocer mejor el negocio</h2>
+            <p>Contenido, redes y señales de negocio real para reforzar confianza antes de pedir o visitar.</p>
+          </div>
+
+          <div class="references-grid">
+            <article class="card reference-video">
+              <h3>Video del negocio</h3>
+              <div class="video-wrap">
+                <iframe
+                  src="https://www.youtube.com/embed/ABv9nlmAgU0"
+                  title="Video de referencia sobre Tacos Fabian"
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                ></iframe>
+              </div>
+              <p class="muted small">
+                Referencia en YouTube:
+                <a href="https://www.youtube.com/watch?v=ABv9nlmAgU0" target="_blank" rel="noreferrer noopener">ver video</a>
+              </p>
+            </article>
+
+            <article class="card reference-links">
+              <h3>Redes y menciones</h3>
+              <ul class="reference-list">
+                <li>
+                  <strong>Facebook oficial:</strong>
+                  <a href="https://www.facebook.com/elmejorsuaderodemexico/?locale=es_LA" target="_blank" rel="noreferrer noopener">
+                    El Mejor Suadero de Mexico
+                  </a>
+                </li>
+                <li>
+                  <strong>YouTube:</strong>
+                  <a href="https://www.youtube.com/watch?v=ABv9nlmAgU0" target="_blank" rel="noreferrer noopener">
+                    Video del negocio
+                  </a>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <footer class="site-footer">
@@ -649,6 +770,8 @@
         <div>
           <h3>Tacos Fabian</h3>
           <p class="muted">Horario: Lun-Sab 5:00 pm - 1:00 am</p>
+          <p class="footer-visit-label">Visitantes del sitio</p>
+          <p id="visitCounter" class="footer-visit" aria-live="polite">000000</p>
         </div>
         <div>
           <h4>Contacto</h4>
@@ -680,9 +803,104 @@
               Facebook oficial
             </a>
           </p>
+          <p class="muted">
+            <a
+              href="https://www.youtube.com/watch?v=ABv9nlmAgU0"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Video del negocio
+            </a>
+          </p>
         </div>
       </div>
     </footer>
+
+    <div class="social-floating-links" aria-label="Redes sociales">
+      <button
+        id="ambientAudioToggle"
+        class="ambient-audio-toggle"
+        type="button"
+        aria-pressed="false"
+        aria-label="Activar ambiente"
+        title="Activar ambiente"
+      >
+        <span class="ambient-audio-toggle__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M10 7.5 7.8 9.7H5.5a1 1 0 0 0-1 1v2.6a1 1 0 0 0 1 1h2.3L10 16.5a1 1 0 0 0 1.7-.7V8.2A1 1 0 0 0 10 7.5Z"></path>
+            <path d="M15.2 9.1a4.2 4.2 0 0 1 0 5.8"></path>
+            <path d="M17.6 6.8a7.4 7.4 0 0 1 0 10.4"></path>
+          </svg>
+        </span>
+        <span class="ambient-audio-toggle__text">Activar ambiente</span>
+      </button>
+      <a
+        href="https://www.facebook.com/elmejorsuaderodemexico/?locale=es_LA"
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label="Facebook de Tacos Fabian"
+      >
+        <span class="inline-icon inline-icon--facebook" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.51 1.5-3.9 3.8-3.9 1.1 0 2.25.2 2.25.2v2.48h-1.27c-1.26 0-1.65.78-1.65 1.58V12h2.81l-.45 2.89h-2.36v6.99A10 10 0 0 0 22 12z"></path>
+          </svg>
+        </span>
+      </a>
+      <a
+        href="https://www.youtube.com/watch?v=ABv9nlmAgU0"
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label="YouTube de Tacos Fabian"
+      >
+        <span class="inline-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M23 8.3a3 3 0 0 0-2.1-2.12C19 5.67 12 5.67 12 5.67s-7 0-8.9.5A3 3 0 0 0 1 8.3 31.4 31.4 0 0 0 .5 12a31.4 31.4 0 0 0 .5 3.7 3 3 0 0 0 2.1 2.12c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.12 31.4 31.4 0 0 0 .5-3.7 31.4 31.4 0 0 0-.5-3.7zM10 15.3V8.7L16 12l-6 3.3z"></path>
+          </svg>
+        </span>
+      </a>
+      <a
+        href="https://www.tiktok.com/"
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label="TikTok de Tacos Fabian"
+      >
+        <span class="inline-icon inline-icon--tiktok" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M14.44 3c.28 2.2 1.53 3.96 3.61 4.96.8.39 1.66.63 2.53.7v3.04a9.1 9.1 0 0 1-3.2-.6v5.55c0 4.13-3.04 7.13-7.17 7.13S3 20.73 3 16.66c0-4.29 3.44-7.3 7.54-7.15v3.1a4.12 4.12 0 0 0-1.08-.14c-2.15 0-3.9 1.72-3.9 4.03 0 2.12 1.53 4.04 3.94 4.04 2.24 0 3.87-1.46 3.87-4.55V3h3.07z"></path>
+          </svg>
+        </span>
+      </a>
+    </div>
+
+    <div
+      id="fabianMain"
+      class="floating-fabian-host fabian-main"
+      aria-hidden="true"
+      data-character-asset="/images/fabian.png"
+      data-character-replace="/images/fabian.png"
+    >
+      <span class="floating-fabian-host__shadow"></span>
+      <div class="floating-fabian-host__stage">
+        <span
+          class="floating-fabian-host__sprite"
+          data-sprite-src="/images/fabian-walk.png"
+          data-sprite-frames="6"
+          aria-hidden="true"
+        ></span>
+        <img
+          class="floating-fabian-host__figure"
+          src="/images/fabian.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchpriority="low"
+          width="352"
+          height="470"
+        />
+        <span class="floating-fabian-host__mouth"></span>
+        <span class="floating-fabian-host__wave"></span>
+      </div>
+    </div>
 
     <a
       id="floatingWhatsapp"

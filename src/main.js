@@ -5,19 +5,33 @@ const navMenu = document.querySelector("#navMenu");
 const navOverlay = document.querySelector("#navOverlay");
 const siteHeader = document.querySelector(".site-header");
 const navLinks = Array.from(document.querySelectorAll('#navMenu a[href^="#"]'));
+const reviewsStatus = document.querySelector("#reviewsStatus");
+const reviewsAverage = document.querySelector("#reviewsAverage");
+const reviewsAverageBadge = document.querySelector("#reviewsAverageBadge");
+const reviewsSatisfied = document.querySelector("#reviewsSatisfied");
 const heroProofAvg = document.querySelector("#heroProofAvg");
 const heroProofCount = document.querySelector("#heroProofCount");
 const heroProofAvgLabel = "\u2605 5.0 sabor recomendado";
 const heroProofCountLabel = "+216 pedidos con antojo resuelto";
+const reviewsList = document.querySelector("#reviewsList");
+const reviewsSection = document.querySelector("#resenas");
+const reviewForm = document.querySelector("#reviewForm");
+const formStatus = document.querySelector("#formStatus");
+const commentInput = document.querySelector("#comment");
+const commentCounter = document.querySelector("#commentCounter");
 const toastRegion = document.querySelector("#toastRegion");
+const floatingFabianHost = document.querySelector("#fabianMain");
+const floatingFabianSprite = floatingFabianHost?.querySelector(".floating-fabian-host__sprite");
 const floatingWhatsapp = document.querySelector("#floatingWhatsapp");
 const footer = document.querySelector(".site-footer");
+const visitCounter = document.querySelector("#visitCounter");
 const heroMenuDestacadoBtn = document.querySelector("#heroMenuDestacadoBtn");
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
 const installAppButtons = Array.from(document.querySelectorAll("#installAppBtn, #introInstallAppBtn"));
 const exitAppButtons = Array.from(document.querySelectorAll("#exitAppBtn"));
+const ambientAudioToggle = document.querySelector("#ambientAudioToggle");
 
 const menuCarousel = document.querySelector("#menuCarousel");
 const menuTrack = document.querySelector("#menuTrack");
@@ -32,9 +46,14 @@ const menuModalTitle = document.querySelector("#menuModalTitle");
 const menuModalDescription = document.querySelector("#menuModalDescription");
 const menuModalPrice = document.querySelector("#menuModalPrice");
 const menuCards = Array.from(document.querySelectorAll(".menu-item"));
+let siteAmbientAudio = null;
+let siteAmbientStarting = false;
+let siteAmbientObserver = null;
+let ambientAudioSourceIndex = 0;
 let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 let swRefreshPending = false;
+let reviewsLoaded = false;
 
 function scheduleIdleWork(callback, timeout = 900) {
   if (typeof callback !== "function") return;
@@ -861,6 +880,52 @@ function setupIntroScreen() {
     });
 }
 
+function setupDeferredReviews() {
+  if (!reviewsSection || reviewsLoaded) return;
+
+  const hydrateReviews = () => {
+    if (reviewsLoaded) return;
+    reviewsLoaded = true;
+    void loadReviews();
+  };
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        hydrateReviews();
+      },
+      { rootMargin: "0px 0px 320px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(reviewsSection);
+    scheduleIdleWork(hydrateReviews, 2400);
+    return;
+  }
+
+  scheduleIdleWork(hydrateReviews, 1600);
+}
+
+function setupVisitCounter() {
+  if (!visitCounter) return;
+
+  const key = "tacos_fabian_visit_count";
+  let next = 1;
+
+  try {
+    const raw = window.localStorage.getItem(key);
+    const current = Number.parseInt(raw || "0", 10);
+    next = Number.isFinite(current) && current > 0 ? current + 1 : 1;
+    window.localStorage.setItem(key, String(next));
+  } catch {
+    const seed = Math.floor(Date.now() / 86400000);
+    next = Math.max(1, (seed % 5000) + 1);
+  }
+
+  visitCounter.textContent = String(next).padStart(6, "0");
+}
+
 function setupMenuDestacadoButton() {
   if (!heroMenuDestacadoBtn || !menuCarousel) return;
 
@@ -868,6 +933,39 @@ function setupMenuDestacadoButton() {
     event.preventDefault();
     menuCarousel.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderStars(stars) {
+  const total = Math.max(1, Math.min(5, Number(stars) || 0));
+  const starSvg = (filled) => `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="star-icon ${filled ? "is-filled" : ""}">
+      <path d="M12 2.5l2.9 5.88 6.5.95-4.7 4.58 1.1 6.48L12 17.3l-5.8 3.09 1.11-6.48-4.72-4.58 6.53-.95L12 2.5z"></path>
+    </svg>
+  `;
+
+  return Array.from({ length: 5 }, (_, index) => starSvg(index < total)).join("");
+}
+
+function formatDate(dateValue) {
+  if (!dateValue) return "Sin fecha";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+  return new Intl.DateTimeFormat("es-MX", { dateStyle: "medium" }).format(date);
+}
+
+function truncateReview(text, maxLength = 96) {
+  const cleanText = String(text || "").trim();
+  if (cleanText.length <= maxLength) return cleanText;
+  return `${cleanText.slice(0, maxLength).trimEnd()}...`;
 }
 
 function paintReviews(items) {
@@ -1217,10 +1315,12 @@ function setupMenuSpotlightModal() {
 function setupRevealAnimations() {
   const groups = [
     ".hero-premium .hero-content, .hero-premium .hero-side, .hero-premium .hero-proof, .trust-card",
-    "#especialidad .card, .featured-product",
+    "#especialidad .card, .featured-product, .story-copy, .story-highlight",
     "#menu .carousel-slide",
     "#menu .menu-item",
     "#ubicacion .location-copy, #ubicacion .map-wrap",
+    "#resenas .review-item, #resenas .review-form-wrap, #resenas .cta-final, #resenas .review-trust",
+    "#referencias .card, .final-cta-banner",
   ];
 
   const items = document.querySelectorAll(groups.join(", "));
@@ -1254,25 +1354,28 @@ function setupRevealAnimations() {
 }
 
 function optimizeMainPageMedia() {
-  const priorityImages = document.querySelectorAll(".menu-carousel--hero .carousel-slide img");
-  priorityImages.forEach((image, index) => {
-    if (!(image instanceof HTMLImageElement)) return;
-    image.loading = index < 3 ? "eager" : "lazy";
-    image.decoding = "async";
-    image.fetchPriority = index < 3 ? "high" : "low";
-  });
+  const heroPriorityImage = document.querySelector(".menu-carousel--hero .carousel-slide:first-child img");
+  if (heroPriorityImage instanceof HTMLImageElement) {
+    heroPriorityImage.loading = "eager";
+    heroPriorityImage.decoding = "async";
+    heroPriorityImage.fetchPriority = "high";
+  }
 
-  const deferredImages = document.querySelectorAll("#menu img, #especialidad img, #ubicacion img");
-  deferredImages.forEach((image, index) => {
+  const deferredImages = document.querySelectorAll(
+    "#menu img, #especialidad img, #ubicacion img, #referencias img"
+  );
+  deferredImages.forEach((image) => {
     if (!(image instanceof HTMLImageElement)) return;
-    image.loading = index < 2 ? "eager" : "lazy";
+    image.loading = "lazy";
     image.decoding = "async";
-    if (!image.hasAttribute("fetchpriority")) image.fetchPriority = index < 2 ? "high" : "low";
+    if (!image.hasAttribute("fetchpriority")) image.fetchPriority = "low";
   });
 }
 
 optimizeMainPageMedia();
 setupDeferredIntroPromo();
+setupCommentCounter();
+setupReviewsForm();
 setupMenuCarousel();
 setupMenuSpotlightModal();
 setupRevealAnimations();
@@ -1284,9 +1387,13 @@ scheduleIdleWork(() => {
 setupFloatingWhatsapp();
 scheduleIdleWork(() => {
   setupFabianVideos();
+  setupSiteAmbientAudio();
   setupWhatsappAudio();
+  setupVisitCounter();
 }, 650);
 setupMenuDestacadoButton();
+
+setupDeferredReviews();
 
 
 
