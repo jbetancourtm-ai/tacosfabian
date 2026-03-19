@@ -194,20 +194,6 @@ function createTaqueriaGroup() {
   return { group, doorPivotLeft, doorPivotRight };
 }
 
-function createHostPlane(textureLoader) {
-  const texture = textureLoader.load("/images/fabian.png");
-  texture.colorSpace = THREE.SRGBColorSpace;
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    transparent: true,
-    depthWrite: false,
-  });
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.42, 1.92), material);
-  mesh.position.set(3.15, 1.28, 0.75);
-  mesh.visible = false;
-  return mesh;
-}
-
 function createCurtain(side = 1) {
   const geometry = new THREE.PlaneGeometry(2.2, 5.6, 20, 20);
   const material = new THREE.MeshStandardMaterial({
@@ -264,6 +250,11 @@ function inferSteamQuality(reducedMotion) {
   if (reducedMotion) return "off";
 
   const isMobileViewport = window.innerWidth <= 720;
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const constrainedNetwork =
+    Boolean(connection?.saveData) ||
+    /(?:2g|3g)/i.test(connection?.effectiveType || "") ||
+    (typeof connection?.downlink === "number" && connection.downlink > 0 && connection.downlink < 1.6);
   const lowMemory =
     typeof navigator.deviceMemory === "number" && navigator.deviceMemory > 0 && navigator.deviceMemory <= 4;
   const lowCpu =
@@ -271,12 +262,17 @@ function inferSteamQuality(reducedMotion) {
     navigator.hardwareConcurrency > 0 &&
     navigator.hardwareConcurrency <= 4;
 
-  if (isMobileViewport || lowMemory || lowCpu) return "light";
+  if (isMobileViewport || lowMemory || lowCpu || constrainedNetwork) return "light";
   return "full";
 }
 
 function isLowEndDevice() {
   const isMobileViewport = window.innerWidth <= 899;
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const constrainedNetwork =
+    Boolean(connection?.saveData) ||
+    /(?:2g|3g)/i.test(connection?.effectiveType || "") ||
+    (typeof connection?.downlink === "number" && connection.downlink > 0 && connection.downlink < 1.6);
   const lowMemory =
     typeof navigator.deviceMemory === "number" && navigator.deviceMemory > 0 && navigator.deviceMemory <= 4;
   const lowCpu =
@@ -284,14 +280,7 @@ function isLowEndDevice() {
     navigator.hardwareConcurrency > 0 &&
     navigator.hardwareConcurrency <= 4;
 
-  return isMobileViewport || lowMemory || lowCpu;
-}
-
-function buildSpeechQueue() {
-  return {
-    speak() {},
-    stop() {},
-  };
+  return isMobileViewport || lowMemory || lowCpu || constrainedNetwork;
 }
 
 function readStoredFlag(key) {
@@ -536,7 +525,7 @@ export async function initIntroExperience({
   const introTransitionSeenKey = "tacos_fabian_intro_cube_seen";
   const skipPremiumIntroTransition = readStoredFlag(introTransitionSeenKey);
   const steamQuality = inferSteamQuality(reducedMotion);
-  const autoDismissMs = reducedMotion ? 650 : 17000;
+  const autoDismissMs = reducedMotion ? 650 : lowEndDevice ? 11000 : 14000;
   const introOutroBufferMs = isStandaloneMode ? 1400 : 1100;
   const preferredVisualSrc =
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.preferredVisual || "/images/fabian_transparente_mejor.webm" : "";
@@ -549,12 +538,12 @@ export async function initIntroExperience({
   const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
   const ambientIntro = !isStandaloneMode ? new Audio("/audio/ambient-intro.mp3.mp3") : null;
   if (fallbackAudio) {
-    fallbackAudio.preload = "auto";
+    fallbackAudio.preload = "metadata";
     fallbackAudio.loop = false;
     fallbackAudio.volume = 0.88;
   }
   if (ambientIntro) {
-    ambientIntro.preload = "auto";
+    ambientIntro.preload = "metadata";
     ambientIntro.loop = true;
     ambientIntro.volume = 0.01;
     ambientIntro.crossOrigin = "anonymous";
@@ -573,7 +562,7 @@ export async function initIntroExperience({
       hostVideo.load();
     }
     hostVideo.autoplay = true;
-    hostVideo.preload = "auto";
+    hostVideo.preload = "metadata";
     hostVideo.playsInline = true;
     hostVideo.setAttribute("playsinline", "");
     hostVideo.setAttribute("webkit-playsinline", "");
@@ -612,7 +601,7 @@ export async function initIntroExperience({
     alpha: true,
     powerPreference: "high-performance",
   });
-  const maxPixelRatio = reducedMotion ? 1 : lowEndDevice ? 1.15 : 1.6;
+  const maxPixelRatio = reducedMotion ? 1 : lowEndDevice ? 1 : 1.3;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -681,11 +670,6 @@ export async function initIntroExperience({
   taqueria.scale.setScalar(0.82);
   scene.add(taqueria);
 
-  const textureLoader = new THREE.TextureLoader();
-  const hostPlane = createHostPlane(textureLoader);
-  const hostBasePosition = { x: 3.45, y: 0.98 };
-  hostPlane.visible = false;
-  scene.add(hostPlane);
   hostCard?.classList.add("is-visible");
   if (hostCard) hostCard.classList.remove("has-sprite", "is-walking");
   if (hostSprite instanceof HTMLElement) hostSprite.style.backgroundImage = "";
@@ -715,7 +699,7 @@ export async function initIntroExperience({
     blending: THREE.AdditiveBlending,
   });
   const smokeGeometry = new THREE.BufferGeometry();
-  const smokeCount = steamQuality === "light" ? 24 : 42;
+  const smokeCount = steamQuality === "light" ? 18 : 30;
   const smokePositions = new Float32Array(smokeCount * 3);
   const smokeData = Array.from({ length: smokeCount }, () => ({
     x: (Math.random() - 0.5) * 0.9,
@@ -745,7 +729,7 @@ export async function initIntroExperience({
     blending: THREE.AdditiveBlending,
   });
   const steamGeometry = new THREE.BufferGeometry();
-  const steamCount = steamQuality === "light" ? 10 : 18;
+  const steamCount = steamQuality === "light" ? 8 : 12;
   const steamPositions = new Float32Array(steamCount * 3);
   const steamData = Array.from({ length: steamCount }, () => ({
     x: (Math.random() - 0.5) * 1.2,
@@ -765,7 +749,7 @@ export async function initIntroExperience({
   scene.add(steam);
 
   const particlesGeometry = new THREE.BufferGeometry();
-  const particleCount = lowEndDevice ? 56 : 120;
+  const particleCount = lowEndDevice ? 34 : 72;
   const particlePositions = new Float32Array(particleCount * 3);
   for (let index = 0; index < particleCount; index += 1) {
     particlePositions[index * 3] = (Math.random() - 0.5) * 18;
@@ -786,7 +770,7 @@ export async function initIntroExperience({
   scene.add(particles);
 
   const emberGeometry = new THREE.BufferGeometry();
-  const emberCount = steamQuality === "light" ? 8 : 14;
+  const emberCount = steamQuality === "light" ? 6 : 10;
   const emberPositions = new Float32Array(emberCount * 3);
   const emberData = Array.from({ length: emberCount }, () => ({
     x: (Math.random() - 0.5) * 0.72,
@@ -1432,7 +1416,6 @@ export async function initIntroExperience({
     .to(doorPivotLeft.rotation, { y: -1.04, duration: 0.9 }, 5.8)
     .to(doorPivotRight.rotation, { y: 1.04, duration: 0.9 }, 5.8)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[2]), null, 6.15)
-    .fromTo(hostPlane.position, { x: hostBasePosition.x, y: hostBasePosition.y }, { x: 2.82, y: 1.28, duration: 1.05, ease: "power2.out" }, 8.2)
     .call(() => setNarrationLine(SCRIPT_SEGMENTS[3]), null, 10.55)
     .to(camera.position, { z: 7.88, y: 2.1, duration: 1.15 }, 12.25)
     .to([spotLeft, spotRight], { intensity: 1.5, duration: 1.05 }, 12.65)
@@ -1441,9 +1424,13 @@ export async function initIntroExperience({
 
   const clock = new THREE.Clock();
   let lastFrameTime = 0;
-  const minFrameGap = reducedMotion ? 48 : lowEndDevice ? 34 : 0;
+  const minFrameGap = reducedMotion ? 64 : lowEndDevice ? 42 : window.innerWidth <= 899 ? 24 : 0;
   const render = () => {
     if (closed) return;
+    if (document.hidden) {
+      rafId = window.requestAnimationFrame(render);
+      return;
+    }
     const now = performance.now();
     if (minFrameGap && now - lastFrameTime < minFrameGap) {
       rafId = window.requestAnimationFrame(render);
@@ -1518,12 +1505,6 @@ export async function initIntroExperience({
     emberGeometry.attributes.position.needsUpdate = true;
     embers.visible = fireGroup.visible;
 
-    const targetHostX = hostPlane.visible ? 2.82 : hostBasePosition.x;
-    const targetHostY = hostPlane.visible ? 1.28 : hostBasePosition.y;
-    hostPlane.position.y = targetHostY + Math.sin(elapsed * 2.4) * 0.028;
-    hostPlane.position.x = targetHostX + Math.sin(elapsed * 1.7) * 0.018;
-    hostPlane.rotation.z = hostPlane.visible ? Math.sin(elapsed * 2.8) * 0.03 : 0;
-    hostPlane.rotation.y = hostPlane.visible ? Math.sin(elapsed * 2.1) * 0.08 : 0;
     renderer.render(scene, camera);
     rafId = window.requestAnimationFrame(render);
   };

@@ -629,10 +629,19 @@ function setupDeferredIntroPromo() {
   const source = promoVideo.querySelector("source[data-src]");
   if (!(source instanceof HTMLSourceElement)) return;
 
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const constrainedDevice =
+    window.innerWidth <= 899 ||
+    Boolean(connection?.saveData) ||
+    /(?:2g|3g)/i.test(connection?.effectiveType || "") ||
+    (typeof connection?.downlink === "number" && connection.downlink > 0 && connection.downlink < 1.6);
+
+  if (constrainedDevice) return;
+
   let hydrated = false;
 
   const hydratePromo = () => {
-    if (hydrated) return;
+    if (hydrated || !introScreen?.isConnected || !document.body.classList.contains("intro-active")) return;
     hydrated = true;
     source.src = source.dataset.src || "";
     source.removeAttribute("data-src");
@@ -654,10 +663,10 @@ function setupDeferredIntroPromo() {
     );
     observer.observe(promoVideo);
   } else {
-    scheduleIdleWork(hydratePromo, 1200);
+    scheduleIdleWork(hydratePromo, 4200);
   }
 
-  scheduleIdleWork(hydratePromo, 1800);
+  scheduleIdleWork(hydratePromo, 5200);
 }
 
 function setupWhatsappAudio() {
