@@ -252,7 +252,6 @@ function createHeatLayer() {
 function inferSteamQuality(reducedMotion) {
   if (reducedMotion) return "off";
 
-  const isMobileViewport = window.innerWidth <= 720;
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   const constrainedNetwork =
     Boolean(connection?.saveData) ||
@@ -265,12 +264,11 @@ function inferSteamQuality(reducedMotion) {
     navigator.hardwareConcurrency > 0 &&
     navigator.hardwareConcurrency <= 4;
 
-  if (isMobileViewport || lowMemory || lowCpu || constrainedNetwork) return "light";
+  if (lowMemory || lowCpu || constrainedNetwork) return "light";
   return "full";
 }
 
 function isLowEndDevice() {
-  const isMobileViewport = window.innerWidth <= 899;
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   const constrainedNetwork =
     Boolean(connection?.saveData) ||
@@ -283,7 +281,28 @@ function isLowEndDevice() {
     navigator.hardwareConcurrency > 0 &&
     navigator.hardwareConcurrency <= 4;
 
-  return isMobileViewport || lowMemory || lowCpu || constrainedNetwork;
+  return lowMemory || lowCpu || constrainedNetwork;
+}
+
+function resolveIntroMediaSource(video) {
+  if (!(video instanceof HTMLVideoElement)) {
+    return { src: "", type: "" };
+  }
+
+  const preferredSrc = video.dataset.preferredVisual || "/images/fabian_transparente_mejor.webm";
+  const browserFallbackSrc = video.dataset.browserFallback || "";
+  const audioFallbackSrc = video.dataset.audioFallback || browserFallbackSrc || preferredSrc;
+  const preferredType = preferredSrc.endsWith(".mp4") ? "video/mp4" : 'video/webm; codecs="vp9,opus"';
+  const canPlayPreferred = preferredType.includes("webm") ? video.canPlayType(preferredType) : "probably";
+
+  if (preferredSrc && (!preferredType.includes("webm") || canPlayPreferred === "probably" || canPlayPreferred === "maybe")) {
+    return { src: preferredSrc, type: preferredType };
+  }
+
+  return {
+    src: browserFallbackSrc || audioFallbackSrc,
+    type: "video/mp4",
+  };
 }
 
 function readStoredFlag(key) {
@@ -524,25 +543,23 @@ export async function initIntroExperience({
   const hostLine = introScreen.querySelector("#introHostLine");
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const hostVideo = introScreen.querySelector(".intro-screen__host-video");
-  const isStandaloneMode =
-    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lowEndDevice = isLowEndDevice();
   const introTransitionSeenKey = "tacos_fabian_intro_cube_seen";
   const skipPremiumIntroTransition = readStoredFlag(introTransitionSeenKey);
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 650 : lowEndDevice ? 11000 : 14000;
-  const introOutroBufferMs = isStandaloneMode ? 1400 : 1100;
-  const preferredVisualSrc =
-    hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.preferredVisual || "/images/fabian_transparente_mejor.webm" : "";
+  const introOutroBufferMs = 1400;
+  const resolvedIntroMedia = resolveIntroMediaSource(hostVideo);
+  const preferredVisualSrc = resolvedIntroMedia.src;
   const visualFallbackSrc =
     hostVideo instanceof HTMLVideoElement
-      ? hostVideo.dataset.browserFallback || hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4"
+      ? hostVideo.dataset.browserFallback || hostVideo.dataset.audioFallback || preferredVisualSrc || "/images/fabian_web_audio5.mp4"
       : "";
   const audioFallbackSrc =
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4" : "";
   const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
-  const ambientIntro = !isStandaloneMode ? new Audio("/audio/ambient-intro.mp3.mp3") : null;
+  const ambientIntro = new Audio("/audio/ambient-intro.mp3.mp3");
   if (fallbackAudio) {
     fallbackAudio.preload = "metadata";
     fallbackAudio.loop = false;
@@ -555,13 +572,12 @@ export async function initIntroExperience({
     ambientIntro.crossOrigin = "anonymous";
   }
   if (hostVideo instanceof HTMLVideoElement) {
-    if (isStandaloneMode && preferredVisualSrc) {
+    if (preferredVisualSrc) {
       hostVideo.src = preferredVisualSrc;
       hostVideo.dataset.resolvedSrc = preferredVisualSrc;
-      hostVideo.dataset.resolvedType =
-        preferredVisualSrc.endsWith(".mp4") ? "video/mp4" : 'video/webm; codecs="vp9,opus"';
+      hostVideo.dataset.resolvedType = resolvedIntroMedia.type;
       hostVideo.load();
-    } else if (!isStandaloneMode && visualFallbackSrc) {
+    } else if (visualFallbackSrc) {
       hostVideo.src = visualFallbackSrc;
       hostVideo.dataset.resolvedSrc = visualFallbackSrc;
       hostVideo.dataset.resolvedType = "video/mp4";
@@ -1171,7 +1187,7 @@ export async function initIntroExperience({
       if (ambientEnabled) fadeAmbientTo(0.06, 0.65);
       audioMode = "media";
       scheduleFinishFromMedia();
-      if (ambientEnabled || isStandaloneMode) {
+      if (ambientEnabled) {
         introSoundBtn?.classList.add("is-hidden");
       } else {
         introSoundBtn?.classList.remove("is-hidden");
@@ -1385,7 +1401,7 @@ export async function initIntroExperience({
     hostCard?.classList.add("is-playing");
   });
   hostVideo?.addEventListener("stalled", () => {
-    if (closed || isStandaloneMode) return;
+    if (closed) return;
     void ensureVisualPlayback({ restart: false, muted: audioMode !== "media" });
   });
   hostVideo?.addEventListener("loadeddata", () => {
@@ -1461,7 +1477,7 @@ export async function initIntroExperience({
 
   const clock = new THREE.Clock();
   let lastFrameTime = 0;
-  const minFrameGap = reducedMotion ? 64 : lowEndDevice ? 42 : window.innerWidth <= 899 ? 24 : 0;
+  const minFrameGap = reducedMotion ? 64 : lowEndDevice ? 42 : 0;
   const render = () => {
     if (closed) return;
     if (document.hidden) {
