@@ -825,12 +825,14 @@ body.intro-transitioning-3d .floating-whatsapp {
 
 .intro-screen__media-reserve {
   position: absolute;
-  top: var(--intro-fabian-top);
+  top: auto;
+  bottom: calc(var(--intro-actions-space) + 5.45rem);
   left: clamp(1rem, 4.2vw, 3rem);
   right: auto;
-  width: clamp(9.8rem, 13vw, 12.8rem);
-  min-width: 9.8rem;
-  aspect-ratio: 9 / 16;
+  width: var(--intro-fabian-width);
+  max-width: calc(100vw - var(--intro-fabian-width) - 2rem);
+  min-width: 0;
+  aspect-ratio: 0.88 / 1.16;
   transform: translate3d(-1.1rem, 0.45rem, 0) rotateY(10deg) scale(0.96);
   display: grid;
   place-items: center;
@@ -4488,10 +4490,12 @@ td {
   }
 
   .intro-screen__media-reserve {
-    top: var(--intro-fabian-top);
-    left: clamp(1rem, 4vw, 2.2rem);
-    width: clamp(9.4rem, 12.6vw, 12rem);
-    min-width: 9.4rem;
+    top: auto;
+    bottom: calc(var(--intro-actions-space) + 5.55rem);
+    left: 0.95rem;
+    width: var(--intro-fabian-width);
+    max-width: calc(100vw - var(--intro-fabian-width) - 1.45rem);
+    min-width: 0;
   }
 
   .header-inner {
@@ -4794,11 +4798,13 @@ td {
 
   .intro-screen__media-reserve {
     display: grid;
-    top: var(--intro-fabian-top);
+    top: auto;
+    bottom: calc(var(--intro-actions-space) + 5.55rem);
     left: 0.7rem;
     right: auto;
-    width: min(24vw, 132px);
-    min-width: 96px;
+    width: var(--intro-fabian-width);
+    max-width: calc(100vw - var(--intro-fabian-width) - 1rem);
+    min-width: 0;
     transform: translate3d(-0.85rem, 0.35rem, 0) rotateY(9deg) scale(0.97);
     opacity: 0;
     filter: saturate(0.9);
@@ -4866,9 +4872,11 @@ td {
 
   .intro-screen__media-reserve {
     left: 0.7rem;
-    top: var(--intro-fabian-top);
-    width: min(7.4rem, calc(35vw - 0.1rem));
-    min-width: 6.6rem;
+    top: auto;
+    bottom: calc(var(--intro-actions-space) + 5.8rem);
+    width: var(--intro-fabian-width);
+    max-width: calc(100vw - var(--intro-fabian-width) - 0.9rem);
+    min-width: 0;
     transform: translate3d(-0.8rem, 0.35rem, 0) rotateY(9deg) scale(0.97);
   }
 
@@ -5047,9 +5055,11 @@ td {
   .intro-screen__media-reserve {
     display: grid;
     left: 0.55rem;
-    top: var(--intro-fabian-top);
-    width: min(22vw, 112px);
-    min-width: 82px;
+    top: auto;
+    bottom: calc(var(--intro-actions-space) + 4rem);
+    width: var(--intro-fabian-width);
+    max-width: calc(100vw - var(--intro-fabian-width) - 0.7rem);
+    min-width: 0;
     transform: translate3d(-0.7rem, 0.28rem, 0) rotateY(8deg) scale(0.97);
   }
 
