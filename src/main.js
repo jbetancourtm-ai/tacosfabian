@@ -1017,6 +1017,22 @@ function scrollToCategory(target) {
   });
 }
 
+function playQuickCategoryIntroAnimation() {
+  const quickCategoryNav = document.querySelector(".quick-category-nav");
+  if (!(quickCategoryNav instanceof HTMLElement)) return;
+  if (quickCategoryNav.dataset.presented === "true") return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  quickCategoryNav.dataset.presented = "true";
+
+  window.requestAnimationFrame(() => {
+    quickCategoryNav.classList.add("is-presenting");
+    window.setTimeout(() => {
+      quickCategoryNav.classList.remove("is-presenting");
+    }, 980);
+  });
+}
+
 function setupQuickCategoryNav() {
   if (!quickCategoryLinks.length || !quickCategoryTargets.length) return;
 
@@ -1058,6 +1074,19 @@ function setupQuickCategoryNav() {
       setActiveQuickCategory(hashTarget);
     }
   }
+
+  const runPresentation = () => {
+    window.requestAnimationFrame(() => {
+      playQuickCategoryIntroAnimation();
+    });
+  };
+
+  if (!document.body.classList.contains("intro-active") && !introScreen?.isConnected) {
+    runPresentation();
+    return;
+  }
+
+  window.addEventListener("intro:complete", runPresentation, { once: true });
 }
 
 function escapeHtml(text) {
