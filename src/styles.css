@@ -4298,6 +4298,16 @@ td {
   }
 }
 
+@keyframes floating-fabian-guide-whatsapp {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(4px, 6px, 0);
+  }
+}
+
 @keyframes float-pulse {
   0%,
   100% {
@@ -8314,8 +8324,36 @@ main#contenido {
 
 /* Final mobile safeguard: keep the top action bar fully scrollable */
 @media (max-width: 767px) {
+  .floating-whatsapp {
+    right: 0.9rem;
+    bottom: 1rem;
+    z-index: 320;
+  }
+
+  .floating-fabian-host,
+  .fabian-main {
+    right: 0.2rem;
+    bottom: 4.95rem;
+    width: 88px;
+    z-index: 321;
+    pointer-events: none;
+  }
+
+  .floating-fabian-host__stage {
+    width: 88px;
+    height: 114px;
+    animation:
+      floating-fabian-attention-mobile 5s ease-in-out infinite,
+      floating-fabian-guide-whatsapp 2.9s ease-in-out infinite;
+  }
+
+  .floating-fabian-host__shadow {
+    transform: translateY(76px);
+  }
+
   .header-cta-group {
-    gap: 0.42rem;
+    gap: 0.72rem;
+    align-items: stretch;
   }
 
   .hero-actions--header {
@@ -8325,14 +8363,18 @@ main#contenido {
     align-items: stretch;
     width: 100%;
     max-width: 100%;
-    gap: 0.42rem;
-    padding: 0 0 0.18rem;
+    gap: 0.5rem;
+    margin-top: 0.18rem;
+    padding: 0.18rem 0.14rem 0.34rem;
+    border-radius: 1.05rem;
+    background: linear-gradient(180deg, rgba(255, 248, 239, 0.16), rgba(255, 241, 229, 0.08));
+    box-shadow: inset 0 1px 0 rgba(255, 230, 203, 0.12);
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    scroll-padding-inline: 0.2rem;
+    scroll-padding-inline: 0.34rem;
   }
 
   .hero-actions--header::-webkit-scrollbar {
@@ -8349,12 +8391,13 @@ main#contenido {
   .hero-actions--header .btn-exit-app {
     width: auto;
     min-width: max-content;
-    min-height: 2.56rem;
-    padding-inline: 0.74rem;
+    min-height: 2.7rem;
+    padding-inline: 0.86rem;
     white-space: nowrap;
     text-align: center;
     line-height: 1.1;
     font-size: clamp(0.72rem, 2.7vw, 0.82rem);
+    box-shadow: 0 10px 22px rgba(20, 12, 9, 0.1);
   }
 
   #heroMenuDestacadoBtn,
@@ -8369,19 +8412,24 @@ main#contenido {
 
 /* Final mobile safeguard: keep quick categories horizontal, readable and touch-friendly */
 @media (max-width: 767px) {
+  .menu-showcase-section {
+    padding-top: 1.9rem;
+  }
+
   .quick-category-nav {
     order: 3;
     width: 100%;
     max-width: 100%;
     gap: 0.42rem;
-    margin-top: 0.46rem;
-    padding: 0 0 0.18rem;
+    margin-top: 0.88rem;
+    padding: 0.12rem 0.14rem 0.26rem;
+    border-top: 1px solid rgba(255, 228, 198, 0.16);
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    scroll-padding-inline: 0.2rem;
+    scroll-padding-inline: 0.34rem;
     scroll-snap-type: x proximity;
   }
 
@@ -8392,11 +8440,35 @@ main#contenido {
   .quick-category-nav__pill {
     flex: 0 0 auto;
     min-width: max-content;
-    min-height: 2.26rem;
-    padding: 0.58rem 0.84rem;
+    min-height: 2.34rem;
+    padding: 0.6rem 0.88rem;
     font-size: clamp(0.74rem, 2.6vw, 0.8rem);
     line-height: 1;
     white-space: nowrap;
     scroll-snap-align: start;
+    box-shadow: 0 8px 18px rgba(20, 12, 9, 0.06);
+  }
+}
+
+@media (max-width: 599px) {
+  .floating-whatsapp {
+    right: 0.82rem;
+    bottom: 0.92rem;
+  }
+
+  .floating-fabian-host,
+  .fabian-main {
+    right: 0.08rem;
+    bottom: 4.7rem;
+    width: 84px;
+  }
+
+  .floating-fabian-host__stage {
+    width: 84px;
+    height: 108px;
+  }
+
+  .floating-fabian-host__shadow {
+    transform: translateY(72px);
   }
 }

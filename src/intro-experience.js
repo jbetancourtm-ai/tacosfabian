@@ -615,7 +615,6 @@ export async function initIntroExperience({
   const introStartedAt = performance.now();
   const exitDurationMs = reducedMotion ? 180 : skipPremiumIntroTransition || lowEndDevice ? 300 : 980;
   let hostSideSwapped = false;
-  let introAudioUnlockBound = false;
   let viewportRepairTimer = 0;
   let pauseRecoverySuppressed = false;
   let introSequenceStarted = false;
@@ -916,6 +915,7 @@ export async function initIntroExperience({
 
   const scheduleAutoplayRetry = (delay = 220) => {
     if (closed || document.hidden || audioMode === "media" || audioMode === "starting") return;
+    if (introPlaybackCommitted || introSequenceStarted) return;
     if (autoplayRetryCount >= 1) return;
     clearAutoplayRetry();
     autoplayRetryTimer = window.setTimeout(() => {
@@ -1084,9 +1084,7 @@ export async function initIntroExperience({
     }
 
     if (audioMode === "media") {
-      await tryPlayNarrationAudio();
-    } else if (autoplayRetryCount < 3) {
-      scheduleAutoplayRetry(120);
+      scheduleFinishFromMedia();
     }
   };
 
@@ -1097,32 +1095,6 @@ export async function initIntroExperience({
       resize();
       void restoreIntroPlayback();
     }, 220);
-  };
-
-  const unlockIntroAudioOnInteraction = (event) => {
-    if (closed || audioMode === "media" || audioMode === "starting") return;
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest("a, button, input, textarea, select, label, [role='button']")
-    ) {
-      return;
-    }
-    void resumeIntroExperience();
-  };
-
-  const removeIntroAudioUnlockListeners = () => {
-    if (!introAudioUnlockBound) return;
-    introAudioUnlockBound = false;
-    window.removeEventListener("pointerdown", unlockIntroAudioOnInteraction, true);
-    window.removeEventListener("touchstart", unlockIntroAudioOnInteraction, true);
-  };
-
-  const armIntroAudioUnlockListeners = () => {
-    if (introAudioUnlockBound) return;
-    introAudioUnlockBound = true;
-    window.addEventListener("pointerdown", unlockIntroAudioOnInteraction, true);
-    window.addEventListener("touchstart", unlockIntroAudioOnInteraction, true);
   };
 
   const moveHostToOppositeSide = () => {
@@ -1194,7 +1166,6 @@ export async function initIntroExperience({
       }
       clearAutoplayRetry();
       autoplayRetryCount = 0;
-      removeIntroAudioUnlockListeners();
       return true;
     } catch {
       if (token !== audioToken) return false;
@@ -1208,8 +1179,7 @@ export async function initIntroExperience({
         if (ambientEnabled) fadeAmbientTo(0.085, 0.6);
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
-        scheduleAutoplayRetry(280);
-        armIntroAudioUnlockListeners();
+        clearAutoplayRetry();
         return false;
       } catch {
         if (token !== audioToken) return false;
@@ -1225,8 +1195,7 @@ export async function initIntroExperience({
         stopAmbientIntro({ reset: true });
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
-        scheduleAutoplayRetry(320);
-        armIntroAudioUnlockListeners();
+        clearAutoplayRetry();
         return false;
       }
     }
@@ -1336,7 +1305,6 @@ export async function initIntroExperience({
         hostVideo.volume = 0.88;
       });
     }, 360);
-    removeIntroAudioUnlockListeners();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
     const cubeTransition = createIntroCubeTransition({
       introScreen,
