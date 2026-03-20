@@ -5,6 +5,9 @@ export const HOME_THEME_VARIANTS = Object.freeze({
   original: {
     label: "Original",
   },
+  "premium-noir": {
+    label: "Premium Noir",
+  },
   "premium-warm": {
     label: "Premium Warm",
   },
