@@ -1,4 +1,5 @@
 import { gsap } from "gsap";
+import { initHomeTheme } from "./home-theme.js";
 
 const menuBtn = document.querySelector("#menuBtn");
 const navMenu = document.querySelector("#navMenu");
@@ -56,6 +57,8 @@ let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 let swRefreshPending = false;
 let reviewsLoaded = false;
+
+initHomeTheme();
 
 function scheduleIdleWork(callback, timeout = 900) {
   if (typeof callback !== "function") return;
