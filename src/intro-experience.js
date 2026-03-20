@@ -549,7 +549,7 @@ export async function initIntroExperience({
   const skipPremiumIntroTransition = readStoredFlag(introTransitionSeenKey);
   const steamQuality = inferSteamQuality(reducedMotion);
   const autoDismissMs = reducedMotion ? 650 : lowEndDevice ? 11000 : 14000;
-  const introOutroBufferMs = 1400;
+  const introOutroBufferMs = reducedMotion ? 20 : 80;
   const resolvedIntroMedia = resolveIntroMediaSource(hostVideo);
   const preferredVisualSrc = resolvedIntroMedia.src;
   const visualFallbackSrc =
@@ -1221,9 +1221,11 @@ export async function initIntroExperience({
     return Math.max(0, Math.round(timeline.totalDuration() * 1000 - elapsed));
   };
 
-  const scheduleFinish = (delay = autoDismissMs) => {
+  const scheduleFinish = (delay = autoDismissMs, { ignoreTimeline = false } = {}) => {
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
-    const safeDelay = Math.max(delay, getTimelineRemainingMs() + (reducedMotion ? 140 : 320));
+    const safeDelay = ignoreTimeline
+      ? Math.max(0, delay)
+      : Math.max(delay, getTimelineRemainingMs() + (reducedMotion ? 140 : 320));
     autoDismissTimer = window.setTimeout(finishIntro, safeDelay);
   };
 
@@ -1238,10 +1240,10 @@ export async function initIntroExperience({
         const fallbackDuration = fallbackAudio.duration;
         if (Number.isFinite(fallbackDuration) && fallbackDuration > 0) {
           const fallbackRemainingMs = Math.max(
-            4600,
-            Math.round((fallbackDuration - fallbackAudio.currentTime) * 1000) + introOutroBufferMs + 900
+            0,
+            Math.round((fallbackDuration - fallbackAudio.currentTime) * 1000) + introOutroBufferMs
           );
-          scheduleFinish(fallbackRemainingMs);
+          scheduleFinish(fallbackRemainingMs, { ignoreTimeline: true });
           return;
         }
       }
@@ -1249,18 +1251,18 @@ export async function initIntroExperience({
       const hostDuration = hostVideo.duration;
       if (Number.isFinite(hostDuration) && hostDuration > 0) {
         const hostRemainingMs = Math.max(
-          4600,
-          Math.round((hostDuration - hostVideo.currentTime) * 1000) + introOutroBufferMs + 900
+          0,
+          Math.round((hostDuration - hostVideo.currentTime) * 1000) + introOutroBufferMs
         );
-        scheduleFinish(hostRemainingMs);
+        scheduleFinish(hostRemainingMs, { ignoreTimeline: true });
         return;
       }
     }
 
     const durationSeconds = usingFallbackAudio && fallbackAudio ? fallbackAudio.duration : hostVideo.duration;
     if (Number.isFinite(durationSeconds) && durationSeconds > 0) {
-      const remainingMs = Math.max(3200, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + introOutroBufferMs);
-      scheduleFinish(remainingMs);
+      const remainingMs = Math.max(0, Math.round((durationSeconds - hostVideo.currentTime) * 1000) + introOutroBufferMs);
+      scheduleFinish(remainingMs, { ignoreTimeline: true });
       return;
     }
 
@@ -1408,11 +1410,11 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("ended", () => {
     if (usingFallbackAudio && fallbackAudio && !fallbackAudio.ended) return;
     hostCard?.classList.remove("is-playing");
-    scheduleFinishFromMedia();
+    finishIntro();
   });
   fallbackAudio?.addEventListener("ended", () => {
     if (!usingFallbackAudio) return;
-    scheduleFinishFromMedia();
+    finishIntro();
   });
   fallbackAudio?.addEventListener("timeupdate", () => {
     if (!speechPlaybackStarted && fallbackAudio.currentTime >= 0.18) {
