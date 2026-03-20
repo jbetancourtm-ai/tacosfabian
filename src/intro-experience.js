@@ -543,6 +543,8 @@ export async function initIntroExperience({
   const hostLine = introScreen.querySelector("#introHostLine");
   const introSoundBtn = introScreen.querySelector("#introSoundBtn");
   const hostVideo = introScreen.querySelector(".intro-screen__host-video");
+  const promoReserve = introScreen.querySelector(".intro-screen__media-reserve");
+  const promoVideo = introScreen.querySelector(".intro-screen__promo-video");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lowEndDevice = isLowEndDevice();
   const introTransitionSeenKey = "tacos_fabian_intro_cube_seen";
@@ -560,6 +562,7 @@ export async function initIntroExperience({
     hostVideo instanceof HTMLVideoElement ? hostVideo.dataset.audioFallback || "/images/fabian_web_audio5.mp4" : "";
   const fallbackAudio = audioFallbackSrc ? new Audio(audioFallbackSrc) : null;
   const ambientIntro = new Audio("/audio/ambient-intro.mp3.mp3");
+  const promoVideoSrc = promoVideo instanceof HTMLVideoElement ? promoVideo.dataset.src || "" : "";
   if (fallbackAudio) {
     fallbackAudio.preload = "metadata";
     fallbackAudio.loop = false;
@@ -594,6 +597,18 @@ export async function initIntroExperience({
     hostVideo.removeAttribute("muted");
     hostVideo.volume = 0.88;
   }
+  if (promoVideo instanceof HTMLVideoElement) {
+    promoVideo.preload = "metadata";
+    promoVideo.playsInline = true;
+    promoVideo.setAttribute("playsinline", "");
+    promoVideo.setAttribute("webkit-playsinline", "");
+    promoVideo.controls = false;
+    promoVideo.loop = false;
+    promoVideo.autoplay = false;
+    promoVideo.muted = false;
+    promoVideo.defaultMuted = false;
+    promoVideo.volume = 1;
+  }
 
   if (!(canvas instanceof HTMLCanvasElement) || !(narration instanceof HTMLElement)) {
     introExperienceActive = false;
@@ -620,6 +635,8 @@ export async function initIntroExperience({
   let introSequenceStarted = false;
   let introPlaybackCommitted = false;
   let speechPlaybackStarted = false;
+  let promoPlaybackStarted = false;
+  let promoPlaybackCompleted = false;
 
   const suppressPauseRecovery = (callback) => {
     pauseRecoverySuppressed = true;
@@ -912,6 +929,11 @@ export async function initIntroExperience({
   const clearAutoplayRetry = () => {
     if (autoplayRetryTimer) window.clearTimeout(autoplayRetryTimer);
     autoplayRetryTimer = 0;
+  };
+
+  const clearAutoDismissTimer = () => {
+    if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
+    autoDismissTimer = 0;
   };
 
   const scheduleAutoplayRetry = (delay = 220) => {
@@ -1221,15 +1243,102 @@ export async function initIntroExperience({
     return Math.max(0, Math.round(timeline.totalDuration() * 1000 - elapsed));
   };
 
-  const scheduleFinish = (delay = autoDismissMs, { ignoreTimeline = false } = {}) => {
-    if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
+  const scheduleAutoAction = (callback, delay = autoDismissMs, { ignoreTimeline = false } = {}) => {
+    clearAutoDismissTimer();
     const safeDelay = ignoreTimeline
       ? Math.max(0, delay)
       : Math.max(delay, getTimelineRemainingMs() + (reducedMotion ? 140 : 320));
-    autoDismissTimer = window.setTimeout(finishIntro, safeDelay);
+    autoDismissTimer = window.setTimeout(() => {
+      autoDismissTimer = 0;
+      callback();
+    }, safeDelay);
+  };
+
+  const scheduleFinish = (delay = autoDismissMs, options = {}) => {
+    scheduleAutoAction(finishIntro, delay, options);
+  };
+
+  const preparePromoVideo = () => {
+    if (!(promoVideo instanceof HTMLVideoElement) || !promoVideoSrc) return false;
+    if (!promoVideo.getAttribute("src")) {
+      promoVideo.src = promoVideoSrc;
+      promoVideo.load();
+    }
+    return true;
+  };
+
+  const handlePrimaryMediaEnded = async () => {
+    if (closed || promoPlaybackStarted || promoPlaybackCompleted) return;
+    if (!(promoVideo instanceof HTMLVideoElement) || !preparePromoVideo()) {
+      finishIntro();
+      return;
+    }
+
+    promoPlaybackStarted = true;
+    clearAutoDismissTimer();
+    clearAutoplayRetry();
+    stopFallbackAudio({ reset: true });
+    usingFallbackAudio = false;
+    audioMode = "idle";
+    hostCard?.classList.remove("is-speaking");
+    hostCard?.classList.remove("is-playing");
+    promoReserve?.classList.add("is-active");
+
+    try {
+      suppressPauseRecovery(() => {
+        hostVideo?.pause();
+      });
+      promoVideo.currentTime = 0;
+      promoVideo.muted = false;
+      promoVideo.defaultMuted = false;
+      promoVideo.volume = 1;
+      await promoVideo.play();
+      scheduleFinishFromMedia();
+    } catch {
+      finishIntro();
+    }
   };
 
   const scheduleFinishFromMedia = () => {
+    if (promoPlaybackStarted && promoVideo instanceof HTMLVideoElement && !promoPlaybackCompleted) {
+      const promoDuration = promoVideo.duration;
+      if (Number.isFinite(promoDuration) && promoDuration > 0) {
+        const promoRemainingMs = Math.max(
+          0,
+          Math.round((promoDuration - promoVideo.currentTime) * 1000) + introOutroBufferMs
+        );
+        scheduleFinish(promoRemainingMs, { ignoreTimeline: true });
+        return;
+      }
+      scheduleFinish(autoDismissMs);
+      return;
+    }
+
+    if (promoVideo instanceof HTMLVideoElement && !promoPlaybackStarted && !promoPlaybackCompleted && audioMode === "media") {
+      if (usingFallbackAudio && fallbackAudio) {
+        const fallbackDuration = fallbackAudio.duration;
+        if (Number.isFinite(fallbackDuration) && fallbackDuration > 0) {
+          const fallbackRemainingMs = Math.max(
+            0,
+            Math.round((fallbackDuration - fallbackAudio.currentTime) * 1000) + introOutroBufferMs
+          );
+          scheduleAutoAction(() => {
+            void handlePrimaryMediaEnded();
+          }, fallbackRemainingMs, { ignoreTimeline: true });
+          return;
+        }
+      }
+
+      const hostDuration = hostVideo?.duration;
+      if (Number.isFinite(hostDuration) && hostDuration > 0) {
+        const hostRemainingMs = Math.max(0, Math.round((hostDuration - hostVideo.currentTime) * 1000) + introOutroBufferMs);
+        scheduleAutoAction(() => {
+          void handlePrimaryMediaEnded();
+        }, hostRemainingMs, { ignoreTimeline: true });
+        return;
+      }
+    }
+
     if (!(hostVideo instanceof HTMLVideoElement)) {
       scheduleFinish(autoDismissMs);
       return;
@@ -1308,6 +1417,7 @@ export async function initIntroExperience({
     hostCard?.classList.remove("is-playing");
     audioToken += 1;
     audioMode = "idle";
+    promoPlaybackCompleted = true;
     fadeHostVideoTo(0, 0.35);
     fadeAmbientTo(0.01, 0.25);
     window.setTimeout(() => {
@@ -1320,8 +1430,14 @@ export async function initIntroExperience({
         hostVideo.currentTime = 0;
         hostVideo.volume = 0.88;
       });
+      if (promoVideo instanceof HTMLVideoElement) {
+        suppressPauseRecovery(() => {
+          promoVideo.pause();
+        });
+        promoVideo.currentTime = 0;
+      }
     }, 360);
-    if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
+    clearAutoDismissTimer();
     const cubeTransition = createIntroCubeTransition({
       introScreen,
       reducedMotion,
@@ -1362,6 +1478,16 @@ export async function initIntroExperience({
 
   introSkipBtn?.addEventListener("click", finishIntro);
   introSoundBtn?.addEventListener("click", async () => {
+    if (promoPlaybackStarted && promoVideo instanceof HTMLVideoElement && !promoPlaybackCompleted) {
+      try {
+        promoVideo.muted = false;
+        promoVideo.defaultMuted = false;
+        await promoVideo.play();
+      } catch {
+        // Keep the intro usable even if the browser still blocks playback.
+      }
+      return;
+    }
     if (audioMode === "media" && hostVideo instanceof HTMLVideoElement && !hostVideo.paused) {
       const ambientStarted = await ensureAmbientIntro({ force: true });
       if (ambientStarted) {
@@ -1410,17 +1536,29 @@ export async function initIntroExperience({
   hostVideo?.addEventListener("ended", () => {
     if (usingFallbackAudio && fallbackAudio && !fallbackAudio.ended) return;
     hostCard?.classList.remove("is-playing");
-    finishIntro();
+    void handlePrimaryMediaEnded();
   });
   fallbackAudio?.addEventListener("ended", () => {
     if (!usingFallbackAudio) return;
-    finishIntro();
+    void handlePrimaryMediaEnded();
   });
   fallbackAudio?.addEventListener("timeupdate", () => {
     if (!speechPlaybackStarted && fallbackAudio.currentTime >= 0.18) {
       speechPlaybackStarted = true;
       clearAutoplayRetry();
     }
+  });
+  promoVideo?.addEventListener("play", () => {
+    promoReserve?.classList.add("is-active");
+  });
+  promoVideo?.addEventListener("ended", () => {
+    if (promoPlaybackCompleted) return;
+    promoPlaybackCompleted = true;
+    finishIntro();
+  });
+  promoVideo?.addEventListener("error", () => {
+    if (closed || promoPlaybackCompleted) return;
+    finishIntro();
   });
   const handleIntroKeydown = (event) => {
     if (event.key === "Escape") finishIntro();
