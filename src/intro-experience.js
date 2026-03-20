@@ -619,6 +619,7 @@ export async function initIntroExperience({
   let pauseRecoverySuppressed = false;
   let introSequenceStarted = false;
   let introPlaybackCommitted = false;
+  let speechPlaybackStarted = false;
 
   const suppressPauseRecovery = (callback) => {
     pauseRecoverySuppressed = true;
@@ -915,7 +916,7 @@ export async function initIntroExperience({
 
   const scheduleAutoplayRetry = (delay = 220) => {
     if (closed || document.hidden || audioMode === "media" || audioMode === "starting") return;
-    if (introPlaybackCommitted || introSequenceStarted) return;
+    if (introPlaybackCommitted || introSequenceStarted || speechPlaybackStarted) return;
     if (autoplayRetryCount >= 1) return;
     clearAutoplayRetry();
     autoplayRetryTimer = window.setTimeout(() => {
@@ -1058,6 +1059,11 @@ export async function initIntroExperience({
   const restoreIntroPlayback = async () => {
     if (closed || !(hostVideo instanceof HTMLVideoElement) || document.hidden) return;
 
+    if (speechPlaybackStarted) {
+      scheduleFinishFromMedia();
+      return;
+    }
+
     if (audioMode === "media") {
       try {
         if (hostVideo.paused) await hostVideo.play();
@@ -1121,6 +1127,10 @@ export async function initIntroExperience({
     if (!(hostVideo instanceof HTMLVideoElement)) return false;
     if (audioMode === "media" && !hostVideo.paused) return true;
     if (audioMode === "starting") return false;
+    if (speechPlaybackStarted) {
+      scheduleFinishFromMedia();
+      return true;
+    }
 
     const token = ++audioToken;
     audioMode = "starting";
@@ -1131,7 +1141,7 @@ export async function initIntroExperience({
       stopFallbackAudio({ reset: true });
       suppressPauseRecovery(() => {
         hostVideo.pause();
-        if (resetToStart) hostVideo.currentTime = 0;
+        if (resetToStart && !speechPlaybackStarted) hostVideo.currentTime = 0;
       });
       hostVideo.muted = false;
       hostVideo.defaultMuted = false;
@@ -1151,6 +1161,10 @@ export async function initIntroExperience({
       if (!visualReady && visualFallbackSrc && swapHostVideoSource(visualFallbackSrc)) {
         stopFallbackAudio({ reset: true });
         usingFallbackAudio = false;
+        if (speechPlaybackStarted) {
+          scheduleFinishFromMedia();
+          return false;
+        }
         return tryPlayNarrationAudio({ resetToStart: !introSequenceStarted });
       }
       if (token !== audioToken) return false;
@@ -1187,7 +1201,7 @@ export async function initIntroExperience({
         stopFallbackAudio({ reset: true });
         suppressPauseRecovery(() => {
           hostVideo.pause();
-          if (!introSequenceStarted) hostVideo.currentTime = 0;
+          if (!introSequenceStarted && !speechPlaybackStarted) hostVideo.currentTime = 0;
           hostVideo.muted = true;
           hostVideo.defaultMuted = true;
           hostVideo.volume = 0;
@@ -1357,11 +1371,17 @@ export async function initIntroExperience({
     void resumeIntroExperience();
   });
   hostVideo?.addEventListener("timeupdate", () => syncFallbackAudioTime());
+  hostVideo?.addEventListener("timeupdate", () => {
+    if (!speechPlaybackStarted && hostVideo.currentTime >= 0.18) {
+      speechPlaybackStarted = true;
+      clearAutoplayRetry();
+    }
+  });
   hostVideo?.addEventListener("seeking", () => syncFallbackAudioTime(true));
   hostVideo?.addEventListener("seeked", () => syncFallbackAudioTime(true));
   hostVideo?.addEventListener("pause", () => {
     if (usingFallbackAudio) stopFallbackAudio();
-    if (!closed && !document.hidden && !pauseRecoverySuppressed && introPlaybackCommitted) {
+    if (!closed && !document.hidden && !pauseRecoverySuppressed && introPlaybackCommitted && !speechPlaybackStarted) {
       scheduleViewportRepair();
     }
   });
@@ -1393,6 +1413,12 @@ export async function initIntroExperience({
   fallbackAudio?.addEventListener("ended", () => {
     if (!usingFallbackAudio) return;
     scheduleFinishFromMedia();
+  });
+  fallbackAudio?.addEventListener("timeupdate", () => {
+    if (!speechPlaybackStarted && fallbackAudio.currentTime >= 0.18) {
+      speechPlaybackStarted = true;
+      clearAutoplayRetry();
+    }
   });
   const handleIntroKeydown = (event) => {
     if (event.key === "Escape") finishIntro();
