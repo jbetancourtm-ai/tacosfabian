@@ -8,6 +8,9 @@ const SCRIPT_SEGMENTS = [
   "Revisa el menu o haz tu pedido por WhatsApp."
 ];
 
+let introExperienceActive = false;
+let introExperienceCompleted = false;
+
 function createSmokeTexture() {
   const size = 128;
   const canvas = document.createElement("canvas");
@@ -511,6 +514,9 @@ export async function initIntroExperience({
   introScreen,
   introSkipBtn,
 }) {
+  if (introExperienceCompleted || introExperienceActive) return;
+  introExperienceActive = true;
+
   const canvas = introScreen.querySelector("#introCanvas");
   const narration = introScreen.querySelector("#introNarration");
   const hostCard = introScreen.querySelector("#fabianIntro");
@@ -574,6 +580,7 @@ export async function initIntroExperience({
   }
 
   if (!(canvas instanceof HTMLCanvasElement) || !(narration instanceof HTMLElement)) {
+    introExperienceActive = false;
     document.body.classList.remove("intro-active");
     return;
   }
@@ -594,6 +601,20 @@ export async function initIntroExperience({
   let hostSideSwapped = false;
   let introAudioUnlockBound = false;
   let viewportRepairTimer = 0;
+  let pauseRecoverySuppressed = false;
+  let introSequenceStarted = false;
+  let introPlaybackCommitted = false;
+
+  const suppressPauseRecovery = (callback) => {
+    pauseRecoverySuppressed = true;
+    try {
+      return callback();
+    } finally {
+      window.setTimeout(() => {
+        pauseRecoverySuppressed = false;
+      }, 0);
+    }
+  };
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -821,7 +842,9 @@ export async function initIntroExperience({
 
   const stopFallbackAudio = ({ reset = false } = {}) => {
     if (!fallbackAudio) return;
-    fallbackAudio.pause();
+    suppressPauseRecovery(() => {
+      fallbackAudio.pause();
+    });
     if (reset) {
       try {
         fallbackAudio.currentTime = 0;
@@ -844,7 +867,9 @@ export async function initIntroExperience({
 
   const stopAmbientIntro = ({ reset = false } = {}) => {
     if (!ambientIntro) return;
-    ambientIntro.pause();
+    suppressPauseRecovery(() => {
+      ambientIntro.pause();
+    });
     if (reset) {
       try {
         ambientIntro.currentTime = 0;
@@ -875,11 +900,11 @@ export async function initIntroExperience({
 
   const scheduleAutoplayRetry = (delay = 220) => {
     if (closed || document.hidden || audioMode === "media" || audioMode === "starting") return;
-    if (autoplayRetryCount >= 3) return;
+    if (autoplayRetryCount >= 1) return;
     clearAutoplayRetry();
     autoplayRetryTimer = window.setTimeout(() => {
       autoplayRetryCount += 1;
-      void tryPlayNarrationAudio({ restart: autoplayRetryCount > 1 });
+      void tryPlayNarrationAudio();
     }, delay);
   };
 
@@ -896,11 +921,13 @@ export async function initIntroExperience({
     const resolvedSrc = hostVideo.dataset.resolvedSrc || hostVideo.currentSrc || hostVideo.src;
     const absoluteTarget = new URL(src, window.location.origin).href;
     if (resolvedSrc === src || resolvedSrc === absoluteTarget) return false;
-    hostVideo.pause();
-    hostVideo.src = src;
-    hostVideo.dataset.resolvedSrc = src;
-    hostVideo.dataset.resolvedType = src.endsWith(".mp4") ? "video/mp4" : 'video/webm; codecs="vp9,opus"';
-    hostVideo.load();
+    suppressPauseRecovery(() => {
+      hostVideo.pause();
+      hostVideo.src = src;
+      hostVideo.dataset.resolvedSrc = src;
+      hostVideo.dataset.resolvedType = src.endsWith(".mp4") ? "video/mp4" : 'video/webm; codecs="vp9,opus"';
+      hostVideo.load();
+    });
     return true;
   };
 
@@ -955,8 +982,10 @@ export async function initIntroExperience({
 
     try {
       if (restart) {
-        hostVideo.pause();
-        hostVideo.currentTime = 0;
+        suppressPauseRecovery(() => {
+          hostVideo.pause();
+          hostVideo.currentTime = 0;
+        });
       }
       hostVideo.muted = muted;
       hostVideo.defaultMuted = muted;
@@ -1039,7 +1068,7 @@ export async function initIntroExperience({
     }
 
     if (audioMode === "media") {
-      await tryPlayNarrationAudio({ restart: false });
+      await tryPlayNarrationAudio();
     } else if (autoplayRetryCount < 3) {
       scheduleAutoplayRetry(120);
     }
@@ -1063,7 +1092,7 @@ export async function initIntroExperience({
     ) {
       return;
     }
-    void restartIntroExperience();
+    void resumeIntroExperience();
   };
 
   const removeIntroAudioUnlockListeners = () => {
@@ -1100,18 +1129,22 @@ export async function initIntroExperience({
     );
   };
 
-  const tryPlayNarrationAudio = async ({ restart = false } = {}) => {
+  const tryPlayNarrationAudio = async ({ resetToStart = false } = {}) => {
     if (!(hostVideo instanceof HTMLVideoElement)) return false;
-    if (!restart && audioMode === "media" && !hostVideo.paused) return true;
+    if (audioMode === "media" && !hostVideo.paused) return true;
+    if (audioMode === "starting") return false;
 
     const token = ++audioToken;
     audioMode = "starting";
     usingFallbackAudio = false;
+    introPlaybackCommitted = true;
 
     try {
       stopFallbackAudio({ reset: true });
-      hostVideo.pause();
-      hostVideo.currentTime = 0;
+      suppressPauseRecovery(() => {
+        hostVideo.pause();
+        if (resetToStart) hostVideo.currentTime = 0;
+      });
       hostVideo.muted = false;
       hostVideo.defaultMuted = false;
       hostVideo.volume = 0;
@@ -1125,14 +1158,15 @@ export async function initIntroExperience({
         await fallbackAudio.play();
       }
       fadeHostVideoTo(0.88, 0.18);
-      await ensureAmbientIntro({ force: restart });
+      await ensureAmbientIntro({ force: resetToStart });
       const visualReady = await waitForVideoProgress(1200);
       if (!visualReady && visualFallbackSrc && swapHostVideoSource(visualFallbackSrc)) {
         stopFallbackAudio({ reset: true });
         usingFallbackAudio = false;
-        return tryPlayNarrationAudio({ restart: true });
+        return tryPlayNarrationAudio({ resetToStart: !introSequenceStarted });
       }
       if (token !== audioToken) return false;
+      introSequenceStarted = true;
       hostVideo.classList.add("is-ready");
       if (ambientEnabled) fadeAmbientTo(0.06, 0.65);
       audioMode = "media";
@@ -1151,10 +1185,10 @@ export async function initIntroExperience({
       try {
         usingFallbackAudio = false;
         stopFallbackAudio({ reset: true });
-        const visualStarted = await ensureVisualPlayback({ restart: true, muted: true });
+        const visualStarted = await ensureVisualPlayback({ restart: !introSequenceStarted, muted: true });
         if (!visualStarted) throw new Error("visual-playback-failed");
         if (token !== audioToken) return false;
-        await ensureAmbientIntro({ force: restart });
+        await ensureAmbientIntro({ force: resetToStart });
         if (ambientEnabled) fadeAmbientTo(0.085, 0.6);
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
@@ -1165,11 +1199,13 @@ export async function initIntroExperience({
         if (token !== audioToken) return false;
         usingFallbackAudio = false;
         stopFallbackAudio({ reset: true });
-        hostVideo.pause();
-        hostVideo.currentTime = 0;
-        hostVideo.muted = true;
-        hostVideo.defaultMuted = true;
-        hostVideo.volume = 0;
+        suppressPauseRecovery(() => {
+          hostVideo.pause();
+          if (!introSequenceStarted) hostVideo.currentTime = 0;
+          hostVideo.muted = true;
+          hostVideo.defaultMuted = true;
+          hostVideo.volume = 0;
+        });
         stopAmbientIntro({ reset: true });
         audioMode = "idle";
         introSoundBtn?.classList.remove("is-hidden");
@@ -1232,18 +1268,10 @@ export async function initIntroExperience({
     scheduleFinish(autoDismissMs);
   };
 
-  const restartIntroExperience = async () => {
-    if (closed) return false;
-
-    timeline?.pause(0);
-    timeline?.restart();
-    hostSideSwapped = false;
-    hostCard?.classList.remove("is-swapped", "is-playing");
-    setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
-    const started = await tryPlayNarrationAudio({ restart: true });
-
+  const resumeIntroExperience = async () => {
+    if (closed || audioMode === "starting" || audioMode === "media") return false;
+    const started = await tryPlayNarrationAudio();
     if (started) pulseSpeaking(2600);
-
     return started;
   };
 
@@ -1269,6 +1297,8 @@ export async function initIntroExperience({
   const finishIntro = () => {
     if (closed) return;
     closed = true;
+    introExperienceActive = false;
+    introExperienceCompleted = true;
 
     if (speakingTimer) window.clearTimeout(speakingTimer);
     if (viewportRepairTimer) window.clearTimeout(viewportRepairTimer);
@@ -1284,9 +1314,11 @@ export async function initIntroExperience({
       usingFallbackAudio = false;
       stopFallbackAudio({ reset: true });
       stopAmbientIntro({ reset: true });
-      hostVideo.pause();
-      hostVideo.currentTime = 0;
-      hostVideo.volume = 0.88;
+      suppressPauseRecovery(() => {
+        hostVideo.pause();
+        hostVideo.currentTime = 0;
+        hostVideo.volume = 0.88;
+      });
     }, 360);
     removeIntroAudioUnlockListeners();
     if (autoDismissTimer) window.clearTimeout(autoDismissTimer);
@@ -1338,14 +1370,14 @@ export async function initIntroExperience({
       }
       return;
     }
-    void restartIntroExperience();
+    void resumeIntroExperience();
   });
   hostVideo?.addEventListener("timeupdate", () => syncFallbackAudioTime());
   hostVideo?.addEventListener("seeking", () => syncFallbackAudioTime(true));
   hostVideo?.addEventListener("seeked", () => syncFallbackAudioTime(true));
   hostVideo?.addEventListener("pause", () => {
     if (usingFallbackAudio) stopFallbackAudio();
-    if (!closed && !document.hidden) {
+    if (!closed && !document.hidden && !pauseRecoverySuppressed && introPlaybackCommitted) {
       scheduleViewportRepair();
     }
   });
@@ -1357,17 +1389,17 @@ export async function initIntroExperience({
     void ensureVisualPlayback({ restart: false, muted: audioMode !== "media" });
   });
   hostVideo?.addEventListener("loadeddata", () => {
-    if (closed || document.hidden) return;
+    if (closed || document.hidden || introSequenceStarted || introPlaybackCommitted) return;
     scheduleAutoplayRetry(90);
   });
   hostVideo?.addEventListener("canplay", () => {
-    if (closed || document.hidden) return;
+    if (closed || document.hidden || introSequenceStarted || introPlaybackCommitted) return;
     scheduleAutoplayRetry(60);
   });
   hostVideo?.addEventListener("error", () => {
     if (closed) return;
     if (visualFallbackSrc) swapHostVideoSource(visualFallbackSrc);
-    void ensureVisualPlayback({ restart: true, muted: audioMode !== "media", preferFallback: true });
+    void ensureVisualPlayback({ restart: !introSequenceStarted, muted: audioMode !== "media", preferFallback: true });
   });
   hostVideo?.addEventListener("ended", () => {
     if (usingFallbackAudio && fallbackAudio && !fallbackAudio.ended) return;
@@ -1518,6 +1550,6 @@ export async function initIntroExperience({
     setNarrationLine(SCRIPT_SEGMENTS[0], SCRIPT_SEGMENTS[0]);
   }
 
-  void tryPlayNarrationAudio();
+  void tryPlayNarrationAudio({ resetToStart: true });
   render();
 }
