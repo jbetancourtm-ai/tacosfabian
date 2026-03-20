@@ -1301,16 +1301,6 @@ export async function initIntroExperience({
 
   const scheduleFinishFromMedia = () => {
     if (promoPlaybackStarted && promoVideo instanceof HTMLVideoElement && !promoPlaybackCompleted) {
-      const promoDuration = promoVideo.duration;
-      if (Number.isFinite(promoDuration) && promoDuration > 0) {
-        const promoRemainingMs = Math.max(
-          0,
-          Math.round((promoDuration - promoVideo.currentTime) * 1000) + introOutroBufferMs
-        );
-        scheduleFinish(promoRemainingMs, { ignoreTimeline: true });
-        return;
-      }
-      scheduleFinish(autoDismissMs);
       return;
     }
 
@@ -1550,6 +1540,7 @@ export async function initIntroExperience({
   });
   promoVideo?.addEventListener("play", () => {
     promoReserve?.classList.add("is-active");
+    clearAutoDismissTimer();
   });
   promoVideo?.addEventListener("ended", () => {
     if (promoPlaybackCompleted) return;

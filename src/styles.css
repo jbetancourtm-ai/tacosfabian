@@ -829,8 +829,8 @@ body.intro-transitioning-3d .floating-whatsapp {
   bottom: calc(var(--intro-actions-space) + 5.45rem);
   left: clamp(1rem, 4.2vw, 3rem);
   right: auto;
-  width: min(calc(var(--intro-fabian-width) + 4cm), calc(100vw - 1.6rem));
-  max-width: calc(100vw - 1.6rem);
+  width: var(--intro-fabian-width);
+  max-width: var(--intro-fabian-width);
   min-width: 0;
   aspect-ratio: 0.88 / 1.16;
   transform: translate3d(-1.1rem, 0.45rem, 0) rotateY(10deg) scale(0.96);
@@ -4474,8 +4474,8 @@ td {
     top: auto;
     bottom: calc(var(--intro-actions-space) + 5.55rem);
     left: 0.95rem;
-    width: min(calc(var(--intro-fabian-width) + 4cm), calc(100vw - 1.2rem));
-    max-width: calc(100vw - 1.2rem);
+    width: var(--intro-fabian-width);
+    max-width: var(--intro-fabian-width);
     min-width: 0;
   }
 
@@ -4783,8 +4783,8 @@ td {
     bottom: calc(var(--intro-actions-space) + 5.55rem);
     left: 0.7rem;
     right: auto;
-    width: min(calc(var(--intro-fabian-width) + 4cm), calc(100vw - 1rem));
-    max-width: calc(100vw - 1rem);
+    width: var(--intro-fabian-width);
+    max-width: var(--intro-fabian-width);
     min-width: 0;
     transform: translate3d(-0.85rem, 0.35rem, 0) rotateY(9deg) scale(0.97);
     opacity: 0;
@@ -4855,8 +4855,8 @@ td {
     left: 0.7rem;
     top: auto;
     bottom: calc(var(--intro-actions-space) + 5.8rem);
-    width: min(calc(var(--intro-fabian-width) + 4cm), calc(100vw - 0.9rem));
-    max-width: calc(100vw - 0.9rem);
+    width: var(--intro-fabian-width);
+    max-width: var(--intro-fabian-width);
     min-width: 0;
     transform: translate3d(-0.8rem, 0.35rem, 0) rotateY(9deg) scale(0.97);
   }
@@ -5038,8 +5038,8 @@ td {
     left: 0.55rem;
     top: auto;
     bottom: calc(var(--intro-actions-space) + 4rem);
-    width: min(calc(var(--intro-fabian-width) + 4cm), calc(100vw - 0.7rem));
-    max-width: calc(100vw - 0.7rem);
+    width: var(--intro-fabian-width);
+    max-width: var(--intro-fabian-width);
     min-width: 0;
     transform: translate3d(-0.7rem, 0.28rem, 0) rotateY(8deg) scale(0.97);
   }
