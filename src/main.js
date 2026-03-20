@@ -985,10 +985,25 @@ function getStickyHeaderOffset(extraOffset = 18) {
 function setActiveQuickCategory(targetId) {
   if (!quickCategoryLinks.length) return;
 
+  let activeLink = null;
+
   quickCategoryLinks.forEach((link) => {
     const isActive = link.dataset.categoryLink === targetId;
     link.classList.toggle("is-active", isActive);
     link.setAttribute("aria-current", isActive ? "true" : "false");
+    if (isActive) activeLink = link;
+  });
+
+  quickCategoryTargets.forEach((target) => {
+    const isActive = target.id === targetId;
+    target.classList.toggle("is-category-active", isActive);
+    target.setAttribute("data-category-active", isActive ? "true" : "false");
+  });
+
+  activeLink?.scrollIntoView({
+    behavior: "smooth",
+    inline: "center",
+    block: "nearest",
   });
 }
 

@@ -7155,33 +7155,73 @@ body::after {
   box-shadow: 0 14px 28px rgba(255, 106, 0, 0.24);
 }
 
-.menu-subcategory-anchor {
-  display: grid;
-  gap: 0.18rem;
-  margin: 0.32rem 0 0.7rem;
-  padding: 0.72rem 0.84rem;
-  border: 1px solid rgba(255, 146, 72, 0.24);
-  border-radius: 1rem;
-  background: linear-gradient(180deg, rgba(255, 247, 238, 0.96), rgba(255, 239, 223, 0.9));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
-}
-
-.menu-subcategory-anchor span {
-  color: #8f3708;
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.menu-subcategory-anchor small {
-  color: #805438;
-  font-size: 0.73rem;
-  line-height: 1.45;
-}
-
 [data-category-target] {
   scroll-margin-top: 7.2rem;
+}
+
+.menu-item {
+  transition:
+    transform 220ms ease,
+    box-shadow 240ms ease,
+    border-color 220ms ease,
+    background 240ms ease;
+}
+
+.menu-item h3 {
+  transition:
+    color 220ms ease,
+    text-shadow 240ms ease,
+    transform 220ms ease;
+}
+
+.menu-item h3::after {
+  transition:
+    width 220ms ease,
+    background 220ms ease,
+    box-shadow 240ms ease,
+    opacity 220ms ease;
+}
+
+.menu-item.is-category-active {
+  border-color: rgba(17, 44, 84, 0.24);
+  box-shadow:
+    0 24px 42px rgba(17, 44, 84, 0.12),
+    0 0 0 1px rgba(17, 44, 84, 0.08);
+  background: linear-gradient(168deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 255, 0.96));
+}
+
+.menu-item.is-category-active h3 {
+  color: #173155;
+  text-shadow:
+    0 0 8px rgba(28, 74, 138, 0.18),
+    0 0 18px rgba(15, 45, 88, 0.12);
+  transform: translateY(-1px);
+  animation: menu-category-title-glow 2.4s ease-in-out infinite;
+}
+
+.menu-item.is-category-active h3::after {
+  width: 72px;
+  background: linear-gradient(90deg, rgba(17, 44, 84, 0.92), rgba(61, 114, 193, 0.42));
+  box-shadow: 0 0 12px rgba(24, 68, 128, 0.22);
+}
+
+.menu-item--kilo .menu-item-price {
+  background: linear-gradient(135deg, #173155, #315b92);
+  box-shadow: 0 10px 18px rgba(23, 49, 85, 0.24);
+}
+
+@keyframes menu-category-title-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 6px rgba(28, 74, 138, 0.14),
+      0 0 14px rgba(15, 45, 88, 0.08);
+  }
+  50% {
+    text-shadow:
+      0 0 10px rgba(37, 89, 163, 0.22),
+      0 0 22px rgba(15, 45, 88, 0.14);
+  }
 }
 
 @media (min-width: 768px) {
@@ -7208,19 +7248,6 @@ body::after {
     min-height: 2.16rem;
     padding: 0.56rem 0.82rem;
     font-size: 0.75rem;
-  }
-
-  .menu-subcategory-anchor {
-    margin-bottom: 0.62rem;
-    padding: 0.66rem 0.74rem;
-  }
-
-  .menu-subcategory-anchor span {
-    font-size: 0.74rem;
-  }
-
-  .menu-subcategory-anchor small {
-    font-size: 0.68rem;
   }
 
   [data-category-target] {
