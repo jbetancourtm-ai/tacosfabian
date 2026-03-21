@@ -73,7 +73,7 @@
     />
     <script>
       window.__HOME_THEME__ = "premium-noir";
-      window.__EXPERIENCE_VARIANT__ = "classic-intro";
+      window.__EXPERIENCE_VARIANT__ = "home-direct";
       document.documentElement.dataset.experienceVariant = window.__EXPERIENCE_VARIANT__;
     </script>
     <link rel="stylesheet" href="/src/styles.css" />
@@ -83,6 +83,7 @@
       (function syncExperienceVariant() {
         var variant = window.__EXPERIENCE_VARIANT__ || "classic-intro";
         document.body.dataset.experienceVariant = variant;
+        document.body.dataset.homeHostsExperimentComplete = variant === "home-direct" ? "false" : "true";
         if (variant === "home-direct") {
           document.body.classList.remove("intro-active");
           return;

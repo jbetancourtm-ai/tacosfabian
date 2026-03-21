@@ -752,19 +752,36 @@ function setupHomeHostsExperiment() {
     fabian: homeHostFabian,
     favio: homeHostFavio,
   };
-  const lines = [
-    { speaker: "fabian", text: "Bienvenido. Ya entraste directo a la casa, sin intro separado." },
-    { speaker: "favio", text: "Aqui mismo te contamos lo bueno: suadero, trozos y antojo listo en minutos." },
-    { speaker: "fabian", text: "Mira el menu, ubicate rapido y pide cuando quieras por WhatsApp." },
-    { speaker: "favio", text: "Terminando nosotros, te seguimos acompanando arriba del boton de WhatsApp." },
+  const availableCards = Object.values(speakerCards).filter((card) => card instanceof HTMLElement);
+  const steps = [
+    {
+      speaker: "fabian",
+      reveal: "fabian",
+      text: "Bienvenido. Aqui entras directo a HOME, sin correr el intro al inicio.",
+    },
+    {
+      speaker: "favio",
+      reveal: "favio",
+      text: "Yo aparezco despues, del mismo tamano visual, y participamos aqui sin taparnos con la pagina.",
+    },
+    {
+      speaker: "fabian",
+      text: "Revisas el menu y la experiencia sigue limpia, sin personajes duplicados ni capas encima.",
+    },
+    {
+      speaker: "favio",
+      text: "Cuando terminamos, desaparecemos y solo entonces vuelve el estado pequeno junto a WhatsApp.",
+    },
   ];
   const entranceDuration = reducedMotion ? 0.18 : 0.55;
+  const revealDuration = reducedMotion ? 0.2 : 0.38;
   const lineHoldMs = reducedMotion ? 1200 : 1800;
   const betweenLineMs = reducedMotion ? 140 : 220;
   const exitDuration = reducedMotion ? 0.18 : 0.45;
   let lineTimer = 0;
   let nextLineTimer = 0;
   let sequenceCompleted = false;
+  const revealedSpeakers = new Set();
 
   const clearTimers = () => {
     window.clearTimeout(lineTimer);
@@ -780,10 +797,29 @@ function setupHomeHostsExperiment() {
     });
   };
 
+  const revealSpeakerCard = (speaker, onComplete) => {
+    const card = speakerCards[speaker];
+    if (!(card instanceof HTMLElement) || revealedSpeakers.has(speaker)) {
+      onComplete?.();
+      return;
+    }
+
+    revealedSpeakers.add(speaker);
+    gsap.to(card, {
+      autoAlpha: 1,
+      y: 0,
+      duration: revealDuration,
+      ease: "power2.out",
+      overwrite: true,
+      onComplete,
+    });
+  };
+
   const finishSequence = () => {
     if (sequenceCompleted) return;
     sequenceCompleted = true;
     clearTimers();
+    gsap.killTweensOf(availableCards);
     Object.values(speakerCards).forEach((card) => {
       if (card instanceof HTMLElement) card.classList.remove("is-speaking", "is-active");
     });
@@ -804,29 +840,35 @@ function setupHomeHostsExperiment() {
     });
   };
 
-  const runLine = (index) => {
-    const line = lines[index];
-    if (!line) {
+  const runStep = (index) => {
+    const step = steps[index];
+    if (!step) {
       finishSequence();
       return;
     }
 
-    setSpeakerState(line.speaker);
-    homeHostsLine.textContent = line.text;
-    lineTimer = window.setTimeout(() => {
-      nextLineTimer = window.setTimeout(() => runLine(index + 1), betweenLineMs);
-    }, lineHoldMs);
+    const applyStep = () => {
+      setSpeakerState(step.speaker);
+      homeHostsLine.textContent = step.text;
+      lineTimer = window.setTimeout(() => {
+        nextLineTimer = window.setTimeout(() => runStep(index + 1), betweenLineMs);
+      }, lineHoldMs);
+    };
+
+    revealSpeakerCard(step.reveal, applyStep);
   };
 
   gsap.killTweensOf(homeHostsExperiment);
+  gsap.killTweensOf(availableCards);
   gsap.set(homeHostsExperiment, { autoAlpha: 0, y: reducedMotion ? 0 : 16 });
+  gsap.set(availableCards, { autoAlpha: 0, y: reducedMotion ? 0 : 22 });
   gsap.to(homeHostsExperiment, {
     autoAlpha: 1,
     y: 0,
     duration: entranceDuration,
     ease: "power2.out",
     overwrite: true,
-    onComplete: () => runLine(0),
+    onComplete: () => runStep(0),
   });
 }
 

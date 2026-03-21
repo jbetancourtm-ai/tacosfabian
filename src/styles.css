@@ -564,6 +564,13 @@ html[data-experience-variant="home-direct"] #intro-screen {
   display: none;
 }
 
+html[data-experience-variant="home-direct"] body[data-home-hosts-experiment-complete="false"] .floating-fabian-host,
+html[data-experience-variant="home-direct"] body[data-home-hosts-experiment-complete="false"] .floating-whatsapp {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 @keyframes site-intro-reveal {
   from {
     opacity: 0;
@@ -8050,6 +8057,7 @@ main#contenido {
   z-index: 1;
   display: grid;
   gap: 0.65rem;
+  align-self: start;
 }
 
 .home-hosts__eyebrow {
@@ -8080,6 +8088,8 @@ main#contenido {
 }
 
 .home-hosts__duo {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
@@ -8088,6 +8098,7 @@ main#contenido {
 }
 
 .home-host-card {
+  --home-host-scale: 1;
   position: relative;
   display: grid;
   justify-items: center;
@@ -8099,6 +8110,10 @@ main#contenido {
   transition: transform 0.26s ease, opacity 0.26s ease, filter 0.26s ease;
   opacity: 0.76;
   filter: saturate(0.88);
+}
+
+.home-host-card--favio {
+  --home-host-scale: 1.14;
 }
 
 .home-host-card.is-active {
@@ -8129,6 +8144,7 @@ main#contenido {
   transform-origin: center bottom;
   filter: drop-shadow(0 18px 20px rgba(14, 7, 4, 0.28));
   animation: home-host-idle 3.2s ease-in-out infinite;
+  transform: scale(var(--home-host-scale, 1));
 }
 
 .home-host-card.is-speaking .home-host-card__figure {
@@ -8149,26 +8165,26 @@ main#contenido {
 @keyframes home-host-idle {
   0%,
   100% {
-    transform: translateY(0) rotate(0deg);
+    transform: translateY(0) rotate(0deg) scale(var(--home-host-scale, 1));
   }
   50% {
-    transform: translateY(-4px) rotate(-1deg);
+    transform: translateY(-4px) rotate(-1deg) scale(var(--home-host-scale, 1));
   }
 }
 
 @keyframes home-host-speaking {
   0%,
   100% {
-    transform: translateY(0) rotate(0deg) scale(1);
+    transform: translateY(0) rotate(0deg) scale(var(--home-host-scale, 1));
   }
   25% {
-    transform: translateY(-5px) rotate(-1deg) scale(1.02);
+    transform: translateY(-5px) rotate(-1deg) scale(calc(var(--home-host-scale, 1) * 1.02));
   }
   50% {
-    transform: translateY(-2px) rotate(1deg) scale(1.03);
+    transform: translateY(-2px) rotate(1deg) scale(calc(var(--home-host-scale, 1) * 1.03));
   }
   75% {
-    transform: translateY(-6px) rotate(-1deg) scale(1.01);
+    transform: translateY(-6px) rotate(-1deg) scale(calc(var(--home-host-scale, 1) * 1.01));
   }
 }
 
