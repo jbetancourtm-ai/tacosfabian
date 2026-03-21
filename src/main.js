@@ -36,6 +36,8 @@ const homeHostsExperiment = document.querySelector("#homeHostsExperiment");
 const homeHostsLine = document.querySelector("#homeHostsLine");
 const homeHostFabian = document.querySelector("#homeHostFabian");
 const homeHostFavio = document.querySelector("#homeHostFavio");
+const homeHostFabianVideo = document.querySelector("#homeHostFabianVideo");
+const homeHostFavioVideo = document.querySelector("#homeHostFavioVideo");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
 const installAppButtons = Array.from(document.querySelectorAll("#installAppBtn, #introInstallAppBtn"));
 const exitAppButtons = Array.from(document.querySelectorAll("#exitAppBtn"));
@@ -752,6 +754,10 @@ function setupHomeHostsExperiment() {
     fabian: homeHostFabian,
     favio: homeHostFavio,
   };
+  const speakerVideos = {
+    fabian: homeHostFabianVideo,
+    favio: homeHostFavioVideo,
+  };
   const availableCards = Object.values(speakerCards).filter((card) => card instanceof HTMLElement);
   const steps = [
     {
@@ -788,6 +794,50 @@ function setupHomeHostsExperiment() {
     window.clearTimeout(nextLineTimer);
   };
 
+  const prepareSequenceVideo = (video) => {
+    if (!(video instanceof HTMLVideoElement)) return;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.autoplay = false;
+    video.loop = false;
+    video.controls = false;
+    video.preload = "metadata";
+    video.classList.remove("is-ready");
+    const markReady = () => {
+      video.classList.add("is-ready");
+      video.closest(".home-host-card")?.classList.add("has-video");
+    };
+    video.addEventListener("loadeddata", markReady, { once: true });
+    video.addEventListener("canplay", markReady, { once: true });
+    video.addEventListener("playing", markReady, { once: true });
+    video.load();
+  };
+
+  const playSequenceVideo = async (speaker) => {
+    const video = speakerVideos[speaker];
+    if (!(video instanceof HTMLVideoElement)) return;
+    try {
+      video.currentTime = 0;
+    } catch {}
+    try {
+      await video.play();
+      video.classList.add("is-ready");
+      video.closest(".home-host-card")?.classList.add("has-video");
+    } catch {
+      // Keep image fallback visible if playback is blocked.
+    }
+  };
+
+  const pauseSequenceVideos = () => {
+    Object.values(speakerVideos).forEach((video) => {
+      if (!(video instanceof HTMLVideoElement)) return;
+      video.pause();
+    });
+  };
+
   const setSpeakerState = (speaker) => {
     Object.entries(speakerCards).forEach(([key, card]) => {
       if (!(card instanceof HTMLElement)) return;
@@ -795,6 +845,8 @@ function setupHomeHostsExperiment() {
       card.classList.toggle("is-active", isActive);
       card.classList.toggle("is-speaking", isActive);
     });
+    pauseSequenceVideos();
+    void playSequenceVideo(speaker);
   };
 
   const revealSpeakerCard = (speaker, onComplete) => {
@@ -805,13 +857,21 @@ function setupHomeHostsExperiment() {
     }
 
     revealedSpeakers.add(speaker);
-    gsap.to(card, {
-      autoAlpha: 1,
-      y: 0,
-      duration: revealDuration,
-      ease: "power2.out",
-      overwrite: true,
-      onComplete,
+    card.classList.add("is-mounted");
+    window.requestAnimationFrame(() => {
+      card.classList.add("is-visible");
+      gsap.fromTo(
+        card,
+        { y: reducedMotion ? 0 : 24, opacity: 0.01 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: revealDuration,
+          ease: "power2.out",
+          overwrite: true,
+          onComplete,
+        }
+      );
     });
   };
 
@@ -820,6 +880,7 @@ function setupHomeHostsExperiment() {
     sequenceCompleted = true;
     clearTimers();
     gsap.killTweensOf(availableCards);
+    pauseSequenceVideos();
     Object.values(speakerCards).forEach((card) => {
       if (card instanceof HTMLElement) card.classList.remove("is-speaking", "is-active");
     });
@@ -860,8 +921,12 @@ function setupHomeHostsExperiment() {
 
   gsap.killTweensOf(homeHostsExperiment);
   gsap.killTweensOf(availableCards);
+  Object.values(speakerVideos).forEach((video) => prepareSequenceVideo(video));
+  availableCards.forEach((card) => {
+    card.classList.remove("is-mounted", "is-visible", "is-speaking", "is-active");
+  });
   gsap.set(homeHostsExperiment, { autoAlpha: 0, y: reducedMotion ? 0 : 16 });
-  gsap.set(availableCards, { autoAlpha: 0, y: reducedMotion ? 0 : 22 });
+  gsap.set(availableCards, { clearProps: "opacity,transform" });
   gsap.to(homeHostsExperiment, {
     autoAlpha: 1,
     y: 0,

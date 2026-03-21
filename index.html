@@ -383,29 +383,57 @@
             <div class="home-hosts__duo" aria-hidden="true">
               <article id="homeHostFabian" class="home-host-card home-host-card--fabian">
                 <span class="home-host-card__halo"></span>
-                <img
-                  class="home-host-card__figure"
-                  src="/images/fabian.png"
-                  alt=""
-                  loading="eager"
-                  decoding="async"
-                  fetchpriority="high"
-                  width="352"
-                  height="470"
-                />
+                <div class="home-host-card__media">
+                  <video
+                    id="homeHostFabianVideo"
+                    class="home-host-card__video"
+                    playsinline
+                    muted
+                    preload="metadata"
+                    poster="/images/fabian.png"
+                    data-preferred-visual="/images/fabian_transparente_mejor.webm"
+                    data-browser-fallback="/images/fabian_web_audio5.mp4"
+                    data-audio-fallback="/images/fabian_web_audio5.mp4"
+                  >
+                    <source src="/images/fabian_transparente_mejor.webm" type='video/webm; codecs="vp9,opus"' />
+                    <source src="/images/fabian_web_audio5.mp4" type="video/mp4" />
+                  </video>
+                  <img
+                    class="home-host-card__figure home-host-card__figure--fallback"
+                    src="/images/fabian.png"
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                    fetchpriority="high"
+                    width="352"
+                    height="470"
+                  />
+                </div>
                 <span class="home-host-card__name">Fabian</span>
               </article>
               <article id="homeHostFavio" class="home-host-card home-host-card--favio">
                 <span class="home-host-card__halo"></span>
-                <img
-                  class="home-host-card__figure"
-                  src="/images/favio.png"
-                  alt=""
-                  loading="eager"
-                  decoding="async"
-                  width="352"
-                  height="470"
-                />
+                <div class="home-host-card__media">
+                  <video
+                    id="homeHostFavioVideo"
+                    class="home-host-card__video"
+                    playsinline
+                    muted
+                    preload="metadata"
+                    poster="/images/favio.png"
+                  >
+                    <source src="/video/Tacos%20Favio_720p_caption.mp4" type="video/mp4" />
+                  </video>
+                  <img
+                    class="home-host-card__figure home-host-card__figure--fallback"
+                    src="/images/favio.png"
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                    width="352"
+                    height="470"
+                  />
+                </div>
                 <span class="home-host-card__name">Favio</span>
               </article>
             </div>
