@@ -73,10 +73,23 @@
     />
     <script>
       window.__HOME_THEME__ = "premium-noir";
+      window.__EXPERIENCE_VARIANT__ = "classic-intro";
+      document.documentElement.dataset.experienceVariant = window.__EXPERIENCE_VARIANT__;
     </script>
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body class="intro-active" data-home-theme="premium-noir">
+    <script>
+      (function syncExperienceVariant() {
+        var variant = window.__EXPERIENCE_VARIANT__ || "classic-intro";
+        document.body.dataset.experienceVariant = variant;
+        if (variant === "home-direct") {
+          document.body.classList.remove("intro-active");
+          return;
+        }
+        document.body.classList.add("intro-active");
+      })();
+    </script>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <div id="intro-screen" class="intro-screen" aria-hidden="false">
@@ -354,6 +367,48 @@
         <div class="hero-premium__glow hero-premium__glow--left" aria-hidden="true"></div>
         <div class="hero-premium__glow hero-premium__glow--right" aria-hidden="true"></div>
         <div class="container hero-grid hero-grid--premium">
+          <section
+            id="homeHostsExperiment"
+            class="home-hosts home-hosts--experiment"
+            aria-label="Bienvenida de Fabian y Favio en home"
+            hidden
+          >
+            <div class="home-hosts__copy">
+              <p class="home-hosts__eyebrow">Recibimiento en home</p>
+              <div class="home-hosts__speech" aria-live="polite" aria-atomic="true">
+                <p id="homeHostsLine">Bienvenido a Tacos Fabian.</p>
+              </div>
+            </div>
+            <div class="home-hosts__duo" aria-hidden="true">
+              <article id="homeHostFabian" class="home-host-card home-host-card--fabian">
+                <span class="home-host-card__halo"></span>
+                <img
+                  class="home-host-card__figure"
+                  src="/images/fabian.png"
+                  alt=""
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                  width="352"
+                  height="470"
+                />
+                <span class="home-host-card__name">Fabian</span>
+              </article>
+              <article id="homeHostFavio" class="home-host-card home-host-card--favio">
+                <span class="home-host-card__halo"></span>
+                <img
+                  class="home-host-card__figure"
+                  src="/images/favio.png"
+                  alt=""
+                  loading="eager"
+                  decoding="async"
+                  width="352"
+                  height="470"
+                />
+                <span class="home-host-card__name">Favio</span>
+              </article>
+            </div>
+          </section>
           <aside class="hero-side-stack hero-side-stack--premium hero-side-stack--solo" aria-label="Productos destacados">
             <div
               id="menuCarousel"

@@ -1,5 +1,6 @@
 import { gsap } from "gsap";
 import { initHomeTheme } from "./home-theme.js";
+import { IS_EXPERIMENTAL_HOME_DIRECT, applyExperienceVariantToDocument } from "./experience-config.js";
 
 const menuBtn = document.querySelector("#menuBtn");
 const navMenu = document.querySelector("#navMenu");
@@ -31,6 +32,10 @@ const quickCategoryLinks = Array.from(document.querySelectorAll("[data-category-
 const quickCategoryTargets = Array.from(document.querySelectorAll("[data-category-target]"));
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
+const homeHostsExperiment = document.querySelector("#homeHostsExperiment");
+const homeHostsLine = document.querySelector("#homeHostsLine");
+const homeHostFabian = document.querySelector("#homeHostFabian");
+const homeHostFavio = document.querySelector("#homeHostFavio");
 const whatsappLinks = Array.from(document.querySelectorAll('a[href*="wa.me/"]')).filter((link) => !link.closest("#intro-screen"));
 const installAppButtons = Array.from(document.querySelectorAll("#installAppBtn, #introInstallAppBtn"));
 const exitAppButtons = Array.from(document.querySelectorAll("#exitAppBtn"));
@@ -59,6 +64,13 @@ let swRefreshPending = false;
 let reviewsLoaded = false;
 
 initHomeTheme();
+applyExperienceVariantToDocument();
+
+const HOME_HOSTS_COMPLETE_EVENT = "home-hosts:complete";
+
+function hasActiveIntro() {
+  return !IS_EXPERIMENTAL_HOME_DIRECT && Boolean(introScreen?.isConnected) && document.body.classList.contains("intro-active");
+}
 
 function scheduleIdleWork(callback, timeout = 900) {
   if (typeof callback !== "function") return;
@@ -644,7 +656,7 @@ function setupDeferredIntroPromo() {
   let hydrated = false;
 
   const hydratePromo = () => {
-    if (hydrated || !introScreen?.isConnected || !document.body.classList.contains("intro-active")) return;
+    if (hydrated || !hasActiveIntro()) return;
     hydrated = true;
     source.src = source.dataset.src || "";
     source.removeAttribute("data-src");
@@ -712,6 +724,109 @@ function setupWhatsappAudio() {
 
   whatsappLinks.forEach((link) => {
     link.addEventListener("click", playWhatsappChime, { passive: true });
+  });
+}
+
+function setupHomeHostsExperiment() {
+  if (!IS_EXPERIMENTAL_HOME_DIRECT) {
+    document.body.dataset.homeHostsExperimentComplete = "true";
+    window.dispatchEvent(new CustomEvent(HOME_HOSTS_COMPLETE_EVENT));
+    return;
+  }
+
+  if (!(homeHostsExperiment instanceof HTMLElement) || !(homeHostsLine instanceof HTMLElement)) {
+    document.body.dataset.homeHostsExperimentComplete = "true";
+    window.dispatchEvent(new CustomEvent(HOME_HOSTS_COMPLETE_EVENT));
+    return;
+  }
+
+  if (homeHostsExperiment.dataset.sequenceStarted === "true") return;
+  homeHostsExperiment.dataset.sequenceStarted = "true";
+  document.body.dataset.homeHostsExperimentComplete = "false";
+  document.body.classList.add("home-hosts-active");
+  homeHostsExperiment.hidden = false;
+  homeHostsExperiment.setAttribute("aria-hidden", "false");
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const speakerCards = {
+    fabian: homeHostFabian,
+    favio: homeHostFavio,
+  };
+  const lines = [
+    { speaker: "fabian", text: "Bienvenido. Ya entraste directo a la casa, sin intro separado." },
+    { speaker: "favio", text: "Aqui mismo te contamos lo bueno: suadero, trozos y antojo listo en minutos." },
+    { speaker: "fabian", text: "Mira el menu, ubicate rapido y pide cuando quieras por WhatsApp." },
+    { speaker: "favio", text: "Terminando nosotros, te seguimos acompanando arriba del boton de WhatsApp." },
+  ];
+  const entranceDuration = reducedMotion ? 0.18 : 0.55;
+  const lineHoldMs = reducedMotion ? 1200 : 1800;
+  const betweenLineMs = reducedMotion ? 140 : 220;
+  const exitDuration = reducedMotion ? 0.18 : 0.45;
+  let lineTimer = 0;
+  let nextLineTimer = 0;
+  let sequenceCompleted = false;
+
+  const clearTimers = () => {
+    window.clearTimeout(lineTimer);
+    window.clearTimeout(nextLineTimer);
+  };
+
+  const setSpeakerState = (speaker) => {
+    Object.entries(speakerCards).forEach(([key, card]) => {
+      if (!(card instanceof HTMLElement)) return;
+      const isActive = key === speaker;
+      card.classList.toggle("is-active", isActive);
+      card.classList.toggle("is-speaking", isActive);
+    });
+  };
+
+  const finishSequence = () => {
+    if (sequenceCompleted) return;
+    sequenceCompleted = true;
+    clearTimers();
+    Object.values(speakerCards).forEach((card) => {
+      if (card instanceof HTMLElement) card.classList.remove("is-speaking", "is-active");
+    });
+
+    gsap.to(homeHostsExperiment, {
+      autoAlpha: 0,
+      y: reducedMotion ? 0 : -12,
+      duration: exitDuration,
+      ease: "power2.inOut",
+      overwrite: true,
+      onComplete: () => {
+        homeHostsExperiment.hidden = true;
+        homeHostsExperiment.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("home-hosts-active");
+        document.body.dataset.homeHostsExperimentComplete = "true";
+        window.dispatchEvent(new CustomEvent(HOME_HOSTS_COMPLETE_EVENT));
+      },
+    });
+  };
+
+  const runLine = (index) => {
+    const line = lines[index];
+    if (!line) {
+      finishSequence();
+      return;
+    }
+
+    setSpeakerState(line.speaker);
+    homeHostsLine.textContent = line.text;
+    lineTimer = window.setTimeout(() => {
+      nextLineTimer = window.setTimeout(() => runLine(index + 1), betweenLineMs);
+    }, lineHoldMs);
+  };
+
+  gsap.killTweensOf(homeHostsExperiment);
+  gsap.set(homeHostsExperiment, { autoAlpha: 0, y: reducedMotion ? 0 : 16 });
+  gsap.to(homeHostsExperiment, {
+    autoAlpha: 1,
+    y: 0,
+    duration: entranceDuration,
+    ease: "power2.out",
+    overwrite: true,
+    onComplete: () => runLine(0),
   });
 }
 
@@ -879,13 +994,18 @@ function setupFloatingWhatsapp() {
     floatingWhatsapp.classList.add("is-hidden");
     floatingFabianHost?.classList.add("is-hidden");
 
-    if (!document.body.classList.contains("intro-active") && !introScreen?.isConnected) {
+    if (IS_EXPERIMENTAL_HOME_DIRECT && document.body.dataset.homeHostsExperimentComplete === "true") {
+      activateFloatingExperience();
+      return;
+    }
+
+    if (!hasActiveIntro() && !IS_EXPERIMENTAL_HOME_DIRECT) {
       activateFloatingExperience();
       return;
     }
 
     window.addEventListener(
-      "intro:complete",
+      IS_EXPERIMENTAL_HOME_DIRECT ? HOME_HOSTS_COMPLETE_EVENT : "intro:complete",
       () => {
         window.requestAnimationFrame(() => activateFloatingExperience());
       },
@@ -900,6 +1020,17 @@ function setupIntroScreen() {
   if (!introScreen) {
     document.body.classList.remove("intro-active");
     window.dispatchEvent(new CustomEvent("intro:complete"));
+    return;
+  }
+
+  if (IS_EXPERIMENTAL_HOME_DIRECT) {
+    introScreen.classList.add("is-hidden");
+    introScreen.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("intro-active");
+    window.setTimeout(() => {
+      introScreen.remove();
+      window.dispatchEvent(new CustomEvent("intro:complete"));
+    }, 0);
     return;
   }
 
@@ -1084,7 +1215,7 @@ function setupQuickCategoryNav() {
     });
   };
 
-  if (!document.body.classList.contains("intro-active") && !introScreen?.isConnected) {
+  if (!hasActiveIntro()) {
     runPresentation();
     return;
   }
@@ -1542,6 +1673,7 @@ scheduleIdleWork(() => {
   setupPwaSupport();
 }, 220);
 setupFloatingWhatsapp();
+setupHomeHostsExperiment();
 scheduleIdleWork(() => {
   setupFabianVideos();
   setupSiteAmbientAudio();
