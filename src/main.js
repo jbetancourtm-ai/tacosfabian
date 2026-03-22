@@ -33,7 +33,6 @@ const quickCategoryTargets = Array.from(document.querySelectorAll("[data-categor
 const introScreen = document.querySelector("#intro-screen");
 const introSkipBtn = document.querySelector("#introSkipBtn");
 const homeHostsExperiment = document.querySelector("#homeHostsExperiment");
-const homeHostsLine = document.querySelector("#homeHostsLine");
 const homeHostFabian = document.querySelector("#homeHostFabian");
 const homeHostFavio = document.querySelector("#homeHostFavio");
 const homeHostFabianVideo = document.querySelector("#homeHostFabianVideo");
@@ -72,6 +71,27 @@ const HOME_HOSTS_COMPLETE_EVENT = "home-hosts:complete";
 
 function hasActiveIntro() {
   return !IS_EXPERIMENTAL_HOME_DIRECT && Boolean(introScreen?.isConnected) && document.body.classList.contains("intro-active");
+}
+
+function resolveOverlayMediaSource(video) {
+  if (!(video instanceof HTMLVideoElement)) {
+    return { src: "", type: "" };
+  }
+
+  const preferredSrc = video.dataset.preferredVisual || "";
+  const browserFallbackSrc = video.dataset.browserFallback || "";
+  const audioFallbackSrc = video.dataset.audioFallback || browserFallbackSrc || preferredSrc;
+  const preferredType = preferredSrc.endsWith(".mp4") ? "video/mp4" : 'video/webm; codecs="vp9,opus"';
+  const canPlayPreferred = preferredType.includes("webm") ? video.canPlayType(preferredType) : "probably";
+
+  if (preferredSrc && (!preferredType.includes("webm") || canPlayPreferred === "probably" || canPlayPreferred === "maybe")) {
+    return { src: preferredSrc, type: preferredType };
+  }
+
+  return {
+    src: browserFallbackSrc || audioFallbackSrc,
+    type: "video/mp4",
+  };
 }
 
 function scheduleIdleWork(callback, timeout = 900) {
@@ -736,7 +756,7 @@ function setupHomeHostsExperiment() {
     return;
   }
 
-  if (!(homeHostsExperiment instanceof HTMLElement) || !(homeHostsLine instanceof HTMLElement)) {
+  if (!(homeHostsExperiment instanceof HTMLElement)) {
     document.body.dataset.homeHostsExperimentComplete = "true";
     window.dispatchEvent(new CustomEvent(HOME_HOSTS_COMPLETE_EVENT));
     return;
@@ -758,9 +778,12 @@ function setupHomeHostsExperiment() {
     fabian: homeHostFabianVideo,
     favio: homeHostFavioVideo,
   };
-  const speakerUsesVideo = {
-    fabian: true,
-    favio: false,
+  const speakerFallbackAudio = {
+    fabian:
+      homeHostFabianVideo instanceof HTMLVideoElement && homeHostFabianVideo.dataset.audioFallback
+        ? new Audio(homeHostFabianVideo.dataset.audioFallback)
+        : null,
+    favio: null,
   };
   const availableCards = Object.values(speakerCards).filter((card) => card instanceof HTMLElement);
   const speakerPlaybackFallbackMs = {
@@ -781,10 +804,28 @@ function setupHomeHostsExperiment() {
     window.clearTimeout(nextStepTimer);
   };
 
+  const mediaHasUsableAudio = (video) => {
+    if (!(video instanceof HTMLVideoElement)) return false;
+    if (typeof video.mozHasAudio === "boolean") return video.mozHasAudio;
+    if (video.audioTracks && typeof video.audioTracks.length === "number") {
+      return video.audioTracks.length > 0;
+    }
+    if (typeof video.webkitAudioDecodedByteCount === "number") {
+      return video.webkitAudioDecodedByteCount > 0;
+    }
+    return false;
+  };
+
   const prepareSequenceVideo = (video) => {
     if (!(video instanceof HTMLVideoElement)) return;
-    video.muted = true;
-    video.defaultMuted = true;
+    const resolvedMedia = resolveOverlayMediaSource(video);
+    if (resolvedMedia.src) {
+      video.src = resolvedMedia.src;
+      video.dataset.resolvedSrc = resolvedMedia.src;
+      video.dataset.resolvedType = resolvedMedia.type;
+    }
+    video.muted = false;
+    video.defaultMuted = false;
     video.playsInline = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
@@ -792,6 +833,7 @@ function setupHomeHostsExperiment() {
     video.loop = false;
     video.controls = false;
     video.preload = "metadata";
+    video.volume = 0.88;
     video.classList.remove("is-ready");
     const markReady = () => {
       video.classList.add("is-ready");
@@ -804,19 +846,41 @@ function setupHomeHostsExperiment() {
   };
 
   const playSequenceVideo = async (speaker) => {
-    if (!speakerUsesVideo[speaker]) return false;
     const video = speakerVideos[speaker];
     if (!(video instanceof HTMLVideoElement)) return false;
+    const fallbackAudio = speakerFallbackAudio[speaker];
     try {
       video.currentTime = 0;
     } catch {}
+    if (fallbackAudio instanceof HTMLAudioElement) {
+      fallbackAudio.preload = "metadata";
+      fallbackAudio.loop = false;
+      fallbackAudio.volume = 0.88;
+      try {
+        fallbackAudio.currentTime = 0;
+      } catch {}
+    }
     try {
+      video.muted = false;
+      video.defaultMuted = false;
       await video.play();
       video.classList.add("is-ready");
       video.closest(".home-host-card")?.classList.add("has-video");
+      if (!mediaHasUsableAudio(video) && fallbackAudio instanceof HTMLAudioElement) {
+        video.muted = true;
+        video.defaultMuted = true;
+        await fallbackAudio.play();
+      }
       return true;
     } catch {
-      // Keep image fallback visible if playback is blocked.
+      if (fallbackAudio instanceof HTMLAudioElement) {
+        try {
+          await fallbackAudio.play();
+          return true;
+        } catch {
+          // Keep image fallback visible if playback is blocked.
+        }
+      }
       return false;
     }
   };
@@ -825,6 +889,10 @@ function setupHomeHostsExperiment() {
     Object.values(speakerVideos).forEach((video) => {
       if (!(video instanceof HTMLVideoElement)) return;
       video.pause();
+    });
+    Object.values(speakerFallbackAudio).forEach((audio) => {
+      if (!(audio instanceof HTMLAudioElement)) return;
+      audio.pause();
     });
   };
 
@@ -952,8 +1020,7 @@ function setupHomeHostsExperiment() {
 
   gsap.killTweensOf(homeHostsExperiment);
   gsap.killTweensOf(availableCards);
-  Object.entries(speakerVideos).forEach(([speaker, video]) => {
-    if (!speakerUsesVideo[speaker]) return;
+  Object.values(speakerVideos).forEach((video) => {
     prepareSequenceVideo(video);
   });
   availableCards.forEach((card) => {
