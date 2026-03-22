@@ -571,10 +571,6 @@ html[data-experience-variant="home-direct"] body[data-home-hosts-experiment-comp
   pointer-events: none;
 }
 
-html[data-experience-variant="home-direct"] .hero-premium {
-  padding-top: clamp(13rem, 18vw, 15rem);
-}
-
 @keyframes site-intro-reveal {
   from {
     opacity: 0;
@@ -7934,10 +7930,8 @@ body::after {
 
 @media (max-width: 599px) {
   .home-hosts--experiment {
-    top: 5.6rem;
-    left: 0.4rem;
-    right: 0.4rem;
-    min-height: 300px;
+    top: 4.9rem;
+    min-height: 320px;
   }
 
   .home-hosts__duo {
@@ -8053,18 +8047,17 @@ main#contenido {
 }
 
 .home-hosts--experiment {
-  position: absolute;
-  top: clamp(6.4rem, 9vw, 8rem);
-  left: clamp(0.8rem, 3vw, 2.8rem);
-  right: clamp(0.8rem, 3vw, 2.8rem);
-  z-index: 7;
-  min-height: clamp(320px, 40vw, 430px);
+  position: fixed;
+  inset: clamp(5.4rem, 8vw, 6.8rem) 0 0;
+  z-index: 180;
+  min-height: calc(100vh - clamp(5.4rem, 8vw, 6.8rem));
   pointer-events: none;
+  isolation: isolate;
 }
 
 .home-hosts__copy {
   position: absolute;
-  top: 0;
+  top: clamp(0.4rem, 1vw, 1rem);
   left: 50%;
   z-index: 2;
   display: grid;
@@ -8105,7 +8098,7 @@ main#contenido {
 .home-hosts__duo {
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: clamp(1.2rem, 6vh, 4rem);
   z-index: 1;
   display: flex;
   justify-content: center;
