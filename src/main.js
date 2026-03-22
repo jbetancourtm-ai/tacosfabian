@@ -758,40 +758,27 @@ function setupHomeHostsExperiment() {
     fabian: homeHostFabianVideo,
     favio: homeHostFavioVideo,
   };
+  const speakerUsesVideo = {
+    fabian: true,
+    favio: false,
+  };
   const availableCards = Object.values(speakerCards).filter((card) => card instanceof HTMLElement);
-  const steps = [
-    {
-      speaker: "fabian",
-      reveal: "fabian",
-      text: "Bienvenido. Aqui entras directo a HOME, sin correr el intro al inicio.",
-    },
-    {
-      speaker: "favio",
-      reveal: "favio",
-      text: "Yo aparezco despues, del mismo tamano visual, y participamos aqui sin taparnos con la pagina.",
-    },
-    {
-      speaker: "fabian",
-      text: "Revisas el menu y la experiencia sigue limpia, sin personajes duplicados ni capas encima.",
-    },
-    {
-      speaker: "favio",
-      text: "Cuando terminamos, desaparecemos y solo entonces vuelve el estado pequeno junto a WhatsApp.",
-    },
-  ];
+  const speakerPlaybackFallbackMs = {
+    fabian: reducedMotion ? 2200 : 4200,
+    favio: reducedMotion ? 2200 : 4200,
+  };
   const entranceDuration = reducedMotion ? 0.18 : 0.55;
   const revealDuration = reducedMotion ? 0.2 : 0.38;
-  const lineHoldMs = reducedMotion ? 1200 : 1800;
   const betweenLineMs = reducedMotion ? 140 : 220;
   const exitDuration = reducedMotion ? 0.18 : 0.45;
-  let lineTimer = 0;
-  let nextLineTimer = 0;
+  let playbackTimer = 0;
+  let nextStepTimer = 0;
   let sequenceCompleted = false;
   const revealedSpeakers = new Set();
 
   const clearTimers = () => {
-    window.clearTimeout(lineTimer);
-    window.clearTimeout(nextLineTimer);
+    window.clearTimeout(playbackTimer);
+    window.clearTimeout(nextStepTimer);
   };
 
   const prepareSequenceVideo = (video) => {
@@ -817,8 +804,9 @@ function setupHomeHostsExperiment() {
   };
 
   const playSequenceVideo = async (speaker) => {
+    if (!speakerUsesVideo[speaker]) return false;
     const video = speakerVideos[speaker];
-    if (!(video instanceof HTMLVideoElement)) return;
+    if (!(video instanceof HTMLVideoElement)) return false;
     try {
       video.currentTime = 0;
     } catch {}
@@ -826,8 +814,10 @@ function setupHomeHostsExperiment() {
       await video.play();
       video.classList.add("is-ready");
       video.closest(".home-host-card")?.classList.add("has-video");
+      return true;
     } catch {
       // Keep image fallback visible if playback is blocked.
+      return false;
     }
   };
 
@@ -846,7 +836,39 @@ function setupHomeHostsExperiment() {
       card.classList.toggle("is-speaking", isActive);
     });
     pauseSequenceVideos();
-    void playSequenceVideo(speaker);
+  };
+
+  const waitForSpeakerCompletion = async (speaker) => {
+    const video = speakerVideos[speaker];
+    const fallbackMs = speakerPlaybackFallbackMs[speaker] || 3600;
+    const started = await playSequenceVideo(speaker);
+
+    if (!(video instanceof HTMLVideoElement) || !started) {
+      await new Promise((resolve) => {
+        playbackTimer = window.setTimeout(resolve, fallbackMs);
+      });
+      return;
+    }
+
+    await new Promise((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        video.removeEventListener("ended", finish);
+        video.removeEventListener("error", finish);
+        window.clearTimeout(playbackTimer);
+        resolve();
+      };
+
+      video.addEventListener("ended", finish, { once: true });
+      video.addEventListener("error", finish, { once: true });
+
+      const durationMs =
+        Number.isFinite(video.duration) && video.duration > 0 ? Math.round(video.duration * 1000) + 120 : fallbackMs;
+
+      playbackTimer = window.setTimeout(finish, Math.max(durationMs, fallbackMs));
+    });
   };
 
   const revealSpeakerCard = (speaker, onComplete) => {
@@ -901,27 +923,39 @@ function setupHomeHostsExperiment() {
     });
   };
 
-  const runStep = (index) => {
-    const step = steps[index];
-    if (!step) {
+  const runSpeakerSequence = async () => {
+    revealSpeakerCard("fabian", async () => {
+      if (sequenceCompleted) return;
+      setSpeakerState("fabian");
+      await waitForSpeakerCompletion("fabian");
+      if (sequenceCompleted) return;
+
+      nextStepTimer = window.setTimeout(() => {
+        revealSpeakerCard("favio", async () => {
+          if (sequenceCompleted) return;
+          setSpeakerState("favio");
+          await waitForSpeakerCompletion("favio");
+          if (sequenceCompleted) return;
+          finishSequence();
+        });
+      }, betweenLineMs);
+    });
+  };
+
+  const runStep = () => {
+    if (sequenceCompleted) {
       finishSequence();
       return;
     }
-
-    const applyStep = () => {
-      setSpeakerState(step.speaker);
-      homeHostsLine.textContent = step.text;
-      lineTimer = window.setTimeout(() => {
-        nextLineTimer = window.setTimeout(() => runStep(index + 1), betweenLineMs);
-      }, lineHoldMs);
-    };
-
-    revealSpeakerCard(step.reveal, applyStep);
+    void runSpeakerSequence();
   };
 
   gsap.killTweensOf(homeHostsExperiment);
   gsap.killTweensOf(availableCards);
-  Object.values(speakerVideos).forEach((video) => prepareSequenceVideo(video));
+  Object.entries(speakerVideos).forEach(([speaker, video]) => {
+    if (!speakerUsesVideo[speaker]) return;
+    prepareSequenceVideo(video);
+  });
   availableCards.forEach((card) => {
     card.classList.remove("is-mounted", "is-visible", "is-speaking", "is-active");
   });
@@ -933,7 +967,7 @@ function setupHomeHostsExperiment() {
     duration: entranceDuration,
     ease: "power2.out",
     overwrite: true,
-    onComplete: () => runStep(0),
+    onComplete: () => runStep(),
   });
 }
 

@@ -7936,35 +7936,23 @@ body::after {
 
   .home-hosts__duo {
     gap: 0.35rem;
-    width: min(100%, 320px);
-    min-height: 188px;
+    width: min(100%, 360px);
+    min-height: 220px;
   }
 
   .home-host-card {
-    width: min(44vw, 150px);
-    min-height: 188px;
-  }
-
-  .home-hosts__copy {
-    width: min(100%, 280px);
-    margin: 0 auto;
-    justify-items: center;
-    text-align: center;
-  }
-
-  .home-hosts__speech {
-    padding: 0.72rem 0.82rem;
-    border-radius: 18px;
+    width: min(47vw, 178px);
+    min-height: 220px;
   }
 
   .home-host-card__media {
-    min-height: 168px;
+    min-height: 210px;
   }
 
   .home-host-card__video,
   .home-host-card__figure {
-    width: min(100%, 142px);
-    height: 168px;
+    width: min(100%, 172px);
+    height: 210px;
   }
 
   .hero-content--premium {
@@ -8056,16 +8044,7 @@ main#contenido {
 }
 
 .home-hosts__copy {
-  position: absolute;
-  top: clamp(0.4rem, 1vw, 1rem);
-  left: 50%;
-  z-index: 2;
-  display: grid;
-  gap: 0.65rem;
-  width: min(100%, 420px);
-  transform: translateX(-50%);
-  justify-items: center;
-  text-align: center;
+  display: none;
 }
 
 .home-hosts__eyebrow {
@@ -8102,10 +8081,10 @@ main#contenido {
   z-index: 1;
   display: flex;
   justify-content: center;
-  width: min(100%, 560px);
+  width: min(100%, 720px);
   align-items: end;
-  gap: clamp(0.35rem, 1.6vw, 1.1rem);
-  min-height: 250px;
+  gap: clamp(0.5rem, 2vw, 1.3rem);
+  min-height: 340px;
   transform: translateX(-50%);
 }
 
@@ -8115,8 +8094,8 @@ main#contenido {
   display: grid;
   justify-items: center;
   align-items: end;
-  width: min(25vw, 220px);
-  min-height: 250px;
+  width: min(31vw, 300px);
+  min-height: 340px;
   min-width: 0;
   padding: 0;
   border-radius: 0;
@@ -8150,7 +8129,7 @@ main#contenido {
   display: grid;
   place-items: end center;
   width: 100%;
-  min-height: 250px;
+  min-height: 340px;
 }
 
 .home-host-card__halo {
@@ -8170,8 +8149,8 @@ main#contenido {
   position: relative;
   z-index: 1;
   grid-area: 1 / 1;
-  width: min(100%, 220px);
-  height: 250px;
+  width: min(100%, 300px);
+  height: 340px;
   object-fit: contain;
   object-position: center bottom;
   transform-origin: center bottom;
