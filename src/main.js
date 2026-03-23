@@ -1046,6 +1046,8 @@ function setupFloatingWhatsapp() {
     if (initialized) return;
     initialized = true;
 
+    floatingWhatsapp.hidden = false;
+    if (floatingFabianHost) floatingFabianHost.hidden = false;
     floatingWhatsapp.classList.remove("is-hidden");
     floatingFabianHost?.classList.remove("is-hidden");
 
@@ -1201,6 +1203,9 @@ function setupFloatingWhatsapp() {
   const waitForIntroCompletion = () => {
     floatingWhatsapp.classList.add("is-hidden");
     floatingFabianHost?.classList.add("is-hidden");
+
+    floatingWhatsapp.hidden = true;
+    if (floatingFabianHost) floatingFabianHost.hidden = true;
 
     if (IS_EXPERIMENTAL_HOME_DIRECT && document.body.dataset.homeHostsExperimentComplete === "true") {
       activateFloatingExperience();
