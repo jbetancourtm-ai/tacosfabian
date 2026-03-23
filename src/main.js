@@ -1207,8 +1207,10 @@ function setupFloatingWhatsapp() {
     floatingWhatsapp.hidden = true;
     if (floatingFabianHost) floatingFabianHost.hidden = true;
 
-    if (IS_EXPERIMENTAL_HOME_DIRECT && document.body.dataset.homeHostsExperimentComplete === "true") {
-      activateFloatingExperience();
+    if (IS_EXPERIMENTAL_HOME_DIRECT) {
+      window.addEventListener(HOME_HOSTS_COMPLETE_EVENT, () => {
+        window.requestAnimationFrame(() => activateFloatingExperience());
+      }, { once: true });
       return;
     }
 
@@ -1218,7 +1220,7 @@ function setupFloatingWhatsapp() {
     }
 
     window.addEventListener(
-      IS_EXPERIMENTAL_HOME_DIRECT ? HOME_HOSTS_COMPLETE_EVENT : "intro:complete",
+      "intro:complete",
       () => {
         window.requestAnimationFrame(() => activateFloatingExperience());
       },
