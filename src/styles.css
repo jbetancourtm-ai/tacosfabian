@@ -8024,14 +8024,14 @@ main#contenido {
 }
 
 .menu-showcase-intro {
-  margin: 0 0 0.18rem;
+  margin: 0;
   max-width: 58ch;
   line-height: 1.55;
   animation: menu-showcase-intro-rise 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .menu-showcase-intro + h2 {
-  margin-top: 0;
+  margin: 0;
 }
 
 @keyframes menu-showcase-intro-rise {
