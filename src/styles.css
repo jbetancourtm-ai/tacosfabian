@@ -2102,8 +2102,8 @@ p {
 
 .btn-whatsapp--brand {
   width: auto;
-  min-height: 2.85rem;
-  padding-inline: 0.78rem;
+  min-height: 2.72rem;
+  padding-inline: 0.62rem;
   white-space: nowrap;
 }
 
@@ -7226,7 +7226,7 @@ body::after {
 
   .btn-whatsapp--brand {
     width: auto;
-    padding-inline: 0.74rem;
+    padding-inline: 0.58rem;
   }
 
   .hero-actions--header {
@@ -7308,8 +7308,8 @@ body::after {
 
   .btn-whatsapp--brand {
     min-width: auto;
-    min-height: 2.7rem;
-    padding: 0.64rem 0.76rem;
+    min-height: 2.56rem;
+    padding: 0.58rem 0.62rem;
   }
 
   .btn-whatsapp--brand .inline-icon {
