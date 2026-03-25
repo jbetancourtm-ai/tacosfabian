@@ -7307,17 +7307,13 @@ body::after {
   }
 
   .btn-whatsapp--brand {
-    min-width: 2.7rem;
+    min-width: auto;
     min-height: 2.7rem;
-    padding: 0.68rem;
+    padding: 0.68rem 0.92rem;
   }
 
   .btn-whatsapp--brand .inline-icon {
-    margin-right: 0;
-  }
-
-  .btn-whatsapp--brand .btn-whatsapp__label {
-    display: none;
+    margin-right: 0.28rem;
   }
 
   .hero-actions--header {
