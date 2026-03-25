@@ -818,6 +818,7 @@ function setupHomeHostsExperiment() {
 
   const prepareSequenceVideo = (video) => {
     if (!(video instanceof HTMLVideoElement)) return;
+    video.closest(".home-host-card")?.classList.remove("has-video");
     const resolvedMedia = resolveOverlayMediaSource(video);
     if (resolvedMedia.src) {
       video.src = resolvedMedia.src;
@@ -837,11 +838,17 @@ function setupHomeHostsExperiment() {
     video.classList.remove("is-ready");
     const markReady = () => {
       video.classList.add("is-ready");
-      video.closest(".home-host-card")?.classList.add("has-video");
     };
     video.addEventListener("loadeddata", markReady, { once: true });
     video.addEventListener("canplay", markReady, { once: true });
-    video.addEventListener("playing", markReady, { once: true });
+    video.addEventListener(
+      "playing",
+      () => {
+        markReady();
+        video.closest(".home-host-card")?.classList.add("has-video");
+      },
+      { once: true }
+    );
     video.load();
   };
 
