@@ -2048,6 +2048,13 @@ p {
   padding: 0.85rem 0;
 }
 
+.header-brand-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.78rem;
+  min-width: 0;
+}
+
 .header-cta-group {
   grid-column: 1 / -1;
   display: flex;
@@ -2091,6 +2098,17 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 0.78rem;
+}
+
+.btn-whatsapp--brand {
+  width: auto;
+  min-height: 2.85rem;
+  padding-inline: 1rem;
+  white-space: nowrap;
+}
+
+.btn-whatsapp__label {
+  white-space: nowrap;
 }
 
 .brand-orbit {
@@ -7206,6 +7224,11 @@ body::after {
     justify-content: center;
   }
 
+  .btn-whatsapp--brand {
+    width: auto;
+    padding-inline: 0.9rem;
+  }
+
   .hero-actions--header {
     width: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -7264,6 +7287,10 @@ body::after {
     padding: 0.48rem 0;
   }
 
+  .header-brand-cluster {
+    gap: 0.38rem;
+  }
+
   .brand {
     gap: 0.5rem;
   }
@@ -7277,6 +7304,20 @@ body::after {
     width: 46px;
     height: 46px;
     border-radius: 11px;
+  }
+
+  .btn-whatsapp--brand {
+    min-width: 2.7rem;
+    min-height: 2.7rem;
+    padding: 0.68rem;
+  }
+
+  .btn-whatsapp--brand .inline-icon {
+    margin-right: 0;
+  }
+
+  .btn-whatsapp--brand .btn-whatsapp__label {
+    display: none;
   }
 
   .hero-actions--header {
