@@ -2050,8 +2050,9 @@ p {
 
 .header-brand-cluster {
   display: inline-flex;
-  align-items: center;
-  gap: 0.78rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.42rem;
   min-width: 0;
 }
 
@@ -2101,6 +2102,7 @@ p {
 }
 
 .btn-whatsapp--brand {
+  align-self: flex-start;
   width: auto;
   min-height: 2.72rem;
   padding-inline: 0.62rem;
@@ -7288,7 +7290,7 @@ body::after {
   }
 
   .header-brand-cluster {
-    gap: 0.38rem;
+    gap: 0.34rem;
   }
 
   .brand {
