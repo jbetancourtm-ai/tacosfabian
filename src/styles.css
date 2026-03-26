@@ -2190,6 +2190,7 @@ p {
 .menu-btn {
   width: 44px;
   height: 44px;
+  align-self: start;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--surface-solid);
@@ -7310,9 +7311,11 @@ body::after {
   }
 
   .btn-whatsapp--brand {
-    min-width: auto;
+    width: 100%;
+    min-width: 100%;
     min-height: 2.56rem;
     padding: 0.58rem 0.62rem;
+    justify-content: center;
   }
 
   .btn-whatsapp--brand .inline-icon {
