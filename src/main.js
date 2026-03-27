@@ -390,16 +390,29 @@ function setupPwaSupport() {
     window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   const userAgent = window.navigator.userAgent || "";
   const isIos = /iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(userAgent);
   const isMobileViewport = window.matchMedia("(max-width: 899px)");
-  const hasIosInstallPath = isIos && !isStandaloneMode();
+  const canOfferManualInstall = isIos || isAndroid || isMobileViewport.matches;
 
-  const syncInstallButton = (visible) => {
+  const getManualInstallMessage = () => {
+    if (isIos) {
+      return "En iPhone o iPad: toca Compartir y luego Agregar a pantalla de inicio.";
+    }
+
+    if (isAndroid) {
+      return "En Android: abre el menu del navegador y toca Instalar app o Agregar a pantalla de inicio.";
+    }
+
+    return "Si tu navegador lo permite, usa el menu y toca Instalar app o Agregar a pantalla de inicio.";
+  };
+
+  const syncInstallButton = (visible, { ready = false } = {}) => {
     installAppButtons.forEach((button) => {
       if (!(button instanceof HTMLButtonElement)) return;
       button.hidden = !visible;
       button.setAttribute("aria-hidden", visible ? "false" : "true");
       button.disabled = !visible;
-      button.classList.toggle("is-ready", visible);
+      button.classList.toggle("is-ready", ready);
     });
   };
 
@@ -412,14 +425,14 @@ function setupPwaSupport() {
     });
   };
 
-  syncInstallButton(false);
+  syncInstallButton(!isStandaloneMode() && canOfferManualInstall, { ready: Boolean(deferredInstallPrompt) });
   syncExitButton(isStandaloneMode());
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     if (isStandaloneMode()) return;
     deferredInstallPrompt = event;
-    syncInstallButton(true);
+    syncInstallButton(true, { ready: true });
     window.dispatchEvent(new CustomEvent("app-installable"));
   });
 
@@ -429,8 +442,8 @@ function setupPwaSupport() {
     syncExitButton(true);
   });
 
-  if (hasIosInstallPath) {
-    syncInstallButton(true);
+  if (!isStandaloneMode() && canOfferManualInstall) {
+    syncInstallButton(true, { ready: Boolean(deferredInstallPrompt) });
   }
 
   window.matchMedia("(display-mode: standalone)").addEventListener?.("change", (event) => {
@@ -440,13 +453,25 @@ function setupPwaSupport() {
       syncExitButton(true);
       return;
     }
+    syncInstallButton(canOfferManualInstall, { ready: Boolean(deferredInstallPrompt) });
     syncExitButton(false);
   });
 
   const handleExitAppClick = () => {
-    if (!isStandaloneMode()) return;
+    if (!isStandaloneMode()) {
+      showToast("Este boton funciona cuando la web esta abierta como app instalada.", "info");
+      return;
+    }
 
     document.body.classList.add("app-exit-pending");
+
+    const fallbackExitMessage = () => {
+      showToast("Si la app no se cierra sola, usa el gesto Atrás o el selector de apps recientes.", "info");
+    };
+
+    const browserUrl = new URL(window.location.href);
+    browserUrl.searchParams.set("source", "browser");
+    browserUrl.hash ||= "top";
 
     window.setTimeout(() => {
       try {
@@ -459,6 +484,13 @@ function setupPwaSupport() {
     }, 60);
 
     window.setTimeout(() => {
+      try {
+        const externalWindow = window.open(browserUrl.toString(), "_blank", "noopener,noreferrer");
+        if (externalWindow) {
+          externalWindow.focus?.();
+        }
+      } catch {}
+
       if (window.history.length > 1) {
         window.history.back();
         return;
@@ -468,6 +500,8 @@ function setupPwaSupport() {
         window.location.replace("about:blank");
       } catch {}
     }, 180);
+
+    window.setTimeout(fallbackExitMessage, 900);
   };
 
   exitAppButtons.forEach((button) => {
@@ -479,17 +513,15 @@ function setupPwaSupport() {
     const button = event.currentTarget;
     if (!(button instanceof HTMLButtonElement)) return;
 
-    if (isIos && !deferredInstallPrompt && !isStandaloneMode()) {
-      showToast("En iPhone o iPad: toca Compartir y luego Agregar a pantalla de inicio.", "info");
-      syncInstallButton(true);
+    if (isStandaloneMode()) {
+      showToast("La app ya esta abierta en modo instalado.", "info");
+      syncInstallButton(false);
       return;
     }
 
-    if (!deferredInstallPrompt || isStandaloneMode()) {
-      if (isMobileViewport.matches && !isStandaloneMode()) {
-        showToast("Si tu navegador lo permite, usa el menu y toca Instalar app o Agregar a pantalla de inicio.", "info");
-      }
-      syncInstallButton(false);
+    if (!deferredInstallPrompt) {
+      showToast(getManualInstallMessage(), "info");
+      syncInstallButton(canOfferManualInstall, { ready: false });
       return;
     }
 
@@ -510,7 +542,7 @@ function setupPwaSupport() {
       installAppButtons.forEach((item) => {
         if (item instanceof HTMLButtonElement) item.disabled = false;
       });
-      syncInstallButton(Boolean(deferredInstallPrompt));
+      syncInstallButton(canOfferManualInstall, { ready: Boolean(deferredInstallPrompt) });
     }
   };
 
@@ -518,11 +550,7 @@ function setupPwaSupport() {
     button.addEventListener("click", handleInstallClick);
   });
 
-  if (!deferredInstallPrompt && hasIosInstallPath) {
-    syncInstallButton(true);
-  } else if (!deferredInstallPrompt && !hasIosInstallPath) {
-    syncInstallButton(false);
-  }
+  syncInstallButton(!isStandaloneMode() && canOfferManualInstall, { ready: Boolean(deferredInstallPrompt) });
 
   if (!("serviceWorker" in navigator)) return;
 
