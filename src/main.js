@@ -1092,67 +1092,24 @@ function setupFloatingWhatsapp() {
       if (floatingFabianSprite instanceof HTMLElement) floatingFabianSprite.style.backgroundImage = "";
     }
 
-    const floatingFabianFrames = [
-      { type: "image", src: "/images/fabian.png" },
-      { type: "video", src: "/video/Tacos Favio_720p_caption.mp4" },
-    ];
+    const floatingFabianFrames = ["/images/fabian.png", "/images/favio.png"];
     const floatingFabianFigure = floatingFabianHost?.querySelector(".floating-fabian-host__figure");
-    const floatingFabianStage = floatingFabianHost?.querySelector(".floating-fabian-host__stage");
-    let floatingFabianVideo = floatingFabianHost?.querySelector(".floating-fabian-host__video");
     let floatingFabianFrameIndex = 0;
     let floatingFabianSwapTimer = 0;
 
-    if (!(floatingFabianVideo instanceof HTMLVideoElement) && floatingFabianStage instanceof HTMLElement) {
-      floatingFabianVideo = document.createElement("video");
-      floatingFabianVideo.className = "floating-fabian-host__video is-hidden";
-      floatingFabianVideo.setAttribute("aria-hidden", "true");
-      floatingFabianVideo.setAttribute("playsinline", "");
-      floatingFabianVideo.setAttribute("muted", "");
-      floatingFabianVideo.muted = true;
-      floatingFabianVideo.loop = true;
-      floatingFabianVideo.autoplay = true;
-      floatingFabianVideo.preload = "auto";
-      floatingFabianStage.insertBefore(floatingFabianVideo, floatingFabianHost.querySelector(".floating-fabian-host__mouth"));
-    }
-
-    floatingFabianFrames.forEach((frame) => {
-      if (frame.type === "image") {
-        const preloadImage = new Image();
-        preloadImage.src = frame.src;
-      }
+    floatingFabianFrames.forEach((src) => {
+      const preloadImage = new Image();
+      preloadImage.src = src;
     });
 
     const applyFloatingFabianFrame = (index) => {
+      if (!(floatingFabianFigure instanceof HTMLImageElement)) return;
       const safeIndex = ((index % floatingFabianFrames.length) + floatingFabianFrames.length) % floatingFabianFrames.length;
-      const frame = floatingFabianFrames[safeIndex];
       floatingFabianFrameIndex = safeIndex;
-
-      if (floatingFabianFigure instanceof HTMLImageElement) {
-        floatingFabianFigure.classList.toggle("is-hidden", frame.type !== "image");
-      }
-
-      if (floatingFabianVideo instanceof HTMLVideoElement) {
-        const isVideoFrame = frame.type === "video";
-        floatingFabianVideo.classList.toggle("is-hidden", !isVideoFrame);
-
-        if (isVideoFrame) {
-          if (floatingFabianVideo.src !== new URL(frame.src, window.location.origin).toString()) {
-            floatingFabianVideo.src = frame.src;
-            floatingFabianVideo.load();
-          }
-          floatingFabianVideo.currentTime = 0;
-          floatingFabianVideo.play().catch(() => {});
-        } else {
-          floatingFabianVideo.pause();
-        }
-      }
-
-      if (frame.type === "image" && floatingFabianFigure instanceof HTMLImageElement) {
-        floatingFabianFigure.removeAttribute("loading");
-        floatingFabianFigure.decoding = "async";
-        floatingFabianFigure.src = frame.src;
-        floatingFabianFigure.setAttribute("src", frame.src);
-      }
+      floatingFabianFigure.removeAttribute("loading");
+      floatingFabianFigure.decoding = "async";
+      floatingFabianFigure.src = floatingFabianFrames[safeIndex];
+      floatingFabianFigure.setAttribute("src", floatingFabianFrames[safeIndex]);
     };
 
     const scheduleFloatingFabianSwap = () => {
