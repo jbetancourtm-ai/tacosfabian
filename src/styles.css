@@ -4512,7 +4512,8 @@ td {
     floating-fabian-grow 5s ease-in-out infinite;
 }
 
-.floating-fabian-host__figure.is-hidden {
+.floating-fabian-host__figure.is-hidden,
+.floating-fabian-host__video.is-hidden {
   display: none;
 }
 
