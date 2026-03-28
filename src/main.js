@@ -1941,8 +1941,10 @@ function setupMenuOrderingSystem() {
     const isDesktop = isDesktopOrderLayout();
 
     document.body.classList.toggle("has-order-fab", !isDesktop);
+    document.body.classList.toggle("cart-panel-open", !isDesktop && isCartPanelOpen);
     menuOrderFab.hidden = isDesktop;
     menuOrderFab.setAttribute("aria-hidden", String(isDesktop));
+    menuOrderFab.classList.toggle("is-active", !isDesktop && isCartPanelOpen);
     menuOrderShell.classList.toggle("is-desktop", isDesktop);
 
     if (isDesktop) {
@@ -1997,7 +1999,7 @@ function setupMenuOrderingSystem() {
     menuOrderFabCheckout.disabled = count === 0;
     menuOrderFab.classList.toggle("has-items", count > 0);
     menuOrderShell.classList.toggle("is-empty", count === 0);
-    menuOrderFabCheckout.textContent = count > 0 ? "Finalizar" : "Sin productos";
+    menuOrderFabCheckout.textContent = count > 0 ? "Enviar pedido" : "Sin productos";
   };
 
   const adjustCartItem = (id, delta) => {

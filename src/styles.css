@@ -1888,10 +1888,10 @@ body.intro-transitioning-3d .floating-whatsapp {
   z-index: 950;
   display: inline-flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.42rem;
-  padding: 0.42rem;
-  border-radius: 999px;
+  align-items: stretch;
+  gap: 0.48rem;
+  padding: 0.58rem;
+  border-radius: 24px;
   background: rgba(255, 255, 255, 0.84);
   border: 1px solid #f3d8c5;
   box-shadow: 0 10px 20px rgba(106, 65, 34, 0.15);
@@ -1900,6 +1900,7 @@ body.intro-transitioning-3d .floating-whatsapp {
 }
 
 .social-floating-links a {
+  align-self: center;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -2483,6 +2484,23 @@ button:focus-visible,
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-size: 0.72rem;
+}
+
+.btn-exit-app--floating {
+  width: 100%;
+  min-height: 2.7rem;
+  justify-content: flex-start;
+  padding: 0.62rem 0.82rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  box-shadow:
+    0 8px 18px rgba(72, 49, 34, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84);
+}
+
+.btn-exit-app--floating .btn-exit-app__text {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
 }
 
 @keyframes install-app-breathe {
@@ -8561,18 +8579,18 @@ main#contenido {
 }
 
 .menu-showcase-section .menu-grid {
-  margin-top: 1.35rem;
+  margin-top: 1.55rem;
 }
 
 .menu-order-fab {
   position: fixed;
   right: 1rem;
-  bottom: 5.5rem;
-  z-index: 33;
+  bottom: calc(0.8rem + env(safe-area-inset-bottom));
+  z-index: 1040;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.65rem;
-  width: min(420px, calc(100vw - 2rem));
+  width: min(430px, calc(100vw - 1.5rem));
   padding: 0.5rem;
   border: 1px solid rgba(232, 152, 92, 0.2);
   border-radius: 24px;
@@ -8591,6 +8609,7 @@ main#contenido {
     box-shadow 220ms ease,
     border-color 220ms ease,
     opacity 220ms ease;
+  touch-action: manipulation;
 }
 
 .menu-order-fab.is-active {
@@ -8613,6 +8632,7 @@ main#contenido {
   color: #4c2a18;
   text-align: left;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .menu-order-fab__toggle:hover,
@@ -8664,6 +8684,7 @@ main#contenido {
   white-space: nowrap;
   box-shadow: 0 12px 22px rgba(145, 52, 16, 0.18);
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .menu-order-fab__cta:disabled,
@@ -8676,7 +8697,7 @@ main#contenido {
 .menu-order-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 31;
+  z-index: 1030;
   background: rgba(43, 24, 13, 0.34);
   backdrop-filter: blur(4px);
   opacity: 0;
@@ -8691,8 +8712,9 @@ main#contenido {
   position: fixed;
   right: 1rem;
   bottom: 1rem;
-  z-index: 32;
+  z-index: 1035;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 1rem;
   width: min(430px, calc(100vw - 2rem));
   max-height: min(76vh, 720px);
@@ -8724,8 +8746,8 @@ main#contenido {
   top: 6.2rem;
   right: max(1rem, calc((100vw - 1200px) / 2 + 1rem));
   bottom: auto;
-  width: min(360px, calc(100vw - 2rem));
-  max-height: calc(100vh - 8rem);
+  width: min(378px, calc(100vw - 2rem));
+  max-height: calc(100vh - 7.4rem);
   transform: none;
   opacity: 1;
   pointer-events: auto;
@@ -8801,7 +8823,8 @@ main#contenido {
 
 .menu-order-shell__body {
   display: grid;
-  gap: 1rem;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.92rem;
   min-height: 0;
 }
 
@@ -8809,6 +8832,7 @@ main#contenido {
   display: grid;
   gap: 0.75rem;
   min-height: 0;
+  overflow: hidden;
 }
 
 .menu-order-shell__empty {
@@ -8826,9 +8850,12 @@ main#contenido {
   padding: 0;
   display: grid;
   gap: 0.72rem;
-  max-height: min(42vh, 380px);
+  max-height: none;
+  min-height: 0;
   overflow: auto;
   padding-right: 0.2rem;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .menu-order-item {
@@ -8883,6 +8910,15 @@ main#contenido {
   flex-wrap: wrap;
 }
 
+.menu-order-shell__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-top: auto;
+  padding-top: 0.95rem;
+  background: linear-gradient(180deg, rgba(255, 250, 245, 0), rgba(255, 250, 245, 0.96) 24%, rgba(255, 250, 245, 1) 100%);
+}
+
 .menu-order-shell__actions .btn,
 .order-modal__actions .btn {
   flex: 1 1 180px;
@@ -8891,6 +8927,15 @@ main#contenido {
 .menu-order-shell__actions .btn-primary {
   min-height: 3.3rem;
   box-shadow: 0 16px 28px rgba(139, 47, 16, 0.18);
+  touch-action: manipulation;
+}
+
+.menu-order-shell__actions .btn-secondary,
+.order-modal__actions .btn,
+.menu-order-control__btn,
+.menu-order-line__remove,
+.menu-order-add-btn {
+  touch-action: manipulation;
 }
 
 .menu-order-control {
@@ -9094,7 +9139,7 @@ main#contenido {
 }
 
 .has-order-fab .floating-whatsapp {
-  bottom: 10.5rem;
+  bottom: calc(6.25rem + env(safe-area-inset-bottom));
 }
 
 @keyframes menu-order-fab-in {
@@ -9123,17 +9168,17 @@ main#contenido {
 
 @media (max-width: 767px) {
   body.has-order-fab {
-    padding-bottom: calc(6.6rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(7.1rem + env(safe-area-inset-bottom));
   }
 
   .menu-order-fab {
     left: 0.75rem;
     right: 0.75rem;
-    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    bottom: calc(0.7rem + env(safe-area-inset-bottom));
     width: auto;
     border-radius: 24px;
     grid-template-columns: minmax(0, 1fr) auto;
-    padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom) * 0.2);
+    padding: 0.52rem 0.52rem calc(0.52rem + env(safe-area-inset-bottom) * 0.2);
   }
 
   .menu-order-fab__cta {
@@ -9152,14 +9197,23 @@ main#contenido {
     right: 0;
     bottom: 0;
     width: 100%;
-    max-height: min(84vh, 760px);
+    max-height: min(85vh, 760px);
     border-radius: 28px 28px 0 0;
-    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+    padding: 1rem 1rem calc(1.05rem + env(safe-area-inset-bottom));
     transform: translate3d(0, 100%, 0);
   }
 
   .menu-order-shell.is-open {
     transform: translate3d(0, 0, 0);
+  }
+
+  .menu-order-shell::before {
+    content: "";
+    width: 56px;
+    height: 5px;
+    margin: -0.1rem auto 0.15rem;
+    border-radius: 999px;
+    background: rgba(133, 92, 61, 0.2);
   }
 
   .menu-order-item__top,
@@ -9185,11 +9239,16 @@ main#contenido {
   }
 
   .has-order-fab .floating-whatsapp {
-    bottom: calc(6.9rem + env(safe-area-inset-bottom));
+    bottom: calc(7.55rem + env(safe-area-inset-bottom));
   }
 }
 
 @media (min-width: 960px) {
+  .menu-showcase-section > .container {
+    position: relative;
+    padding-right: min(26rem, 34vw);
+  }
+
   .menu-order-fab {
     display: none;
   }
@@ -9204,6 +9263,14 @@ main#contenido {
 
   body.has-order-fab {
     padding-bottom: 0;
+  }
+
+  .menu-order-shell__head {
+    gap: 1rem;
+  }
+
+  .menu-order-shell__actions {
+    padding-bottom: 0.15rem;
   }
 }
 
