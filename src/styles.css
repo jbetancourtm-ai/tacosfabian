@@ -2503,6 +2503,28 @@ button:focus-visible,
   letter-spacing: 0.08em;
 }
 
+.btn-exit-app--dock {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 949;
+  min-height: 2.45rem;
+  padding: 0.52rem 0.72rem;
+  border-radius: 14px;
+  border-color: rgba(126, 98, 78, 0.16);
+  background: rgba(255, 252, 248, 0.92);
+  box-shadow:
+    0 10px 22px rgba(72, 49, 34, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.btn-exit-app--dock .btn-exit-app__text {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
 @keyframes install-app-breathe {
   0%,
   78%,
@@ -3432,6 +3454,8 @@ button:focus-visible,
   margin-bottom: 0.4rem;
   color: var(--home-section-title);
   text-shadow: var(--home-heading-emphasis);
+  font-size: 1.26rem;
+  line-height: 1.08;
 }
 
 .menu-item h3::after {
@@ -3448,7 +3472,7 @@ button:focus-visible,
 .menu-item-note {
   margin-bottom: 0.46rem;
   color: var(--home-menu-item-note);
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   line-height: 1.52;
   font-weight: 500;
 }
@@ -3457,7 +3481,7 @@ button:focus-visible,
   display: inline-flex;
   align-items: center;
   margin-bottom: 0.54rem;
-  font-size: 0.96rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--home-price-pill-text);
   background: var(--home-price-pill-bg);
@@ -3488,16 +3512,20 @@ button:focus-visible,
 }
 
 .menu-item .price-list li {
-  padding: 0.28rem 0;
+  padding: 0.36rem 0;
   border-bottom-color: transparent;
 }
 
 .menu-item .price-list li span {
-  font-size: 0.88rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #4e2b14;
 }
 
 .menu-item .price-list li strong {
-  font-size: 0.84rem;
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: #8c2f12;
 }
 
 .menu-carousel {
@@ -8949,10 +8977,10 @@ main#contenido {
   display: inline-flex;
   align-items: center;
   gap: 0.48rem;
-  padding: 0.28rem;
+  padding: 0.22rem;
   border-radius: 999px;
-  background: rgba(255, 245, 236, 0.92);
-  border: 1px solid rgba(225, 166, 115, 0.34);
+  background: rgba(255, 247, 240, 0.78);
+  border: 1px solid rgba(225, 166, 115, 0.24);
 }
 
 .menu-order-control__btn,
@@ -8969,14 +8997,14 @@ main#contenido {
 }
 
 .menu-order-control__btn {
-  width: 2rem;
-  height: 2rem;
+  width: 1.78rem;
+  height: 1.78rem;
   border-radius: 50%;
-  background: #8b2f10;
-  color: #fff;
-  font-size: 1rem;
+  background: rgba(139, 47, 16, 0.1);
+  color: #7f3116;
+  font-size: 0.94rem;
   font-weight: 800;
-  box-shadow: 0 10px 18px rgba(139, 47, 16, 0.18);
+  box-shadow: none;
 }
 
 .menu-order-control__btn:hover,
@@ -8993,15 +9021,17 @@ main#contenido {
   text-align: center;
   font-weight: 800;
   color: #5e3316;
+  font-size: 0.92rem;
 }
 
 .menu-order-add-btn {
-  padding: 0.68rem 0.94rem;
+  padding: 0.56rem 0.86rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, #8b2f10, #c94d17);
-  color: #fff;
-  font-weight: 800;
-  box-shadow: 0 14px 24px rgba(139, 47, 16, 0.2);
+  background: rgba(139, 47, 16, 0.08);
+  color: #8b3c17;
+  font-weight: 700;
+  box-shadow: none;
+  border: 1px solid rgba(201, 77, 23, 0.16);
 }
 
 .menu-order-line {
@@ -9020,17 +9050,17 @@ main#contenido {
 }
 
 .menu-order-line__price {
-  font-size: 0.84rem;
-  color: #7a5c49;
+  font-size: 0.8rem;
+  color: #8a664d;
   font-weight: 700;
 }
 
 .menu-order-line__remove {
-  padding: 0.58rem 0.88rem;
+  padding: 0.48rem 0.74rem;
   border-radius: 999px;
   background: rgba(94, 43, 20, 0.08);
   color: #7f3116;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .price-list li.menu-order-enhanced {
@@ -9270,11 +9300,11 @@ main#contenido {
 
   .social-floating-links {
     left: 0.5rem;
-    bottom: calc(0.5rem + env(safe-area-inset-bottom));
-    gap: 0.22rem;
-    padding: 0.28rem;
-    border-radius: 16px;
-    box-shadow: 0 8px 18px rgba(106, 65, 34, 0.12);
+    bottom: calc(0.58rem + env(safe-area-inset-bottom));
+    gap: 0.2rem;
+    padding: 0.24rem;
+    border-radius: 14px;
+    box-shadow: 0 6px 14px rgba(106, 65, 34, 0.1);
   }
 
   .social-floating-links a {
@@ -9319,6 +9349,27 @@ main#contenido {
 
   .btn-exit-app--floating .btn-exit-app__text {
     font-size: 0.56rem;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-exit-app--dock {
+    left: 0.5rem;
+    bottom: calc(4.2rem + env(safe-area-inset-bottom));
+    min-height: 1.85rem;
+    padding: 0.3rem 0.42rem;
+    border-radius: 11px;
+    box-shadow:
+      0 6px 12px rgba(72, 49, 34, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
+
+  .btn-exit-app--dock .btn-exit-app__icon {
+    width: 0.78rem;
+    height: 0.78rem;
+  }
+
+  .btn-exit-app--dock .btn-exit-app__text {
+    font-size: 0.54rem;
     letter-spacing: 0.05em;
   }
 }

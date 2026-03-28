@@ -1924,6 +1924,7 @@ function setupMenuOrderingSystem() {
   let cartLastFocused = null;
   let sharedLocation = null;
   let isCartPanelOpen = false;
+  let lastCartCount = 0;
   const desktopOrderMedia = window.matchMedia("(min-width: 960px)");
 
   const getCartEntries = () => Array.from(cart.values());
@@ -2001,6 +2002,12 @@ function setupMenuOrderingSystem() {
     menuOrderFab.classList.toggle("is-visible", count > 0 || isCartPanelOpen);
     menuOrderShell.classList.toggle("is-empty", count === 0);
     menuOrderFabCheckout.textContent = count > 0 ? "Enviar pedido" : "Sin productos";
+
+    if (!isDesktopOrderLayout() && lastCartCount === 0 && count > 0 && !isCartPanelOpen) {
+      setCartPanelState(true);
+    }
+
+    lastCartCount = count;
   };
 
   const adjustCartItem = (id, delta) => {
