@@ -501,33 +501,13 @@
             <p>Sabor autentico: <span class="fire-accent" aria-hidden="true">🔥</span></p>
           </div>
 
-          <button
-            id="menuOrderFab"
-            class="menu-order-fab"
-            type="button"
-            aria-expanded="false"
-            aria-controls="menuOrderShell"
-          >
-            <span class="menu-order-fab__icon" aria-hidden="true">🛒</span>
-            <span class="menu-order-fab__summary">
-              <span id="menuOrderFabCount" class="menu-order-fab__count">0 productos</span>
-              <strong id="menuOrderFabTotal" class="menu-order-fab__total">$0 MXN</strong>
-            </span>
-            <span class="menu-order-fab__cta">Ver pedido</span>
-          </button>
-
-          <div id="menuOrderBackdrop" class="menu-order-backdrop" hidden></div>
-
-          <section id="menuOrderShell" class="card menu-order-shell" aria-labelledby="menuOrderTitle" aria-hidden="true">
+          <section id="menuOrderShell" class="card menu-order-shell" aria-labelledby="menuOrderTitle">
             <div class="menu-order-shell__head">
               <div>
                 <p class="menu-order-shell__eyebrow">Tu pedido</p>
                 <h3 id="menuOrderTitle">Arma tu orden sin salir del menu</h3>
                 <p class="menu-order-shell__note">Agrega productos, ajusta cantidades y cuando termines envialo por WhatsApp con tu direccion.</p>
               </div>
-              <button id="menuOrderClose" class="menu-order-shell__close" type="button" aria-label="Cerrar carrito">
-                &times;
-              </button>
               <div class="menu-order-shell__totals" aria-live="polite" aria-atomic="true">
                 <span id="menuOrderCount" class="menu-order-shell__count">0 productos</span>
                 <strong id="menuOrderTotal">Total: $0 MXN</strong>
@@ -542,7 +522,7 @@
 
               <div class="menu-order-shell__actions">
                 <button id="menuOrderClear" class="btn btn-secondary" type="button" disabled>Vaciar pedido</button>
-                <button id="menuOrderCheckout" class="btn btn-primary" type="button" disabled>Enviar pedido por WhatsApp</button>
+                <button id="menuOrderCheckout" class="btn btn-primary" type="button" disabled>Pedir por WhatsApp</button>
               </div>
             </div>
           </section>

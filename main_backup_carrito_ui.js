@@ -55,12 +55,7 @@ const menuModalTitle = document.querySelector("#menuModalTitle");
 const menuModalDescription = document.querySelector("#menuModalDescription");
 const menuModalPrice = document.querySelector("#menuModalPrice");
 const menuCards = Array.from(document.querySelectorAll(".menu-item"));
-const menuOrderFab = document.querySelector("#menuOrderFab");
-const menuOrderFabCount = document.querySelector("#menuOrderFabCount");
-const menuOrderFabTotal = document.querySelector("#menuOrderFabTotal");
-const menuOrderBackdrop = document.querySelector("#menuOrderBackdrop");
 const menuOrderShell = document.querySelector("#menuOrderShell");
-const menuOrderClose = document.querySelector("#menuOrderClose");
 const menuOrderItems = document.querySelector("#menuOrderItems");
 const menuOrderEmpty = document.querySelector("#menuOrderEmpty");
 const menuOrderCount = document.querySelector("#menuOrderCount");
@@ -1887,12 +1882,7 @@ function setupMenuSpotlightModal() {
 
 function setupMenuOrderingSystem() {
   if (
-    !menuOrderFab ||
-    !menuOrderFabCount ||
-    !menuOrderFabTotal ||
-    !menuOrderBackdrop ||
     !menuOrderShell ||
-    !menuOrderClose ||
     !menuOrderItems ||
     !menuOrderEmpty ||
     !menuOrderCount ||
@@ -1914,34 +1904,11 @@ function setupMenuOrderingSystem() {
 
   const cart = new Map();
   let checkoutLastFocused = null;
-  let cartLastFocused = null;
   let sharedLocation = null;
-  let isCartPanelOpen = false;
 
   const getCartEntries = () => Array.from(cart.values());
   const getCartCount = () => getCartEntries().reduce((sum, item) => sum + item.quantity, 0);
   const getCartTotal = () => getCartEntries().reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-
-  const setCartPanelState = (isOpen) => {
-    isCartPanelOpen = isOpen;
-    menuOrderShell.classList.toggle("is-open", isOpen);
-    menuOrderBackdrop.hidden = !isOpen;
-    menuOrderBackdrop.classList.toggle("is-visible", isOpen);
-    menuOrderFab.classList.toggle("is-active", isOpen);
-    menuOrderFab.setAttribute("aria-expanded", String(isOpen));
-    menuOrderShell.setAttribute("aria-hidden", String(!isOpen));
-    document.body.classList.toggle("cart-panel-open", isOpen);
-
-    if (isOpen) {
-      cartLastFocused = document.activeElement;
-      menuOrderClose.focus();
-    } else if (cartLastFocused instanceof HTMLElement) {
-      cartLastFocused.focus();
-    }
-  };
-
-  const closeCartPanel = () => setCartPanelState(false);
-  const toggleCartPanel = () => setCartPanelState(!isCartPanelOpen);
 
   const syncSummaryLabels = () => {
     const count = getCartCount();
@@ -1950,20 +1917,11 @@ function setupMenuOrderingSystem() {
 
     menuOrderCount.textContent = countLabel;
     menuOrderTotal.textContent = `Total: ${formatMxCurrency(total)}`;
-    menuOrderFabCount.textContent = countLabel;
-    menuOrderFabTotal.textContent = formatMxCurrency(total);
     orderCheckoutCount.textContent = countLabel;
     orderCheckoutTotal.textContent = `Total: ${formatMxCurrency(total)}`;
     menuOrderEmpty.hidden = count > 0;
     menuOrderCheckout.disabled = count === 0;
     menuOrderClear.disabled = count === 0;
-    menuOrderFab.classList.toggle("has-items", count > 0);
-    menuOrderShell.classList.toggle("is-empty", count === 0);
-
-    const fabCta = menuOrderFab.querySelector(".menu-order-fab__cta");
-    if (fabCta) {
-      fabCta.textContent = count > 0 ? "Finalizar" : "Ver pedido";
-    }
   };
 
   const adjustCartItem = (id, delta) => {
@@ -1991,7 +1949,7 @@ function setupMenuOrderingSystem() {
         <div class="menu-order-item__top">
           <div>
             <p class="menu-order-item__name">${escapeHtml(item.displayName)}</p>
-            <span class="menu-order-item__meta">${escapeHtml(item.category)} &middot; ${formatMxCurrency(item.unitPrice)} c/u</span>
+            <span class="menu-order-item__meta">${escapeHtml(item.category)} · ${formatMxCurrency(item.unitPrice)} c/u</span>
           </div>
           <span class="menu-order-item__subtotal">${formatMxCurrency(item.quantity * item.unitPrice)}</span>
         </div>
@@ -2017,7 +1975,6 @@ function setupMenuOrderingSystem() {
     }
 
     checkoutLastFocused = document.activeElement;
-    closeCartPanel();
     orderCheckoutModal.classList.add("open");
     orderCheckoutModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
@@ -2174,10 +2131,6 @@ function setupMenuOrderingSystem() {
     }
   });
 
-  menuOrderFab.addEventListener("click", toggleCartPanel);
-  menuOrderClose.addEventListener("click", closeCartPanel);
-  menuOrderBackdrop.addEventListener("click", closeCartPanel);
-
   menuOrderClear.addEventListener("click", () => {
     if (getCartCount() === 0) return;
     cart.clear();
@@ -2230,11 +2183,6 @@ function setupMenuOrderingSystem() {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && isCartPanelOpen) {
-      closeCartPanel();
-      return;
-    }
-
     if (event.key === "Escape" && orderCheckoutModal.classList.contains("open")) {
       closeCheckoutModal();
     }
@@ -2262,7 +2210,6 @@ function setupMenuOrderingSystem() {
 
   enhanceMenuRows();
   renderCart();
-  document.body.classList.add("has-order-fab");
 }
 
 function setupRevealAnimations() {
