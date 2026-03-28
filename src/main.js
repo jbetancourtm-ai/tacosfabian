@@ -1998,6 +1998,7 @@ function setupMenuOrderingSystem() {
     menuOrderClear.disabled = count === 0;
     menuOrderFabCheckout.disabled = count === 0;
     menuOrderFab.classList.toggle("has-items", count > 0);
+    menuOrderFab.classList.toggle("is-visible", count > 0 || isCartPanelOpen);
     menuOrderShell.classList.toggle("is-empty", count === 0);
     menuOrderFabCheckout.textContent = count > 0 ? "Enviar pedido" : "Sin productos";
   };
