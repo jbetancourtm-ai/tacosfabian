@@ -9246,7 +9246,7 @@ main#contenido {
 @media (min-width: 960px) {
   .menu-showcase-section > .container {
     position: relative;
-    padding-right: min(26rem, 34vw);
+    padding-right: min(22rem, 28vw);
   }
 
   .menu-order-fab {
@@ -9271,6 +9271,93 @@ main#contenido {
 
   .menu-order-shell__actions {
     padding-bottom: 0.15rem;
+  }
+
+  .menu-grid.menu-grid,
+  .menu-grid.two-col {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.45rem;
+  }
+
+  .menu-item {
+    min-width: 0;
+    padding: 1.2rem;
+  }
+
+  .menu-item-media {
+    aspect-ratio: 1.12 / 0.9;
+    min-height: 220px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .site-header {
+    width: min(1280px, calc(100vw - 1.8rem));
+  }
+
+  .header-inner {
+    grid-template-columns: minmax(250px, auto) minmax(260px, 1fr) minmax(410px, auto);
+    gap: 1.35rem;
+    padding: 1.02rem 1.22rem;
+  }
+
+  .header-cta-group {
+    justify-items: end;
+    align-items: center;
+    gap: 0.88rem;
+  }
+
+  .hero-actions--header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.72rem;
+    width: min(100%, 34rem);
+  }
+
+  .hero-actions--header .btn,
+  .hero-actions--header .btn-install-app {
+    width: auto;
+    min-width: 9.8rem;
+    min-height: 3.05rem;
+    padding-inline: 1.08rem;
+    white-space: nowrap;
+  }
+
+  .quick-category-nav {
+    max-width: min(100%, 34rem);
+    justify-content: flex-end;
+  }
+
+  .menu-showcase-section > .container {
+    max-width: min(1320px, calc(100vw - 2rem));
+    padding-right: min(21rem, 24vw);
+  }
+
+  .menu-order-shell.is-desktop {
+    width: min(340px, calc(100vw - 2rem));
+    right: max(1rem, calc((100vw - 1280px) / 2 + 1rem));
+  }
+
+  .menu-grid.menu-grid,
+  .menu-grid.two-col {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.55rem;
+  }
+}
+
+@media (min-width: 1380px) {
+  .menu-showcase-section > .container {
+    padding-right: 20rem;
+  }
+
+  .menu-grid.menu-grid,
+  .menu-grid.two-col {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .menu-item-media {
+    min-height: 205px;
   }
 }
 
