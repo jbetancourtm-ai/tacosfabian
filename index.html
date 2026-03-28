@@ -484,54 +484,6 @@
             <p>Sabor autentico: <span class="fire-accent" aria-hidden="true">🔥</span></p>
           </div>
 
-          <div id="menuOrderFab" class="menu-order-fab" aria-label="Resumen flotante del pedido">
-            <button
-              id="menuOrderFabToggle"
-              class="menu-order-fab__toggle"
-              type="button"
-              aria-expanded="false"
-              aria-controls="menuOrderShell"
-            >
-              <span class="menu-order-fab__icon" aria-hidden="true">🛒</span>
-              <span class="menu-order-fab__summary">
-                <span id="menuOrderFabCount" class="menu-order-fab__count">0 productos</span>
-                <strong id="menuOrderFabTotal" class="menu-order-fab__total">$0 MXN</strong>
-              </span>
-            </button>
-            <button id="menuOrderFabCheckout" class="menu-order-fab__cta" type="button" disabled>Enviar pedido</button>
-          </div>
-
-          <div id="menuOrderBackdrop" class="menu-order-backdrop" hidden></div>
-
-          <section id="menuOrderShell" class="card menu-order-shell" aria-labelledby="menuOrderTitle" aria-hidden="true">
-            <div class="menu-order-shell__head">
-              <div>
-                <p class="menu-order-shell__eyebrow">Tu pedido</p>
-                <h3 id="menuOrderTitle">Arma tu orden sin salir del menu</h3>
-                <p class="menu-order-shell__note">Agrega productos, ajusta cantidades y cuando termines envialo por WhatsApp con tu direccion.</p>
-              </div>
-              <button id="menuOrderClose" class="menu-order-shell__close" type="button" aria-label="Cerrar carrito">
-                &times;
-              </button>
-              <div class="menu-order-shell__totals" aria-live="polite" aria-atomic="true">
-                <span id="menuOrderCount" class="menu-order-shell__count">0 productos</span>
-                <strong id="menuOrderTotal">Total: $0 MXN</strong>
-              </div>
-            </div>
-
-            <div class="menu-order-shell__body">
-              <div class="menu-order-shell__summary">
-                <p id="menuOrderEmpty" class="menu-order-shell__empty">Todavia no agregas nada. Usa los botones del menu para empezar tu pedido.</p>
-                <ul id="menuOrderItems" class="menu-order-items" aria-label="Productos agregados"></ul>
-              </div>
-
-              <div class="menu-order-shell__actions">
-                <button id="menuOrderClear" class="btn btn-secondary" type="button" disabled>Vaciar pedido</button>
-                <button id="menuOrderCheckout" class="btn btn-primary" type="button" disabled>Enviar pedido</button>
-              </div>
-            </div>
-          </section>
-
           <div class="cards two-col menu-grid">
             <article id="menu-tacos" class="card menu-item" data-category-target aria-labelledby="menu-tacos-title">
               <span class="menu-badge badge-reco">🌮 Recomendado</span>
@@ -941,6 +893,54 @@
         </div>
       </div>
     </footer>
+
+    <div id="menuOrderFab" class="menu-order-fab" aria-label="Resumen flotante del pedido">
+      <button
+        id="menuOrderFabToggle"
+        class="menu-order-fab__toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="menuOrderShell"
+      >
+        <span class="menu-order-fab__icon" aria-hidden="true">🛒</span>
+        <span class="menu-order-fab__summary">
+          <span id="menuOrderFabCount" class="menu-order-fab__count">0 productos</span>
+          <strong id="menuOrderFabTotal" class="menu-order-fab__total">$0 MXN</strong>
+        </span>
+      </button>
+      <button id="menuOrderFabCheckout" class="menu-order-fab__cta" type="button" disabled>Enviar pedido</button>
+    </div>
+
+    <div id="menuOrderBackdrop" class="menu-order-backdrop" hidden></div>
+
+    <section id="menuOrderShell" class="card menu-order-shell" aria-labelledby="menuOrderTitle" aria-hidden="true">
+      <div class="menu-order-shell__head">
+        <div>
+          <p class="menu-order-shell__eyebrow">Tu pedido</p>
+          <h3 id="menuOrderTitle">Arma tu orden sin salir del menu</h3>
+          <p class="menu-order-shell__note">Agrega productos, ajusta cantidades y cuando termines envialo por WhatsApp con tu direccion.</p>
+        </div>
+        <button id="menuOrderClose" class="menu-order-shell__close" type="button" aria-label="Cerrar carrito">
+          &times;
+        </button>
+        <div class="menu-order-shell__totals" aria-live="polite" aria-atomic="true">
+          <span id="menuOrderCount" class="menu-order-shell__count">0 productos</span>
+          <strong id="menuOrderTotal">Total: $0 MXN</strong>
+        </div>
+      </div>
+
+      <div class="menu-order-shell__body">
+        <div class="menu-order-shell__summary">
+          <p id="menuOrderEmpty" class="menu-order-shell__empty">Todavia no agregas nada. Usa los botones del menu para empezar tu pedido.</p>
+          <ul id="menuOrderItems" class="menu-order-items" aria-label="Productos agregados"></ul>
+        </div>
+
+        <div class="menu-order-shell__actions">
+          <button id="menuOrderClear" class="btn btn-secondary" type="button" disabled>Vaciar pedido</button>
+          <button id="menuOrderCheckout" class="btn btn-primary" type="button" disabled>Enviar pedido</button>
+        </div>
+      </div>
+    </section>
 
     <div class="social-floating-links" aria-label="Redes sociales">
       <button
