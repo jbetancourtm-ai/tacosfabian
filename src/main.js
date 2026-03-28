@@ -56,6 +56,8 @@ const menuModalDescription = document.querySelector("#menuModalDescription");
 const menuModalPrice = document.querySelector("#menuModalPrice");
 const menuCards = Array.from(document.querySelectorAll(".menu-item"));
 const menuOrderFab = document.querySelector("#menuOrderFab");
+const menuOrderFabToggle = document.querySelector("#menuOrderFabToggle");
+const menuOrderFabCheckout = document.querySelector("#menuOrderFabCheckout");
 const menuOrderFabCount = document.querySelector("#menuOrderFabCount");
 const menuOrderFabTotal = document.querySelector("#menuOrderFabTotal");
 const menuOrderBackdrop = document.querySelector("#menuOrderBackdrop");
@@ -79,6 +81,7 @@ const orderCustomerAddress = document.querySelector("#orderCustomerAddress");
 const orderCustomerReference = document.querySelector("#orderCustomerReference");
 const orderUseLocationBtn = document.querySelector("#orderUseLocationBtn");
 const orderLocationStatus = document.querySelector("#orderLocationStatus");
+const orderManualLocationHint = document.querySelector("#orderManualLocationHint");
 let siteAmbientAudio = null;
 let siteAmbientStarting = false;
 let siteAmbientObserver = null;
@@ -1888,6 +1891,8 @@ function setupMenuSpotlightModal() {
 function setupMenuOrderingSystem() {
   if (
     !menuOrderFab ||
+    !menuOrderFabToggle ||
+    !menuOrderFabCheckout ||
     !menuOrderFabCount ||
     !menuOrderFabTotal ||
     !menuOrderBackdrop ||
@@ -1906,8 +1911,10 @@ function setupMenuOrderingSystem() {
     !orderCheckoutForm ||
     !orderCheckoutCount ||
     !orderCheckoutTotal ||
+    !orderCustomerAddress ||
     !orderUseLocationBtn ||
-    !orderLocationStatus
+    !orderLocationStatus ||
+    !orderManualLocationHint
   ) {
     return;
   }
@@ -1917,20 +1924,50 @@ function setupMenuOrderingSystem() {
   let cartLastFocused = null;
   let sharedLocation = null;
   let isCartPanelOpen = false;
+  const desktopOrderMedia = window.matchMedia("(min-width: 960px)");
 
   const getCartEntries = () => Array.from(cart.values());
   const getCartCount = () => getCartEntries().reduce((sum, item) => sum + item.quantity, 0);
   const getCartTotal = () => getCartEntries().reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
 
+  const isDesktopOrderLayout = () => desktopOrderMedia.matches;
+
+  const setManualLocationHint = (message, tone = "neutral") => {
+    orderManualLocationHint.textContent = message;
+    orderManualLocationHint.dataset.tone = tone;
+  };
+
+  const syncOrderLayoutMode = () => {
+    const isDesktop = isDesktopOrderLayout();
+
+    document.body.classList.toggle("has-order-fab", !isDesktop);
+    menuOrderFab.hidden = isDesktop;
+    menuOrderFab.setAttribute("aria-hidden", String(isDesktop));
+    menuOrderShell.classList.toggle("is-desktop", isDesktop);
+
+    if (isDesktop) {
+      menuOrderBackdrop.hidden = true;
+      menuOrderBackdrop.classList.remove("is-visible");
+      menuOrderShell.classList.add("is-open");
+      menuOrderShell.setAttribute("aria-hidden", "false");
+      menuOrderFabToggle.setAttribute("aria-expanded", "true");
+      return;
+    }
+
+    menuOrderBackdrop.hidden = !isCartPanelOpen;
+    menuOrderBackdrop.classList.toggle("is-visible", isCartPanelOpen);
+    menuOrderShell.classList.toggle("is-open", isCartPanelOpen);
+    menuOrderShell.setAttribute("aria-hidden", String(!isCartPanelOpen));
+    menuOrderFabToggle.setAttribute("aria-expanded", String(isCartPanelOpen));
+  };
+
   const setCartPanelState = (isOpen) => {
     isCartPanelOpen = isOpen;
-    menuOrderShell.classList.toggle("is-open", isOpen);
-    menuOrderBackdrop.hidden = !isOpen;
-    menuOrderBackdrop.classList.toggle("is-visible", isOpen);
-    menuOrderFab.classList.toggle("is-active", isOpen);
-    menuOrderFab.setAttribute("aria-expanded", String(isOpen));
-    menuOrderShell.setAttribute("aria-hidden", String(!isOpen));
-    document.body.classList.toggle("cart-panel-open", isOpen);
+    syncOrderLayoutMode();
+    menuOrderFab.classList.toggle("is-active", isOpen && !isDesktopOrderLayout());
+    document.body.classList.toggle("cart-panel-open", isOpen && !isDesktopOrderLayout());
+
+    if (isDesktopOrderLayout()) return;
 
     if (isOpen) {
       cartLastFocused = document.activeElement;
@@ -1957,13 +1994,10 @@ function setupMenuOrderingSystem() {
     menuOrderEmpty.hidden = count > 0;
     menuOrderCheckout.disabled = count === 0;
     menuOrderClear.disabled = count === 0;
+    menuOrderFabCheckout.disabled = count === 0;
     menuOrderFab.classList.toggle("has-items", count > 0);
     menuOrderShell.classList.toggle("is-empty", count === 0);
-
-    const fabCta = menuOrderFab.querySelector(".menu-order-fab__cta");
-    if (fabCta) {
-      fabCta.textContent = count > 0 ? "Finalizar" : "Ver pedido";
-    }
+    menuOrderFabCheckout.textContent = count > 0 ? "Finalizar" : "Sin productos";
   };
 
   const adjustCartItem = (id, delta) => {
@@ -2022,7 +2056,13 @@ function setupMenuOrderingSystem() {
     orderCheckoutModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
     syncSummaryLabels();
-    orderLocationStatus.textContent = sharedLocation ? "Ubicacion actual lista para enviarse en el pedido." : "";
+    orderLocationStatus.textContent = sharedLocation ? "Ubicacion actual lista para enviarse con tu pedido." : "Puedes compartir tu ubicacion o escribir tu direccion manualmente.";
+    setManualLocationHint(
+      sharedLocation
+        ? "Tu ubicacion ya esta lista. Si lo prefieres, tambien puedes editar la direccion manualmente."
+        : "Escribe la direccion manualmente en el campo de arriba si prefieres terminar mas rapido.",
+      sharedLocation ? "success" : "neutral"
+    );
     orderCustomerName?.focus();
   };
 
@@ -2174,7 +2214,15 @@ function setupMenuOrderingSystem() {
     }
   });
 
-  menuOrderFab.addEventListener("click", toggleCartPanel);
+  menuOrderFabToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleCartPanel();
+  });
+  menuOrderFabCheckout.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openCheckoutModal();
+  });
   menuOrderClose.addEventListener("click", closeCartPanel);
   menuOrderBackdrop.addEventListener("click", closeCartPanel);
 
@@ -2192,13 +2240,16 @@ function setupMenuOrderingSystem() {
 
   orderUseLocationBtn.addEventListener("click", () => {
     if (!("geolocation" in navigator)) {
-      orderLocationStatus.textContent = "Tu navegador no permite compartir ubicacion desde aqui.";
+      orderLocationStatus.textContent = "Tu navegador no pudo compartir la ubicacion desde aqui.";
+      setManualLocationHint("Escribe tu direccion manualmente en el campo de arriba para continuar sin problema.", "warning");
+      orderCustomerAddress.focus();
       showToast("Tu navegador no permite obtener ubicacion.", "error");
       return;
     }
 
     syncLocationButtonState(true);
     orderLocationStatus.textContent = "Solicitando acceso a tu ubicacion...";
+    setManualLocationHint("Si prefieres no compartirla, escribe tu direccion manualmente y continua con el pedido.", "neutral");
 
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
@@ -2213,12 +2264,15 @@ function setupMenuOrderingSystem() {
         }
 
         orderLocationStatus.textContent = "Ubicacion agregada. El repartidor podra abrirla en Google Maps.";
+        setManualLocationHint("Si quieres afinar detalles como colonia, piso o referencia, puedes editar el campo de direccion.", "success");
         syncLocationButtonState(false);
         showToast("Ubicacion agregada al pedido.", "ok");
       },
       () => {
         syncLocationButtonState(false);
-        orderLocationStatus.textContent = "No pudimos obtener tu ubicacion. Puedes escribir la direccion manualmente.";
+        orderLocationStatus.textContent = "No pudimos obtener la ubicacion automatica, pero puedes seguir sin problema escribiendo tu direccion manualmente.";
+        setManualLocationHint("Captura tu direccion en el campo de arriba. Con eso basta para continuar tu compra.", "warning");
+        orderCustomerAddress.focus();
         showToast("No pudimos obtener tu ubicacion.", "error");
       },
       {
@@ -2262,7 +2316,12 @@ function setupMenuOrderingSystem() {
 
   enhanceMenuRows();
   renderCart();
-  document.body.classList.add("has-order-fab");
+  syncOrderLayoutMode();
+  if (typeof desktopOrderMedia.addEventListener === "function") {
+    desktopOrderMedia.addEventListener("change", syncOrderLayoutMode);
+  } else if (typeof desktopOrderMedia.addListener === "function") {
+    desktopOrderMedia.addListener(syncOrderLayoutMode);
+  }
 }
 
 function setupRevealAnimations() {

@@ -501,20 +501,22 @@
             <p>Sabor autentico: <span class="fire-accent" aria-hidden="true">🔥</span></p>
           </div>
 
-          <button
-            id="menuOrderFab"
-            class="menu-order-fab"
-            type="button"
-            aria-expanded="false"
-            aria-controls="menuOrderShell"
-          >
-            <span class="menu-order-fab__icon" aria-hidden="true">🛒</span>
-            <span class="menu-order-fab__summary">
-              <span id="menuOrderFabCount" class="menu-order-fab__count">0 productos</span>
-              <strong id="menuOrderFabTotal" class="menu-order-fab__total">$0 MXN</strong>
-            </span>
-            <span class="menu-order-fab__cta">Ver pedido</span>
-          </button>
+          <div id="menuOrderFab" class="menu-order-fab" aria-label="Resumen flotante del pedido">
+            <button
+              id="menuOrderFabToggle"
+              class="menu-order-fab__toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="menuOrderShell"
+            >
+              <span class="menu-order-fab__icon" aria-hidden="true">🛒</span>
+              <span class="menu-order-fab__summary">
+                <span id="menuOrderFabCount" class="menu-order-fab__count">0 productos</span>
+                <strong id="menuOrderFabTotal" class="menu-order-fab__total">$0 MXN</strong>
+              </span>
+            </button>
+            <button id="menuOrderFabCheckout" class="menu-order-fab__cta" type="button" disabled>Finalizar</button>
+          </div>
 
           <div id="menuOrderBackdrop" class="menu-order-backdrop" hidden></div>
 
@@ -1119,6 +1121,7 @@
               rows="4"
               maxlength="240"
               autocomplete="street-address"
+              placeholder="Ej. Calle, numero, colonia, municipio y alguna referencia util para encontrarte rapido."
               required
             ></textarea>
             <div class="order-modal__location-tools">
@@ -1126,6 +1129,9 @@
                 Usar mi ubicacion actual
               </button>
               <p id="orderLocationStatus" class="order-modal__location-status" aria-live="polite"></p>
+              <div id="orderManualLocationHint" class="order-modal__manual-help" aria-live="polite">
+                Si prefieres, escribe tu direccion manualmente en el campo de arriba. Tu pedido puede continuar sin compartir ubicacion.
+              </div>
             </div>
           </label>
 

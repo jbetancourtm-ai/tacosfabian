@@ -8570,12 +8570,11 @@ main#contenido {
   bottom: 5.5rem;
   z-index: 33;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.85rem;
-  width: min(360px, calc(100vw - 2rem));
-  padding: 0.9rem 1rem;
-  border: 1px solid rgba(232, 152, 92, 0.24);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  width: min(420px, calc(100vw - 2rem));
+  padding: 0.5rem;
+  border: 1px solid rgba(232, 152, 92, 0.2);
   border-radius: 24px;
   background:
     linear-gradient(180deg, rgba(255, 251, 247, 0.98), rgba(255, 243, 232, 0.96)),
@@ -8584,8 +8583,6 @@ main#contenido {
     0 26px 60px rgba(108, 55, 24, 0.18),
     0 10px 24px rgba(108, 55, 24, 0.08);
   backdrop-filter: blur(14px);
-  color: #4c2a18;
-  cursor: pointer;
   transform: translateY(18px);
   opacity: 0;
   animation: menu-order-fab-in 420ms ease forwards;
@@ -8596,14 +8593,31 @@ main#contenido {
     opacity 220ms ease;
 }
 
-.menu-order-fab:hover,
-.menu-order-fab:focus-visible,
 .menu-order-fab.is-active {
   transform: translateY(-2px);
   border-color: rgba(219, 119, 42, 0.36);
   box-shadow:
     0 30px 68px rgba(108, 55, 24, 0.22),
     0 14px 28px rgba(108, 55, 24, 0.1);
+}
+
+.menu-order-fab__toggle {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: #4c2a18;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-order-fab__toggle:hover,
+.menu-order-fab__toggle:focus-visible {
+  transform: translateY(-1px);
 }
 
 .menu-order-fab__icon {
@@ -8641,6 +8655,7 @@ main#contenido {
   justify-content: center;
   min-height: 2.65rem;
   padding: 0.7rem 1rem;
+  border: 0;
   border-radius: 999px;
   background: linear-gradient(135deg, #8b2f10, #cf5c1f);
   color: #fff;
@@ -8648,11 +8663,14 @@ main#contenido {
   font-weight: 800;
   white-space: nowrap;
   box-shadow: 0 12px 22px rgba(145, 52, 16, 0.18);
+  cursor: pointer;
 }
 
+.menu-order-fab__cta:disabled,
 .menu-order-fab:not(.has-items) .menu-order-fab__cta {
   background: linear-gradient(135deg, #c4a38d, #dfc3af);
   box-shadow: none;
+  cursor: not-allowed;
 }
 
 .menu-order-backdrop {
@@ -8698,6 +8716,17 @@ main#contenido {
 
 .menu-order-shell.is-open {
   transform: translate3d(0, 0, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.menu-order-shell.is-desktop {
+  top: 6.2rem;
+  right: max(1rem, calc((100vw - 1200px) / 2 + 1rem));
+  bottom: auto;
+  width: min(360px, calc(100vw - 2rem));
+  max-height: calc(100vh - 8rem);
+  transform: none;
   opacity: 1;
   pointer-events: auto;
 }
@@ -9029,6 +9058,28 @@ main#contenido {
   color: #7a5b47;
 }
 
+.order-modal__manual-help {
+  padding: 0.82rem 0.92rem;
+  border-radius: 14px;
+  background: rgba(255, 247, 239, 0.92);
+  border: 1px solid rgba(232, 183, 140, 0.34);
+  color: #6f5647;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.order-modal__manual-help[data-tone="success"] {
+  background: rgba(241, 255, 246, 0.92);
+  border-color: rgba(120, 180, 128, 0.28);
+  color: #356244;
+}
+
+.order-modal__manual-help[data-tone="warning"] {
+  background: rgba(255, 247, 239, 0.98);
+  border-color: rgba(217, 143, 94, 0.44);
+  color: #87502b;
+}
+
 .order-modal__summary {
   display: flex;
   align-items: center;
@@ -9081,14 +9132,19 @@ main#contenido {
     bottom: calc(0.75rem + env(safe-area-inset-bottom));
     width: auto;
     border-radius: 24px;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    padding: 0.82rem 0.92rem calc(0.82rem + env(safe-area-inset-bottom) * 0.2);
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom) * 0.2);
   }
 
   .menu-order-fab__cta {
     min-height: 2.45rem;
     padding-inline: 0.92rem;
     font-size: 0.82rem;
+  }
+
+  .menu-order-fab__toggle {
+    gap: 0.7rem;
+    padding: 0.36rem 0.42rem;
   }
 
   .menu-order-shell {
@@ -9122,13 +9178,32 @@ main#contenido {
   .menu-order-line__remove,
   .order-modal__location-btn,
   .menu-order-shell__actions .btn,
-  .order-modal__actions .btn {
+  .order-modal__actions .btn,
+  .menu-order-fab__cta {
     width: 100%;
     justify-content: center;
   }
 
   .has-order-fab .floating-whatsapp {
     bottom: calc(6.9rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 960px) {
+  .menu-order-fab {
+    display: none;
+  }
+
+  .menu-order-backdrop {
+    display: none;
+  }
+
+  .menu-order-shell__close {
+    display: none;
+  }
+
+  body.has-order-fab {
+    padding-bottom: 0;
   }
 }
 
