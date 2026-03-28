@@ -1882,7 +1882,7 @@ body.intro-transitioning-3d .floating-whatsapp {
 .social-floating-links {
   position: fixed;
   left: 16px;
-  bottom: 16px;
+  bottom: 74px;
   right: auto;
   top: auto;
   z-index: 950;
@@ -3454,8 +3454,8 @@ button:focus-visible,
   margin-bottom: 0.4rem;
   color: var(--home-section-title);
   text-shadow: var(--home-heading-emphasis);
-  font-size: 1.26rem;
-  line-height: 1.08;
+  font-size: 1.34rem;
+  line-height: 1.04;
 }
 
 .menu-item h3::after {
@@ -3472,8 +3472,8 @@ button:focus-visible,
 .menu-item-note {
   margin-bottom: 0.46rem;
   color: var(--home-menu-item-note);
-  font-size: 0.92rem;
-  line-height: 1.52;
+  font-size: 0.94rem;
+  line-height: 1.58;
   font-weight: 500;
 }
 
@@ -3481,14 +3481,14 @@ button:focus-visible,
   display: inline-flex;
   align-items: center;
   margin-bottom: 0.54rem;
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--home-price-pill-text);
-  background: var(--home-price-pill-bg);
-  border: 1px solid rgba(255, 255, 255, 0.26);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #8e4d24;
+  background: rgba(255, 244, 235, 0.82);
+  border: 1px solid rgba(235, 191, 152, 0.56);
   border-radius: 999px;
-  padding: 0.24rem 0.62rem;
-  box-shadow: var(--home-price-pill-shadow);
+  padding: 0.22rem 0.58rem;
+  box-shadow: 0 6px 14px rgba(139, 69, 28, 0.08);
   letter-spacing: 0.01em;
 }
 
@@ -3507,12 +3507,12 @@ button:focus-visible,
 }
 
 .menu-item .price-list {
-  margin-top: 0.14rem;
-  gap: 0.3rem;
+  margin-top: 0.2rem;
+  gap: 0.44rem;
 }
 
 .menu-item .price-list li {
-  padding: 0.36rem 0;
+  padding: 0.44rem 0 0.3rem;
   border-bottom-color: transparent;
 }
 
@@ -6197,6 +6197,38 @@ body[data-home-theme="premium-noir"] .menu-showcase__head {
   background: rgba(255, 246, 239, 0.92);
 }
 
+.menu-showcase-section .menu-item h3 {
+  font-size: 1.36rem;
+  line-height: 1.04;
+}
+
+.menu-showcase-section .menu-item-note {
+  font-size: 0.95rem;
+  line-height: 1.58;
+}
+
+.menu-showcase-section .menu-item-price,
+.menu-showcase-section .menu-item--kilo .menu-item-price {
+  background: rgba(255, 244, 235, 0.86);
+  color: #8e4d24;
+  border: 1px solid rgba(235, 191, 152, 0.58);
+  box-shadow: 0 6px 14px rgba(139, 69, 28, 0.08);
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.menu-showcase-section .menu-item .price-list li span {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4e2b14;
+}
+
+.menu-showcase-section .menu-item .price-list li strong {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: #8c2f12;
+}
+
 .price-list li {
   padding: 0.42rem 0;
   border-bottom-color: transparent;
@@ -8778,11 +8810,11 @@ main#contenido {
 }
 
 .menu-order-shell.is-desktop {
-  top: 6.2rem;
+  top: 5.9rem;
   right: max(1rem, calc((100vw - 1200px) / 2 + 1rem));
   bottom: auto;
   width: min(378px, calc(100vw - 2rem));
-  max-height: calc(100vh - 7.4rem);
+  max-height: calc(100vh - 6.8rem);
   transform: none;
   opacity: 1;
   pointer-events: auto;
@@ -9037,9 +9069,10 @@ main#contenido {
 .menu-order-line {
   display: grid;
   gap: 0.56rem;
-  padding-top: 0.66rem;
-  margin-top: 0.56rem;
-  border-top: 1px dashed rgba(207, 169, 134, 0.56);
+  padding-top: 0.52rem;
+  margin-top: 0.5rem;
+  border-top: 1px dashed rgba(207, 169, 134, 0.42);
+  opacity: 0.92;
 }
 
 .menu-order-line__top {
@@ -9300,7 +9333,7 @@ main#contenido {
 
   .social-floating-links {
     left: 0.5rem;
-    bottom: calc(0.58rem + env(safe-area-inset-bottom));
+    bottom: calc(3.55rem + env(safe-area-inset-bottom));
     gap: 0.2rem;
     padding: 0.24rem;
     border-radius: 14px;
@@ -9354,7 +9387,7 @@ main#contenido {
 
   .btn-exit-app--dock {
     left: 0.5rem;
-    bottom: calc(4.2rem + env(safe-area-inset-bottom));
+    bottom: calc(0.58rem + env(safe-area-inset-bottom));
     min-height: 1.85rem;
     padding: 0.3rem 0.42rem;
     border-radius: 11px;
