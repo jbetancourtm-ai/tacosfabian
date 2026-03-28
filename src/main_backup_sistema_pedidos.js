@@ -55,23 +55,6 @@ const menuModalTitle = document.querySelector("#menuModalTitle");
 const menuModalDescription = document.querySelector("#menuModalDescription");
 const menuModalPrice = document.querySelector("#menuModalPrice");
 const menuCards = Array.from(document.querySelectorAll(".menu-item"));
-const menuOrderShell = document.querySelector("#menuOrderShell");
-const menuOrderItems = document.querySelector("#menuOrderItems");
-const menuOrderEmpty = document.querySelector("#menuOrderEmpty");
-const menuOrderCount = document.querySelector("#menuOrderCount");
-const menuOrderTotal = document.querySelector("#menuOrderTotal");
-const menuOrderCheckout = document.querySelector("#menuOrderCheckout");
-const menuOrderClear = document.querySelector("#menuOrderClear");
-const orderCheckoutModal = document.querySelector("#orderCheckoutModal");
-const orderCheckoutBackdrop = document.querySelector("#orderCheckoutBackdrop");
-const orderCheckoutClose = document.querySelector("#orderCheckoutClose");
-const orderCheckoutCancel = document.querySelector("#orderCheckoutCancel");
-const orderCheckoutForm = document.querySelector("#orderCheckoutForm");
-const orderCheckoutCount = document.querySelector("#orderCheckoutCount");
-const orderCheckoutTotal = document.querySelector("#orderCheckoutTotal");
-const orderCustomerName = document.querySelector("#orderCustomerName");
-const orderCustomerAddress = document.querySelector("#orderCustomerAddress");
-const orderCustomerReference = document.querySelector("#orderCustomerReference");
 let siteAmbientAudio = null;
 let siteAmbientStarting = false;
 let siteAmbientObserver = null;
@@ -80,7 +63,6 @@ let whatsappAudioContext = null;
 let deferredInstallPrompt = null;
 let swRefreshPending = false;
 let reviewsLoaded = false;
-const ORDER_WHATSAPP_NUMBER = "525615496107";
 
 initHomeTheme();
 applyExperienceVariantToDocument();
@@ -133,16 +115,6 @@ function showToast(message, type = "info") {
   window.setTimeout(() => {
     toast.remove();
   }, 2800);
-}
-
-function formatMxCurrency(value) {
-  const amount = Number(value) || 0;
-  return `$${amount.toLocaleString("es-MX")} MXN`;
-}
-
-function parsePriceAmount(priceText) {
-  const clean = String(priceText || "").replace(/[^\d.]/g, "");
-  return Number(clean) || 0;
 }
 
 if (menuBtn && navMenu) {
@@ -1878,282 +1850,6 @@ function setupMenuSpotlightModal() {
   });
 }
 
-function setupMenuOrderingSystem() {
-  if (
-    !menuOrderShell ||
-    !menuOrderItems ||
-    !menuOrderEmpty ||
-    !menuOrderCount ||
-    !menuOrderTotal ||
-    !menuOrderCheckout ||
-    !menuOrderClear ||
-    !orderCheckoutModal ||
-    !orderCheckoutBackdrop ||
-    !orderCheckoutClose ||
-    !orderCheckoutCancel ||
-    !orderCheckoutForm ||
-    !orderCheckoutCount ||
-    !orderCheckoutTotal
-  ) {
-    return;
-  }
-
-  const cart = new Map();
-  let checkoutLastFocused = null;
-
-  const getCartEntries = () => Array.from(cart.values());
-  const getCartCount = () => getCartEntries().reduce((sum, item) => sum + item.quantity, 0);
-  const getCartTotal = () => getCartEntries().reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-
-  const syncSummaryLabels = () => {
-    const count = getCartCount();
-    const total = getCartTotal();
-    const countLabel = `${count} ${count === 1 ? "producto" : "productos"}`;
-
-    menuOrderCount.textContent = countLabel;
-    menuOrderTotal.textContent = `Total: ${formatMxCurrency(total)}`;
-    orderCheckoutCount.textContent = countLabel;
-    orderCheckoutTotal.textContent = `Total: ${formatMxCurrency(total)}`;
-    menuOrderEmpty.hidden = count > 0;
-    menuOrderCheckout.disabled = count === 0;
-    menuOrderClear.disabled = count === 0;
-  };
-
-  const adjustCartItem = (id, delta) => {
-    const current = cart.get(id);
-    if (!current) return;
-
-    const nextQuantity = current.quantity + delta;
-    if (nextQuantity <= 0) {
-      cart.delete(id);
-    } else {
-      cart.set(id, { ...current, quantity: nextQuantity });
-    }
-
-    renderCart();
-  };
-
-  const renderCart = () => {
-    const items = getCartEntries();
-    menuOrderItems.innerHTML = "";
-
-    items.forEach((item) => {
-      const row = document.createElement("li");
-      row.className = "menu-order-item";
-      row.innerHTML = `
-        <div class="menu-order-item__top">
-          <div>
-            <p class="menu-order-item__name">${escapeHtml(item.displayName)}</p>
-            <span class="menu-order-item__meta">${escapeHtml(item.category)} · ${formatMxCurrency(item.unitPrice)} c/u</span>
-          </div>
-          <span class="menu-order-item__subtotal">${formatMxCurrency(item.quantity * item.unitPrice)}</span>
-        </div>
-        <div class="menu-order-item__controls">
-          <div class="menu-order-control" aria-label="Cantidad de ${escapeHtml(item.displayName)}">
-            <button class="menu-order-control__btn" type="button" data-order-summary-action="decrease" data-order-id="${item.id}" aria-label="Quitar uno">-</button>
-            <span class="menu-order-control__value" aria-live="polite">${item.quantity}</span>
-            <button class="menu-order-control__btn" type="button" data-order-summary-action="increase" data-order-id="${item.id}" aria-label="Agregar uno">+</button>
-          </div>
-          <button class="menu-order-line__remove" type="button" data-order-summary-action="remove" data-order-id="${item.id}">Eliminar</button>
-        </div>
-      `;
-      menuOrderItems.appendChild(row);
-    });
-
-    syncSummaryLabels();
-  };
-
-  const openCheckoutModal = () => {
-    if (getCartCount() === 0) {
-      showToast("Agrega al menos un producto antes de enviar tu pedido.", "info");
-      return;
-    }
-
-    checkoutLastFocused = document.activeElement;
-    orderCheckoutModal.classList.add("open");
-    orderCheckoutModal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
-    syncSummaryLabels();
-    orderCustomerName?.focus();
-  };
-
-  const closeCheckoutModal = () => {
-    orderCheckoutModal.classList.remove("open");
-    orderCheckoutModal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("modal-open");
-    if (checkoutLastFocused instanceof HTMLElement) checkoutLastFocused.focus();
-  };
-
-  const buildWhatsAppMessage = ({ customerName, customerAddress, customerReference }) => {
-    const lines = [
-      "Hola, quiero hacer este pedido:",
-      "",
-      ...getCartEntries().map(
-        (item) => `- ${item.quantity} x ${item.displayName} (${formatMxCurrency(item.unitPrice)} c/u) = ${formatMxCurrency(item.quantity * item.unitPrice)}`
-      ),
-      "",
-      `Total: ${formatMxCurrency(getCartTotal())}`,
-      "",
-      `Nombre: ${customerName}`,
-      `Direccion de entrega: ${customerAddress}`,
-    ];
-
-    if (customerReference) {
-      lines.push(`Referencia: ${customerReference}`);
-    }
-
-    return lines.join("\n");
-  };
-
-  const enhanceMenuRows = () => {
-    menuCards.forEach((card, cardIndex) => {
-      const category = card.querySelector("h3")?.textContent?.trim() || `Producto ${cardIndex + 1}`;
-      const rows = Array.from(card.querySelectorAll(".price-list li"));
-
-      rows.forEach((row, rowIndex) => {
-        const labelNode = row.querySelector("span");
-        const priceNode = row.querySelector("strong");
-        if (!(labelNode instanceof HTMLElement) || !(priceNode instanceof HTMLElement)) return;
-
-        const variant = labelNode.textContent?.trim() || `Opcion ${rowIndex + 1}`;
-        const unitPrice = parsePriceAmount(priceNode.textContent);
-        if (!unitPrice) return;
-
-        const orderId = `${card.id || `menu-${cardIndex + 1}`}-${rowIndex + 1}`;
-        const displayName = `${category} - ${variant}`;
-
-        row.classList.add("menu-order-enhanced");
-        row.dataset.orderId = orderId;
-
-        const orderLine = document.createElement("div");
-        orderLine.className = "menu-order-line";
-        orderLine.innerHTML = `
-          <div class="menu-order-line__top">
-            <span class="menu-order-line__price">${formatMxCurrency(unitPrice)} por unidad</span>
-            <div class="menu-order-control" aria-label="Seleccionar cantidad para ${escapeHtml(displayName)}">
-              <button class="menu-order-control__btn" type="button" data-order-picker="decrease" aria-label="Disminuir cantidad">-</button>
-              <span class="menu-order-control__value" data-order-picker-value>1</span>
-              <button class="menu-order-control__btn" type="button" data-order-picker="increase" aria-label="Aumentar cantidad">+</button>
-            </div>
-          </div>
-          <button class="menu-order-add-btn" type="button">Agregar 1</button>
-        `;
-
-        const pickerValue = orderLine.querySelector("[data-order-picker-value]");
-        const addButton = orderLine.querySelector(".menu-order-add-btn");
-        let selectedQuantity = 1;
-
-        const syncPicker = () => {
-          if (pickerValue) pickerValue.textContent = String(selectedQuantity);
-          if (addButton instanceof HTMLButtonElement) {
-            addButton.textContent = `Agregar ${selectedQuantity}`;
-          }
-        };
-
-        orderLine.addEventListener("click", (event) => {
-          event.stopPropagation();
-        });
-
-        orderLine.addEventListener("keydown", (event) => {
-          event.stopPropagation();
-        });
-
-        orderLine.querySelectorAll("button").forEach((button) => {
-          button.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const action = button.getAttribute("data-order-picker");
-            if (action === "decrease") {
-              selectedQuantity = Math.max(1, selectedQuantity - 1);
-              syncPicker();
-              return;
-            }
-
-            if (action === "increase") {
-              selectedQuantity += 1;
-              syncPicker();
-              return;
-            }
-
-            const existing = cart.get(orderId);
-            const nextQuantity = (existing?.quantity || 0) + selectedQuantity;
-            cart.set(orderId, {
-              id: orderId,
-              category,
-              variant,
-              displayName,
-              unitPrice,
-              quantity: nextQuantity,
-            });
-            renderCart();
-            showToast(`${selectedQuantity} ${selectedQuantity === 1 ? "producto agregado" : "productos agregados"} al pedido.`, "ok");
-          });
-        });
-
-        syncPicker();
-        row.appendChild(orderLine);
-      });
-    });
-  };
-
-  menuOrderItems.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLButtonElement)) return;
-
-    const id = target.dataset.orderId;
-    if (!id) return;
-
-    const action = target.dataset.orderSummaryAction;
-    if (action === "increase") adjustCartItem(id, 1);
-    if (action === "decrease") adjustCartItem(id, -1);
-    if (action === "remove") {
-      cart.delete(id);
-      renderCart();
-    }
-  });
-
-  menuOrderClear.addEventListener("click", () => {
-    if (getCartCount() === 0) return;
-    cart.clear();
-    renderCart();
-    showToast("Tu pedido se vacio.", "info");
-  });
-
-  menuOrderCheckout.addEventListener("click", openCheckoutModal);
-  orderCheckoutClose.addEventListener("click", closeCheckoutModal);
-  orderCheckoutCancel.addEventListener("click", closeCheckoutModal);
-  orderCheckoutBackdrop.addEventListener("click", closeCheckoutModal);
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && orderCheckoutModal.classList.contains("open")) {
-      closeCheckoutModal();
-    }
-  });
-
-  orderCheckoutForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const customerName = String(orderCustomerName?.value || "").trim();
-    const customerAddress = String(orderCustomerAddress?.value || "").trim();
-    const customerReference = String(orderCustomerReference?.value || "").trim();
-
-    if (!customerName || !customerAddress) {
-      showToast("Completa nombre y direccion para enviar tu pedido.", "error");
-      return;
-    }
-
-    const message = buildWhatsAppMessage({ customerName, customerAddress, customerReference });
-    const whatsappUrl = `https://wa.me/${ORDER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-    closeCheckoutModal();
-    showToast("Abrimos WhatsApp con tu pedido listo.", "ok");
-  });
-
-  enhanceMenuRows();
-  renderCart();
-}
-
 function setupRevealAnimations() {
   const groups = [
     ".hero-premium .hero-content, .hero-premium .hero-side, .hero-premium .hero-proof, .trust-card",
@@ -2220,7 +1916,6 @@ setupCommentCounter();
 setupReviewsForm();
 setupMenuCarousel();
 setupMenuSpotlightModal();
-setupMenuOrderingSystem();
 setupRevealAnimations();
 setupHeaderEffects();
 setupIntroScreen();

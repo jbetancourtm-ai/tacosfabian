@@ -501,32 +501,6 @@
             <p>Sabor autentico: <span class="fire-accent" aria-hidden="true">🔥</span></p>
           </div>
 
-          <section id="menuOrderShell" class="card menu-order-shell" aria-labelledby="menuOrderTitle">
-            <div class="menu-order-shell__head">
-              <div>
-                <p class="menu-order-shell__eyebrow">Tu pedido</p>
-                <h3 id="menuOrderTitle">Arma tu orden sin salir del menu</h3>
-                <p class="menu-order-shell__note">Agrega productos, ajusta cantidades y cuando termines envialo por WhatsApp con tu direccion.</p>
-              </div>
-              <div class="menu-order-shell__totals" aria-live="polite" aria-atomic="true">
-                <span id="menuOrderCount" class="menu-order-shell__count">0 productos</span>
-                <strong id="menuOrderTotal">Total: $0 MXN</strong>
-              </div>
-            </div>
-
-            <div class="menu-order-shell__body">
-              <div class="menu-order-shell__summary">
-                <p id="menuOrderEmpty" class="menu-order-shell__empty">Todavia no agregas nada. Usa los botones del menu para empezar tu pedido.</p>
-                <ul id="menuOrderItems" class="menu-order-items" aria-label="Productos agregados"></ul>
-              </div>
-
-              <div class="menu-order-shell__actions">
-                <button id="menuOrderClear" class="btn btn-secondary" type="button" disabled>Vaciar pedido</button>
-                <button id="menuOrderCheckout" class="btn btn-primary" type="button" disabled>Pedir por WhatsApp</button>
-              </div>
-            </div>
-          </section>
-
           <div class="cards two-col menu-grid">
             <article id="menu-tacos" class="card menu-item" data-category-target aria-labelledby="menu-tacos-title">
               <span class="menu-badge badge-reco">🌮 Recomendado</span>
@@ -1065,59 +1039,6 @@
         >
           Pedir por WhatsApp
         </a>
-      </div>
-    </div>
-
-    <div
-      id="orderCheckoutModal"
-      class="menu-modal order-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="orderCheckoutTitle"
-      aria-hidden="true"
-    >
-      <div id="orderCheckoutBackdrop" class="menu-modal__backdrop"></div>
-      <div class="menu-modal__panel order-modal__panel" role="document">
-        <button id="orderCheckoutClose" class="menu-modal__close" type="button" aria-label="Cerrar pedido">
-          &times;
-        </button>
-        <span class="menu-modal__badge">Pedido por WhatsApp</span>
-        <h3 id="orderCheckoutTitle">Completa tus datos de entrega</h3>
-        <p class="order-modal__intro">Antes de enviar tu pedido, dinos a nombre de quien va y a donde lo llevamos.</p>
-
-        <form id="orderCheckoutForm" class="order-modal__form">
-          <label class="order-modal__field">
-            <span>Nombre</span>
-            <input id="orderCustomerName" name="customerName" type="text" autocomplete="name" maxlength="80" required />
-          </label>
-
-          <label class="order-modal__field">
-            <span>Direccion o ubicacion de entrega</span>
-            <textarea
-              id="orderCustomerAddress"
-              name="customerAddress"
-              rows="4"
-              maxlength="240"
-              autocomplete="street-address"
-              required
-            ></textarea>
-          </label>
-
-          <label class="order-modal__field">
-            <span>Referencia opcional</span>
-            <input id="orderCustomerReference" name="customerReference" type="text" maxlength="140" autocomplete="off" />
-          </label>
-
-          <div class="order-modal__summary">
-            <span id="orderCheckoutCount">0 productos</span>
-            <strong id="orderCheckoutTotal">Total: $0 MXN</strong>
-          </div>
-
-          <div class="order-modal__actions">
-            <button id="orderCheckoutCancel" class="btn btn-secondary" type="button">Cancelar</button>
-            <button class="btn btn-primary" type="submit">Enviar pedido</button>
-          </div>
-        </form>
       </div>
     </div>
 
