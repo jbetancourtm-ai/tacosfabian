@@ -72,6 +72,8 @@ const orderCheckoutTotal = document.querySelector("#orderCheckoutTotal");
 const orderCustomerName = document.querySelector("#orderCustomerName");
 const orderCustomerAddress = document.querySelector("#orderCustomerAddress");
 const orderCustomerReference = document.querySelector("#orderCustomerReference");
+const orderUseLocationBtn = document.querySelector("#orderUseLocationBtn");
+const orderLocationStatus = document.querySelector("#orderLocationStatus");
 let siteAmbientAudio = null;
 let siteAmbientStarting = false;
 let siteAmbientObserver = null;
@@ -1893,13 +1895,16 @@ function setupMenuOrderingSystem() {
     !orderCheckoutCancel ||
     !orderCheckoutForm ||
     !orderCheckoutCount ||
-    !orderCheckoutTotal
+    !orderCheckoutTotal ||
+    !orderUseLocationBtn ||
+    !orderLocationStatus
   ) {
     return;
   }
 
   const cart = new Map();
   let checkoutLastFocused = null;
+  let sharedLocation = null;
 
   const getCartEntries = () => Array.from(cart.values());
   const getCartCount = () => getCartEntries().reduce((sum, item) => sum + item.quantity, 0);
@@ -1974,6 +1979,7 @@ function setupMenuOrderingSystem() {
     orderCheckoutModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
     syncSummaryLabels();
+    orderLocationStatus.textContent = sharedLocation ? "Ubicacion actual lista para enviarse en el pedido." : "";
     orderCustomerName?.focus();
   };
 
@@ -1984,7 +1990,10 @@ function setupMenuOrderingSystem() {
     if (checkoutLastFocused instanceof HTMLElement) checkoutLastFocused.focus();
   };
 
-  const buildWhatsAppMessage = ({ customerName, customerAddress, customerReference }) => {
+  const buildGoogleMapsLink = ({ latitude, longitude }) =>
+    `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+  const buildWhatsAppMessage = ({ customerName, customerAddress, customerReference, locationLink }) => {
     const lines = [
       "Hola, quiero hacer este pedido:",
       "",
@@ -1998,11 +2007,20 @@ function setupMenuOrderingSystem() {
       `Direccion de entrega: ${customerAddress}`,
     ];
 
+    if (locationLink) {
+      lines.push(`Ubicacion en Google Maps: ${locationLink}`);
+    }
+
     if (customerReference) {
       lines.push(`Referencia: ${customerReference}`);
     }
 
     return lines.join("\n");
+  };
+
+  const syncLocationButtonState = (isLoading = false) => {
+    orderUseLocationBtn.disabled = isLoading;
+    orderUseLocationBtn.textContent = isLoading ? "Obteniendo ubicacion..." : "Usar mi ubicacion actual";
   };
 
   const enhanceMenuRows = () => {
@@ -2125,6 +2143,45 @@ function setupMenuOrderingSystem() {
   orderCheckoutCancel.addEventListener("click", closeCheckoutModal);
   orderCheckoutBackdrop.addEventListener("click", closeCheckoutModal);
 
+  orderUseLocationBtn.addEventListener("click", () => {
+    if (!("geolocation" in navigator)) {
+      orderLocationStatus.textContent = "Tu navegador no permite compartir ubicacion desde aqui.";
+      showToast("Tu navegador no permite obtener ubicacion.", "error");
+      return;
+    }
+
+    syncLocationButtonState(true);
+    orderLocationStatus.textContent = "Solicitando acceso a tu ubicacion...";
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const latitude = Number(coords.latitude?.toFixed(6));
+        const longitude = Number(coords.longitude?.toFixed(6));
+        const mapsLink = buildGoogleMapsLink({ latitude, longitude });
+        sharedLocation = { latitude, longitude, mapsLink };
+
+        const locationText = `Ubicacion actual compartida: ${mapsLink}`;
+        if (orderCustomerAddress instanceof HTMLTextAreaElement) {
+          orderCustomerAddress.value = locationText;
+        }
+
+        orderLocationStatus.textContent = "Ubicacion agregada. El repartidor podra abrirla en Google Maps.";
+        syncLocationButtonState(false);
+        showToast("Ubicacion agregada al pedido.", "ok");
+      },
+      () => {
+        syncLocationButtonState(false);
+        orderLocationStatus.textContent = "No pudimos obtener tu ubicacion. Puedes escribir la direccion manualmente.";
+        showToast("No pudimos obtener tu ubicacion.", "error");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 0,
+      }
+    );
+  });
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && orderCheckoutModal.classList.contains("open")) {
       closeCheckoutModal();
@@ -2137,13 +2194,14 @@ function setupMenuOrderingSystem() {
     const customerName = String(orderCustomerName?.value || "").trim();
     const customerAddress = String(orderCustomerAddress?.value || "").trim();
     const customerReference = String(orderCustomerReference?.value || "").trim();
+    const locationLink = sharedLocation?.mapsLink || "";
 
     if (!customerName || !customerAddress) {
       showToast("Completa nombre y direccion para enviar tu pedido.", "error");
       return;
     }
 
-    const message = buildWhatsAppMessage({ customerName, customerAddress, customerReference });
+    const message = buildWhatsAppMessage({ customerName, customerAddress, customerReference, locationLink });
     const whatsappUrl = `https://wa.me/${ORDER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     closeCheckoutModal();

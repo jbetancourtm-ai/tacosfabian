@@ -8855,6 +8855,24 @@ main#contenido {
   border-color: #c94d17;
 }
 
+.order-modal__location-tools {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.order-modal__location-btn {
+  width: fit-content;
+  min-height: 2.85rem;
+  padding-inline: 1rem;
+}
+
+.order-modal__location-status {
+  margin: 0;
+  min-height: 1.2rem;
+  font-size: 0.84rem;
+  color: #7a5b47;
+}
+
 .order-modal__summary {
   display: flex;
   align-items: center;
@@ -8901,6 +8919,7 @@ main#contenido {
   .menu-order-control,
   .menu-order-add-btn,
   .menu-order-line__remove,
+  .order-modal__location-btn,
   .menu-order-shell__actions .btn,
   .order-modal__actions .btn {
     width: 100%;
