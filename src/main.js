@@ -463,6 +463,45 @@ function setupPwaSupport() {
     });
   };
 
+  const waitForInstallPrompt = (timeoutMs = 1800) =>
+    new Promise((resolve) => {
+      if (deferredInstallPrompt) {
+        resolve(true);
+        return;
+      }
+
+      let settled = false;
+      const finish = (result) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        window.removeEventListener("app-installable", handleInstallable);
+        resolve(result);
+      };
+
+      const handleInstallable = () => finish(true);
+      const timeoutId = window.setTimeout(() => finish(Boolean(deferredInstallPrompt)), timeoutMs);
+
+      window.addEventListener("app-installable", handleInstallable, { once: true });
+    });
+
+  const registerServiceWorker = async () => {
+    if (!("serviceWorker" in navigator)) return null;
+
+    try {
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+        updateViaCache: "none",
+      });
+      watchServiceWorkerRegistration(registration);
+      void registration.update();
+      return registration;
+    } catch (error) {
+      console.error("No se pudo registrar el service worker", error);
+      return null;
+    }
+  };
+
   syncInstallButton(!isStandaloneMode() && canOfferManualInstall, { ready: Boolean(deferredInstallPrompt) });
   syncExitButton(isStandaloneMode());
 
@@ -558,6 +597,19 @@ function setupPwaSupport() {
     }
 
     if (!deferredInstallPrompt) {
+      if (!isIos) {
+        button.disabled = true;
+
+        try {
+          await registerServiceWorker();
+          await waitForInstallPrompt();
+        } finally {
+          button.disabled = false;
+        }
+      }
+    }
+
+    if (!deferredInstallPrompt) {
       showToast(getManualInstallMessage(), "info");
       syncInstallButton(canOfferManualInstall, { ready: false });
       return;
@@ -622,20 +674,7 @@ function setupPwaSupport() {
 
   navigator.serviceWorker.addEventListener("controllerchange", refreshForUpdatedServiceWorker, { once: true });
 
-  window.addEventListener("load", async () => {
-    scheduleIdleWork(async () => {
-      try {
-        const registration = await navigator.serviceWorker.register("/sw.js", {
-          scope: "/",
-          updateViaCache: "none",
-        });
-        watchServiceWorkerRegistration(registration);
-        void registration.update();
-      } catch (error) {
-        console.error("No se pudo registrar el service worker", error);
-      }
-    }, 1600);
-  });
+  void registerServiceWorker();
 }
 
 function setupFabianVideos() {
