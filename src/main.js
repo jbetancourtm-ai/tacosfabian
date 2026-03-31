@@ -550,35 +550,32 @@ function setupPwaSupport() {
     browserUrl.searchParams.set("source", "browser");
     browserUrl.hash ||= "top";
 
-    window.setTimeout(() => {
-      try {
-        window.open("", "_self");
-      } catch {}
+    try {
+      const externalWindow = window.open(browserUrl.toString(), "_blank", "noopener,noreferrer");
+      externalWindow?.focus?.();
+    } catch {}
 
+    window.setTimeout(() => {
       try {
         window.close();
       } catch {}
-    }, 60);
+    }, 40);
 
     window.setTimeout(() => {
-      try {
-        const externalWindow = window.open(browserUrl.toString(), "_blank", "noopener,noreferrer");
-        if (externalWindow) {
-          externalWindow.focus?.();
-        }
-      } catch {}
-
       if (window.history.length > 1) {
         window.history.back();
         return;
       }
 
       try {
-        window.location.replace("about:blank");
+        window.location.replace(browserUrl.toString());
       } catch {}
     }, 180);
 
-    window.setTimeout(fallbackExitMessage, 900);
+    window.setTimeout(() => {
+      document.body.classList.remove("app-exit-pending");
+      fallbackExitMessage();
+    }, 900);
   };
 
   exitAppButtons.forEach((button) => {
@@ -890,6 +887,10 @@ function setupHomeHostsExperiment() {
         : null,
     favio: null,
   };
+  const speakerLines = {
+    fabian: "Hola, bienvenido a Tacos Fabian en Texcoco.",
+    favio: "Arma tu pedido rapido desde el menu o pidelo por WhatsApp.",
+  };
   const availableCards = Object.values(speakerCards).filter((card) => card instanceof HTMLElement);
   const speakerPlaybackFallbackMs = {
     fabian: reducedMotion ? 2200 : 4200,
@@ -907,6 +908,11 @@ function setupHomeHostsExperiment() {
   const clearTimers = () => {
     window.clearTimeout(playbackTimer);
     window.clearTimeout(nextStepTimer);
+  };
+
+  const cancelSpeechFallback = () => {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
   };
 
   const mediaHasUsableAudio = (video) => {
@@ -957,9 +963,42 @@ function setupHomeHostsExperiment() {
     video.load();
   };
 
+  const playSpeechFallback = async (speaker) => {
+    if (!("speechSynthesis" in window)) return false;
+    const line = speakerLines[speaker];
+    if (!line) return false;
+
+    return await new Promise((resolve) => {
+      const utterance = new SpeechSynthesisUtterance(line);
+      utterance.lang = "es-MX";
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
+      let settled = false;
+      const finish = (result) => {
+        if (settled) return;
+        settled = true;
+        utterance.onend = null;
+        utterance.onerror = null;
+        resolve(result);
+      };
+
+      utterance.onend = () => finish(true);
+      utterance.onerror = () => finish(false);
+
+      try {
+        cancelSpeechFallback();
+        window.speechSynthesis.speak(utterance);
+      } catch {
+        finish(false);
+      }
+    });
+  };
+
   const playSequenceVideo = async (speaker) => {
     const video = speakerVideos[speaker];
-    if (!(video instanceof HTMLVideoElement)) return false;
+    if (!(video instanceof HTMLVideoElement)) return { started: false, audible: false };
     const fallbackAudio = speakerFallbackAudio[speaker];
     try {
       video.currentTime = 0;
@@ -982,18 +1021,19 @@ function setupHomeHostsExperiment() {
         video.muted = true;
         video.defaultMuted = true;
         await fallbackAudio.play();
+        return { started: true, audible: true };
       }
-      return true;
+      return { started: true, audible: mediaHasUsableAudio(video) };
     } catch {
       if (fallbackAudio instanceof HTMLAudioElement) {
         try {
           await fallbackAudio.play();
-          return true;
+          return { started: true, audible: true };
         } catch {
           // Keep image fallback visible if playback is blocked.
         }
       }
-      return false;
+      return { started: false, audible: false };
     }
   };
 
@@ -1006,6 +1046,7 @@ function setupHomeHostsExperiment() {
       if (!(audio instanceof HTMLAudioElement)) return;
       audio.pause();
     });
+    cancelSpeechFallback();
   };
 
   const setSpeakerState = (speaker) => {
@@ -1021,9 +1062,14 @@ function setupHomeHostsExperiment() {
   const waitForSpeakerCompletion = async (speaker) => {
     const video = speakerVideos[speaker];
     const fallbackMs = speakerPlaybackFallbackMs[speaker] || 3600;
-    const started = await playSequenceVideo(speaker);
+    const playback = await playSequenceVideo(speaker);
 
-    if (!(video instanceof HTMLVideoElement) || !started) {
+    if (!playback.audible) {
+      const usedSpeechFallback = await playSpeechFallback(speaker);
+      if (usedSpeechFallback) return;
+    }
+
+    if (!(video instanceof HTMLVideoElement) || !playback.started) {
       await new Promise((resolve) => {
         playbackTimer = window.setTimeout(resolve, fallbackMs);
       });
@@ -1959,6 +2005,7 @@ function setupMenuOrderingSystem() {
   }
 
   const cart = new Map();
+  const productPickers = new Map();
   let checkoutLastFocused = null;
   let cartLastFocused = null;
   let sharedLocation = null;
@@ -1968,6 +2015,7 @@ function setupMenuOrderingSystem() {
   const getCartEntries = () => Array.from(cart.values());
   const getCartCount = () => getCartEntries().reduce((sum, item) => sum + item.quantity, 0);
   const getCartTotal = () => getCartEntries().reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+  const getCartQuantity = (id) => cart.get(id)?.quantity || 0;
 
   const isDesktopOrderLayout = () => desktopOrderMedia.matches;
 
@@ -2056,6 +2104,24 @@ function setupMenuOrderingSystem() {
     renderCart();
   };
 
+  const syncProductPicker = (id) => {
+    const controls = productPickers.get(id);
+    if (!controls) return;
+
+    const quantity = getCartQuantity(id);
+    controls.value.textContent = String(quantity);
+    controls.decrease.disabled = quantity === 0;
+    controls.row.classList.toggle("has-selection", quantity > 0);
+    controls.hint.textContent =
+      quantity === 0
+        ? "Toca + para agregar"
+        : `${quantity} ${quantity === 1 ? "agregado" : "agregados"} en tu pedido`;
+  };
+
+  const syncProductPickers = () => {
+    productPickers.forEach((_, id) => syncProductPicker(id));
+  };
+
   const renderCart = () => {
     const items = getCartEntries();
     menuOrderItems.innerHTML = "";
@@ -2084,6 +2150,7 @@ function setupMenuOrderingSystem() {
     });
 
     syncSummaryLabels();
+    syncProductPickers();
   };
 
   const openCheckoutModal = () => {
@@ -2175,23 +2242,33 @@ function setupMenuOrderingSystem() {
             <span class="menu-order-line__price">${formatMxCurrency(unitPrice)} por unidad</span>
             <div class="menu-order-control" aria-label="Seleccionar cantidad para ${escapeHtml(displayName)}">
               <button class="menu-order-control__btn" type="button" data-order-picker="decrease" aria-label="Disminuir cantidad">-</button>
-              <span class="menu-order-control__value" data-order-picker-value>1</span>
+              <span class="menu-order-control__value" data-order-picker-value>0</span>
               <button class="menu-order-control__btn" type="button" data-order-picker="increase" aria-label="Aumentar cantidad">+</button>
             </div>
           </div>
-          <button class="menu-order-add-btn" type="button">Agregar 1</button>
+          <p class="menu-order-line__hint" data-order-picker-hint>Toca + para agregar</p>
         `;
 
         const pickerValue = orderLine.querySelector("[data-order-picker-value]");
-        const addButton = orderLine.querySelector(".menu-order-add-btn");
-        let selectedQuantity = 1;
+        const pickerHint = orderLine.querySelector("[data-order-picker-hint]");
+        const decreaseButton = orderLine.querySelector('[data-order-picker="decrease"]');
+        const increaseButton = orderLine.querySelector('[data-order-picker="increase"]');
+        if (
+          !(pickerValue instanceof HTMLElement) ||
+          !(pickerHint instanceof HTMLElement) ||
+          !(decreaseButton instanceof HTMLButtonElement) ||
+          !(increaseButton instanceof HTMLButtonElement)
+        ) {
+          return;
+        }
 
-        const syncPicker = () => {
-          if (pickerValue) pickerValue.textContent = String(selectedQuantity);
-          if (addButton instanceof HTMLButtonElement) {
-            addButton.textContent = `Agregar ${selectedQuantity}`;
-          }
-        };
+        productPickers.set(orderId, {
+          row: orderLine,
+          value: pickerValue,
+          hint: pickerHint,
+          decrease: decreaseButton,
+          increase: increaseButton,
+        });
 
         orderLine.addEventListener("click", (event) => {
           event.stopPropagation();
@@ -2208,34 +2285,29 @@ function setupMenuOrderingSystem() {
 
             const action = button.getAttribute("data-order-picker");
             if (action === "decrease") {
-              selectedQuantity = Math.max(1, selectedQuantity - 1);
-              syncPicker();
+              adjustCartItem(orderId, -1);
               return;
             }
 
             if (action === "increase") {
-              selectedQuantity += 1;
-              syncPicker();
+              const existing = cart.get(orderId);
+              const nextQuantity = (existing?.quantity || 0) + 1;
+              cart.set(orderId, {
+                id: orderId,
+                category,
+                variant,
+                displayName,
+                unitPrice,
+                quantity: nextQuantity,
+              });
+              renderCart();
               return;
             }
-
-            const existing = cart.get(orderId);
-            const nextQuantity = (existing?.quantity || 0) + selectedQuantity;
-            cart.set(orderId, {
-              id: orderId,
-              category,
-              variant,
-              displayName,
-              unitPrice,
-              quantity: nextQuantity,
-            });
-            renderCart();
-            showToast(`${selectedQuantity} ${selectedQuantity === 1 ? "producto agregado" : "productos agregados"} al pedido.`, "ok");
           });
         });
 
-        syncPicker();
         row.appendChild(orderLine);
+        syncProductPicker(orderId);
       });
     });
   };

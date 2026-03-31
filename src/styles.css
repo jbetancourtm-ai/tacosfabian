@@ -11532,3 +11532,207 @@ textarea:focus {
     bottom: calc(3.85rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Final mobile-first cleanup for premium purchase flow */
+.home-host-card__name {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.hero-actions--header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.hero-actions--header .btn,
+.hero-actions--header .btn-install-app,
+.hero-actions--header .btn-exit-app {
+  flex: 1 1 calc(50% - 0.3rem);
+  min-height: 3rem;
+  white-space: nowrap;
+}
+
+.menu-showcase-section .section-head,
+.section-head.section-head--premium {
+  margin-bottom: 1rem;
+}
+
+.menu-grid,
+.why-grid,
+.featured-products,
+.references-grid {
+  gap: 1rem;
+}
+
+.menu-order-line {
+  gap: 0.42rem;
+  padding-top: 0.66rem;
+  margin-top: 0.58rem;
+}
+
+.menu-order-line__top {
+  align-items: center;
+}
+
+.menu-order-line__price {
+  color: var(--order-ui-muted);
+  font-size: 0.82rem;
+}
+
+.menu-order-line__hint {
+  margin: 0;
+  color: var(--order-ui-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.menu-order-line.has-selection .menu-order-line__hint {
+  color: var(--order-ui-accent);
+  font-weight: 700;
+}
+
+.menu-order-control__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.menu-order-add-btn {
+  display: none !important;
+}
+
+.menu-order-control {
+  min-width: 7.2rem;
+  justify-content: space-between;
+}
+
+.menu-order-control__btn {
+  width: 2rem;
+  height: 2rem;
+}
+
+.menu-order-control__value {
+  min-width: 1.8rem;
+}
+
+.home-hosts--experiment {
+  z-index: 140;
+}
+
+.floating-fabian-host,
+.fabian-main {
+  right: 0.9rem;
+  bottom: 5.8rem;
+  z-index: 300;
+}
+
+.floating-whatsapp {
+  right: 0.9rem;
+  bottom: 1rem;
+  z-index: 360;
+  width: 58px;
+  height: 58px;
+  border-color: rgba(23, 20, 17, 0.08);
+  background: linear-gradient(180deg, #9c4935 0%, #7e3426 100%);
+  box-shadow: 0 16px 30px rgba(126, 52, 38, 0.24);
+}
+
+.btn-exit-app--dock {
+  left: 0.9rem;
+  bottom: 1rem;
+  z-index: 340;
+  border-color: rgba(23, 20, 17, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.social-floating-links {
+  left: 0.9rem;
+  bottom: 4.6rem;
+  z-index: 330;
+}
+
+@media (max-width: 767px) {
+  .header-inner {
+    align-items: start;
+  }
+
+  .hero-actions--header {
+    gap: 0.52rem;
+  }
+
+  .hero-actions--header .btn,
+  .hero-actions--header .btn-install-app,
+  .hero-actions--header .btn-exit-app {
+    flex-basis: calc(50% - 0.26rem);
+    min-height: 2.85rem;
+    padding-inline: 0.92rem;
+    font-size: 0.82rem;
+  }
+
+  .quick-category-nav {
+    margin-top: 0.3rem;
+  }
+
+  .home-hosts--experiment {
+    inset: 6.4rem 0 auto;
+    min-height: 320px;
+  }
+
+  .home-hosts__duo {
+    bottom: 0.4rem;
+    width: min(100%, 360px);
+    gap: 0.2rem;
+    min-height: 260px;
+  }
+
+  .home-host-card,
+  .home-host-card__media {
+    min-height: 248px;
+  }
+
+  .home-host-card__video,
+  .home-host-card__figure {
+    width: min(100%, 172px);
+    height: 248px;
+  }
+
+  .floating-fabian-host,
+  .fabian-main {
+    right: 0.7rem;
+    bottom: 5.3rem;
+    width: 92px;
+  }
+
+  .btn-exit-app--dock {
+    left: 0.7rem;
+    bottom: calc(0.74rem + env(safe-area-inset-bottom));
+  }
+
+  .social-floating-links {
+    left: 0.7rem;
+    bottom: calc(3.95rem + env(safe-area-inset-bottom));
+  }
+
+  .floating-whatsapp {
+    right: 0.7rem;
+    bottom: calc(0.78rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 960px) {
+  .hero-actions--header .btn,
+  .hero-actions--header .btn-install-app,
+  .hero-actions--header .btn-exit-app {
+    flex: 1 1 calc(25% - 0.45rem);
+  }
+}
