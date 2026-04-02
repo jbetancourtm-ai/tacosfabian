@@ -2238,15 +2238,12 @@ function setupMenuOrderingSystem() {
         const orderLine = document.createElement("div");
         orderLine.className = "menu-order-line";
         orderLine.innerHTML = `
-          <div class="menu-order-line__top">
-            <span class="menu-order-line__price">${formatMxCurrency(unitPrice)} por unidad</span>
-            <div class="menu-order-control" aria-label="Seleccionar cantidad para ${escapeHtml(displayName)}">
-              <button class="menu-order-control__btn" type="button" data-order-picker="decrease" aria-label="Disminuir cantidad">-</button>
-              <span class="menu-order-control__value" data-order-picker-value>0</span>
-              <button class="menu-order-control__btn" type="button" data-order-picker="increase" aria-label="Aumentar cantidad">+</button>
-            </div>
+          <div class="menu-order-control" aria-label="Seleccionar cantidad para ${escapeHtml(displayName)}">
+            <button class="menu-order-control__btn" type="button" data-order-picker="decrease" aria-label="Disminuir cantidad">-</button>
+            <span class="menu-order-control__value" data-order-picker-value>0</span>
+            <button class="menu-order-control__btn" type="button" data-order-picker="increase" aria-label="Aumentar cantidad">+</button>
           </div>
-          <p class="menu-order-line__hint" data-order-picker-hint>Toca + para agregar</p>
+          <p class="menu-order-line__hint" data-order-picker-hint aria-live="polite">Toca + para agregar</p>
         `;
 
         const pickerValue = orderLine.querySelector("[data-order-picker-value]");
