@@ -11714,6 +11714,37 @@ textarea:focus {
     gap: 0.52rem;
   }
 
+  .hero-actions__secondary {
+    position: fixed;
+    left: max(0.7rem, env(safe-area-inset-left));
+    bottom: calc(0.78rem + env(safe-area-inset-bottom));
+    z-index: 350;
+    margin-left: 0;
+    padding: 0.26rem;
+    gap: 0.34rem;
+    border: 1px solid rgba(23, 20, 17, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 252, 248, 0.82);
+    box-shadow: 0 12px 24px rgba(23, 20, 17, 0.1);
+    backdrop-filter: blur(10px) saturate(1.04);
+    -webkit-backdrop-filter: blur(10px) saturate(1.04);
+  }
+
+  .hero-actions__secondary .btn-install-app,
+  .hero-actions__secondary .btn-exit-app {
+    min-height: 2.45rem;
+    padding: 0.52rem 0.78rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    box-shadow: none;
+  }
+
+  .hero-actions__secondary .btn-install-app__text,
+  .hero-actions__secondary .btn-exit-app__text {
+    font-size: 0.64rem;
+    letter-spacing: 0.06em;
+  }
+
   .hero-actions--header .btn,
   .hero-actions--header .btn-install-app,
   .hero-actions--header .btn-exit-app {
@@ -11752,9 +11783,11 @@ textarea:focus {
 
   .floating-fabian-host,
   .fabian-main {
-    right: 0.7rem;
-    bottom: 5.3rem;
-    width: 92px;
+    right: calc(0.7rem - 0.95rem);
+    bottom: calc(2.25rem + env(safe-area-inset-bottom));
+    width: 84px;
+    z-index: 359;
+    pointer-events: none;
   }
 
   .btn-exit-app--dock {
@@ -11770,6 +11803,15 @@ textarea:focus {
   .floating-whatsapp {
     right: 0.7rem;
     bottom: calc(0.78rem + env(safe-area-inset-bottom));
+  }
+
+  .floating-fabian-host__stage {
+    width: 84px;
+    height: 108px;
+  }
+
+  .floating-fabian-host__shadow {
+    transform: translateY(72px);
   }
 }
 
