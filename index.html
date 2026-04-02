@@ -374,40 +374,6 @@
             <a class="btn btn-primary" href="#menu">Ver menú</a>
             <a id="heroMenuDestacadoBtn" class="btn btn-secondary btn-hero-highlight" href="#menuCarousel">Ver Especialidad</a>
             <a class="btn btn-secondary" href="#ubicacion">Ubicación</a>
-            <div class="hero-actions__secondary" aria-label="Acciones secundarias de la app">
-              <button
-                id="installAppBtn"
-                class="btn btn-install-app"
-                type="button"
-                hidden
-                aria-hidden="true"
-                aria-label="Instalar app Taquería Fabian"
-              >
-                <span class="btn-install-app__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" focusable="false">
-                    <path d="M8.5 2.5A2.5 2.5 0 0 0 6 5v14a2.5 2.5 0 0 0 2.5 2.5h7A2.5 2.5 0 0 0 18 19V5a2.5 2.5 0 0 0-2.5-2.5h-7zm0 2h7a.5.5 0 0 1 .5.5v14a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5V5a.5.5 0 0 1 .5-.5zm2.25 1.75a.75.75 0 0 0 0 1.5h2.5a.75.75 0 0 0 0-1.5h-2.5zm1.25 8.1a1 1 0 0 1 .74.33l1.72-1.72a1 1 0 1 1 1.42 1.42l-2.44 2.44a1 1 0 0 1-1.42 0l-1.34-1.34a1 1 0 1 1 1.42-1.42l.6.6A1 1 0 0 1 12 14.35zm0 3.4a1.05 1.05 0 1 0 0 2.1 1.05 1.05 0 0 0 0-2.1z"></path>
-                  </svg>
-                </span>
-                <span class="btn-install-app__text">Instalar app</span>
-              </button>
-              <button
-                id="exitAppBtn"
-                class="btn btn-exit-app"
-                type="button"
-                hidden
-                aria-hidden="true"
-                aria-label="Salir de la app"
-                title="Salir"
-              >
-                <span class="btn-exit-app__icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" focusable="false">
-                    <path d="M10 4.75A2.75 2.75 0 0 0 7.25 7.5v9A2.75 2.75 0 0 0 10 19.25h4A2.75 2.75 0 0 0 16.75 16.5v-2.25a1 1 0 1 0-2 0v2.25c0 .41-.34.75-.75.75h-4a.75.75 0 0 1-.75-.75v-9c0-.41.34-.75.75-.75h4c.41 0 .75.34.75.75v2.25a1 1 0 1 0 2 0V7.5A2.75 2.75 0 0 0 14 4.75h-4z"></path>
-                    <path d="M13.3 12a1 1 0 0 1 1-1h4.28l-1.94-1.95a1 1 0 1 1 1.42-1.41l3.66 3.65a1 1 0 0 1 0 1.42l-3.66 3.65a1 1 0 1 1-1.42-1.41L18.58 13H14.3a1 1 0 0 1-1-1z"></path>
-                  </svg>
-                </span>
-                <span class="btn-exit-app__text">Salir</span>
-              </button>
-            </div>
           </div>
           <nav class="quick-category-nav" aria-label="Acceso rápido a categorías del menú">
             <a class="quick-category-nav__pill is-active" href="#menu-tacos" data-category-link="menu-tacos">Tacos</a>
@@ -1015,6 +981,41 @@
           </svg>
         </span>
       </a>
+    </div>
+
+    <div class="fixed-app-actions" aria-label="Acciones secundarias de la app">
+      <button
+        id="installAppBtn"
+        class="btn btn-install-app"
+        type="button"
+        hidden
+        aria-hidden="true"
+        aria-label="Instalar app Taquería Fabian"
+      >
+        <span class="btn-install-app__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M8.5 2.5A2.5 2.5 0 0 0 6 5v14a2.5 2.5 0 0 0 2.5 2.5h7A2.5 2.5 0 0 0 18 19V5a2.5 2.5 0 0 0-2.5-2.5h-7zm0 2h7a.5.5 0 0 1 .5.5v14a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5V5a.5.5 0 0 1 .5-.5zm2.25 1.75a.75.75 0 0 0 0 1.5h2.5a.75.75 0 0 0 0-1.5h-2.5zm1.25 8.1a1 1 0 0 1 .74.33l1.72-1.72a1 1 0 1 1 1.42 1.42l-2.44 2.44a1 1 0 0 1-1.42 0l-1.34-1.34a1 1 0 1 1 1.42-1.42l.6.6A1 1 0 0 1 12 14.35zm0 3.4a1.05 1.05 0 1 0 0 2.1 1.05 1.05 0 0 0 0-2.1z"></path>
+          </svg>
+        </span>
+        <span class="btn-install-app__text">Instalar app</span>
+      </button>
+      <button
+        id="exitAppBtn"
+        class="btn btn-exit-app"
+        type="button"
+        hidden
+        aria-hidden="true"
+        aria-label="Salir de la app"
+        title="Salir"
+      >
+        <span class="btn-exit-app__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M10 4.75A2.75 2.75 0 0 0 7.25 7.5v9A2.75 2.75 0 0 0 10 19.25h4A2.75 2.75 0 0 0 16.75 16.5v-2.25a1 1 0 1 0-2 0v2.25c0 .41-.34.75-.75.75h-4a.75.75 0 0 1-.75-.75v-9c0-.41.34-.75.75-.75h4c.41 0 .75.34.75.75v2.25a1 1 0 1 0 2 0V7.5A2.75 2.75 0 0 0 14 4.75h-4z"></path>
+            <path d="M13.3 12a1 1 0 0 1 1-1h4.28l-1.94-1.95a1 1 0 1 1 1.42-1.41l3.66 3.65a1 1 0 0 1 0 1.42l-3.66 3.65a1 1 0 1 1-1.42-1.41L18.58 13H14.3a1 1 0 0 1-1-1z"></path>
+          </svg>
+        </span>
+        <span class="btn-exit-app__text">Salir</span>
+      </button>
     </div>
 
     <div

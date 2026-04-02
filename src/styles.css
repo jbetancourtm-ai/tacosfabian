@@ -2356,10 +2356,29 @@ button:focus-visible,
 }
 
 .hero-actions__secondary .btn-install-app,
-.hero-actions__secondary .btn-exit-app {
+.hero-actions__secondary .btn-exit-app,
+.fixed-app-actions .btn-install-app,
+.fixed-app-actions .btn-exit-app {
   min-height: 2.8rem;
   padding-inline: 0.88rem;
   box-shadow: 0 8px 18px rgba(23, 20, 17, 0.06);
+}
+
+.fixed-app-actions {
+  position: fixed;
+  left: max(0.85rem, env(safe-area-inset-left));
+  bottom: calc(0.85rem + env(safe-area-inset-bottom));
+  z-index: 350;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem;
+  border: 1px solid rgba(23, 20, 17, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 252, 248, 0.82);
+  box-shadow: 0 12px 24px rgba(23, 20, 17, 0.1);
+  backdrop-filter: blur(10px) saturate(1.04);
+  -webkit-backdrop-filter: blur(10px) saturate(1.04);
 }
 
 .btn-install-app {
