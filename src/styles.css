@@ -11889,3 +11889,179 @@ textarea:focus {
     justify-content: center;
   }
 }
+
+/* Premium color refresh: contrast and readability only */
+:root {
+  --order-ui-bg: #F8F7F4;
+  --order-ui-surface: #FFFFFF;
+  --order-ui-surface-strong: #FFFFFF;
+  --order-ui-surface-soft: #F8F7F4;
+  --order-ui-border: #E7E2D9;
+  --order-ui-border-strong: #E7E2D9;
+  --order-ui-text: #111111;
+  --order-ui-muted: #4B5563;
+  --order-ui-accent: #9E2A2B;
+  --order-ui-accent-strong: #7F1D1D;
+  --order-ui-accent-soft: #F8F1F1;
+  --order-ui-shadow-sm: 0 10px 24px rgba(17, 17, 17, 0.05);
+  --order-ui-shadow-md: 0 18px 36px rgba(17, 17, 17, 0.08);
+  --order-ui-shadow-lg: 0 24px 52px rgba(17, 17, 17, 0.12);
+}
+
+body {
+  background: #F8F7F4;
+  color: #111111;
+}
+
+.section-soft,
+.menu-showcase-section {
+  background: #F8F7F4;
+}
+
+.card,
+.menu-item,
+.menu-modal__panel,
+.order-modal__panel,
+.menu-order-shell,
+.menu-order-fab,
+.menu-order-item,
+.menu-order-shell__totals,
+.order-modal__summary,
+.menu-order-shell__empty {
+  background: #FFFFFF;
+  border-color: #E7E2D9;
+  box-shadow: 0 12px 28px rgba(17, 17, 17, 0.06);
+}
+
+.section-head h2,
+.menu-item h3,
+.slide-copy h3,
+.menu-order-item__name,
+.menu-order-shell h3,
+.menu-modal__panel h3,
+.order-modal__panel h3,
+.brand-text strong,
+.menu li a,
+.menu-order-fab__toggle,
+.btn-secondary,
+.btn-whatsapp,
+.btn-install-app,
+.btn-exit-app {
+  color: #111111;
+}
+
+.section-head p,
+.menu-item-note,
+.slide-copy p,
+.card p,
+.brand-text small,
+.menu-order-item__meta,
+.menu-order-line__price,
+.menu-order-shell__note,
+.menu-order-shell__empty,
+.order-modal__intro,
+.order-modal__location-status,
+.order-modal__manual-help,
+.quick-category-nav__pill {
+  color: #4B5563;
+}
+
+.menu-item-price,
+.menu-showcase-section .menu-item--kilo .menu-item-price,
+.menu-item .price-list li strong,
+.menu-showcase-section .menu-item .price-list li strong,
+.slide-copy strong,
+.menu-modal__price,
+.menu-order-fab__total,
+.menu-order-shell__totals strong,
+.order-modal__summary strong,
+.menu-order-item__subtotal,
+.menu-order-shell__eyebrow,
+.order-modal__field span {
+  color: #9E2A2B;
+}
+
+.btn-primary,
+.menu-order-fab__cta,
+.quick-category-nav__pill.is-active,
+.quick-category-nav__pill[aria-current="true"] {
+  background: #9E2A2B;
+  color: #FFFFFF;
+  border-color: #9E2A2B;
+  box-shadow: 0 14px 28px rgba(158, 42, 43, 0.2);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.menu-order-fab__cta:hover,
+.menu-order-fab__cta:focus-visible {
+  background: #7F1D1D;
+  border-color: #7F1D1D;
+  color: #FFFFFF;
+}
+
+.btn-secondary,
+.btn-whatsapp,
+.btn-install-app,
+.btn-exit-app,
+.quick-category-nav__pill,
+.menu-btn,
+.menu-modal__close,
+.menu-order-shell__close,
+.carousel-arrow {
+  background: #FFFFFF;
+  color: #111111;
+  border-color: #E7E2D9;
+}
+
+.menu-item .price-list li span,
+.menu-showcase-section .menu-item .price-list li span {
+  color: #111111;
+}
+
+.menu-item .price-list li,
+.menu-order-line,
+.menu-item,
+.menu,
+.quick-category-nav__pill,
+.menu-item-cta,
+.menu-badge {
+  border-color: #E7E2D9;
+}
+
+.menu-item-cta,
+.menu-badge,
+.slide-copy__badge,
+.menu-modal__badge,
+.menu-order-control,
+.menu-order-fab__icon {
+  background: #F8F7F4;
+}
+
+.menu-badge,
+.slide-copy__badge,
+.menu-modal__badge,
+.menu-item-cta,
+.menu-order-control__btn,
+.menu-order-line__remove,
+.menu-order-add-btn {
+  color: #111111;
+}
+
+.menu-order-control__btn {
+  background: #F3F4F6;
+}
+
+.menu-order-control__value {
+  color: #111111;
+}
+
+.menu li a:hover,
+.menu li a:focus-visible,
+.menu li a.is-active,
+.quick-category-nav__pill:hover,
+.quick-category-nav__pill:focus-visible {
+  color: #111111;
+  background: #FFFFFF;
+  border-color: #E7E2D9;
+}
