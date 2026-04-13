@@ -91,6 +91,8 @@ let deferredInstallPrompt = null;
 let swRefreshPending = false;
 let reviewsLoaded = false;
 const ORDER_WHATSAPP_NUMBER = "525615496107";
+const SALES_STORAGE_KEY = "tacos_fabian_sales_records_v1";
+const SALES_SYNC_CHANNEL = "tacos-fabian-sales-sync";
 
 initHomeTheme();
 applyExperienceVariantToDocument();
@@ -143,6 +145,64 @@ function showToast(message, type = "info") {
   window.setTimeout(() => {
     toast.remove();
   }, 2800);
+}
+
+function readSalesRecords() {
+  try {
+    const rawValue = window.localStorage.getItem(SALES_STORAGE_KEY);
+    if (!rawValue) return [];
+
+    const parsedValue = JSON.parse(rawValue);
+    return Array.isArray(parsedValue) ? parsedValue : [];
+  } catch {
+    return [];
+  }
+}
+
+function broadcastSalesRecords(records) {
+  try {
+    if ("BroadcastChannel" in window) {
+      const channel = new BroadcastChannel(SALES_SYNC_CHANNEL);
+      channel.postMessage({ type: "sales:update", records });
+      channel.close();
+    }
+  } catch {
+    // Ignore sync errors so checkout never breaks.
+  }
+}
+
+function writeSalesRecords(records) {
+  try {
+    window.localStorage.setItem(SALES_STORAGE_KEY, JSON.stringify(records));
+    broadcastSalesRecords(records);
+  } catch {
+    // Ignore persistence failures so WhatsApp flow keeps working.
+  }
+}
+
+function createOrderRecord({ customerName, customerAddress, customerReference, locationLink, items, total, itemCount }) {
+  const createdAt = new Date().toISOString();
+
+  return {
+    id: `TF-${Date.now().toString(36).toUpperCase()}`,
+    createdAt,
+    updatedAt: createdAt,
+    status: "enviado",
+    customerName,
+    customerAddress,
+    customerReference,
+    locationLink,
+    items,
+    total,
+    itemCount,
+    source: "whatsapp",
+  };
+}
+
+function saveOrderRecord(orderRecord) {
+  const records = readSalesRecords();
+  records.unshift(orderRecord);
+  writeSalesRecords(records.slice(0, 500));
 }
 
 function formatMxCurrency(value) {
@@ -2087,7 +2147,7 @@ function setupMenuOrderingSystem() {
     menuOrderFab.classList.toggle("has-items", count > 0);
     menuOrderFab.classList.toggle("is-visible", count > 0 || isCartPanelOpen);
     menuOrderShell.classList.toggle("is-empty", count === 0);
-    menuOrderFabCheckout.textContent = count > 0 ? "Enviar pedido" : "Sin productos";
+    menuOrderFabCheckout.textContent = count > 0 ? "Enviar por WhatsApp" : "Sin productos";
   };
 
   const adjustCartItem = (id, delta) => {
@@ -2114,8 +2174,8 @@ function setupMenuOrderingSystem() {
     controls.row.classList.toggle("has-selection", quantity > 0);
     controls.hint.textContent =
       quantity === 0
-        ? "Toca + para agregar"
-        : `${quantity} ${quantity === 1 ? "agregado" : "agregados"} en tu pedido`;
+        ? "Toca + para agregar al instante"
+        : `${quantity} ${quantity === 1 ? "listo" : "listos"} en tu pedido`;
   };
 
   const syncProductPickers = () => {
@@ -2243,7 +2303,7 @@ function setupMenuOrderingSystem() {
             <span class="menu-order-control__value" data-order-picker-value>0</span>
             <button class="menu-order-control__btn" type="button" data-order-picker="increase" aria-label="Aumentar cantidad">+</button>
           </div>
-          <p class="menu-order-line__hint" data-order-picker-hint aria-live="polite">Toca + para agregar</p>
+          <p class="menu-order-line__hint" data-order-picker-hint aria-live="polite">Toca + para agregar al instante</p>
         `;
 
         const pickerValue = orderLine.querySelector("[data-order-picker-value]");
@@ -2298,6 +2358,11 @@ function setupMenuOrderingSystem() {
                 quantity: nextQuantity,
               });
               renderCart();
+
+              if (!isDesktopOrderLayout() && nextQuantity === 1) {
+                menuOrderFab.classList.add("is-bumped");
+                window.setTimeout(() => menuOrderFab.classList.remove("is-bumped"), 320);
+              }
               return;
             }
           });
@@ -2418,11 +2483,28 @@ function setupMenuOrderingSystem() {
       return;
     }
 
+    const orderRecord = createOrderRecord({
+      customerName,
+      customerAddress,
+      customerReference,
+      locationLink,
+      items: getCartEntries().map((item) => ({
+        id: item.id,
+        name: item.displayName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        subtotal: item.quantity * item.unitPrice,
+      })),
+      total: getCartTotal(),
+      itemCount: getCartCount(),
+    });
+    saveOrderRecord(orderRecord);
+
     const message = buildWhatsAppMessage({ customerName, customerAddress, customerReference, locationLink });
     const whatsappUrl = `https://wa.me/${ORDER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     closeCheckoutModal();
-    showToast("Abrimos WhatsApp con tu pedido listo.", "ok");
+    showToast(`Abrimos WhatsApp con tu pedido listo. ID ${orderRecord.id}`, "ok");
   });
 
   enhanceMenuRows();
