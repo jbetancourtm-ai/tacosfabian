@@ -160,3 +160,84 @@ Cuando tengas `favian.com`, en Azure Static Web App:
 
 (En este proyecto solo se deja la referencia del dominio, no compra de dominio.)
 
+---
+
+## 🆕 Módulo de Caja y Administración (v1.0)
+
+Se agregó un **módulo comercial completo** para gestionar ventas y administración sin romper el sitio público.
+
+### 📁 Nuevas características
+
+#### `/caja` - Sistema de Punto de Venta (POS)
+- **URL**: `www.tacosfabiantexcoco.com.mx/caja`
+- **Acceso**: PIN requerido (defecto: `1234`)
+- **Características**:
+  - Formulario tablet-first para registrar ventas
+  - Cálculo automático de totales
+  - Registro por turno (mañana/tarde/noche)
+  - Métodos de pago (efectivo, tarjeta, transferencia)
+  - Resumen en tiempo real del día y turno actual
+  - Últimos movimientos visibles
+  - Guardado automático local + servidor
+
+#### `/admin` - Panel de Administración Mejorado
+- **URL**: `www.tacosfabiantexcoco.com.mx/admin`
+- **Acceso**: GitHub OAuth (bloqueado en Azure Security)
+- **Nuevas secciones**:
+  - Dashboard de movimientos de caja
+  - KPIs en tiempo real (total, movimientos, ticket promedio)
+  - Desglose de ingresos por método de pago
+  - Filtro de fechas para ver histórico
+  - Table con todos los movimientos
+  - Auto-refresh cada 5 segundos (sin recargar página)
+
+### 📚 Documentación
+
+- **`MODULO_CAJA_ADMIN.md`** - Documentación técnica completa
+- **`GUIA_RAPIDA.md`** - Guía rápida para usuarios (cajeras y dueño)
+- **`INSTALACION_DEPLOY.md`** - Step-by-step para instalar y deployar en Azure
+
+### 🏗️ Arquitectura
+
+```
+Azure Static Web App (mismo dominio)
+├── Frontend (Vite)
+│   ├── / (sitio público - sin cambios)
+│   ├── /caja (punto de venta - PIN)
+│   └── /admin (panel mejorado - GitHub auth)
+├── Azure Functions (Backend)
+│   ├── /api/auth/ - Validar PIN
+│   ├── /api/movements/ - CRUD movimientos
+│   └── /api/sales-summary/ - KPIs
+└── Azure Table Storage
+    └── SalesMovements (tabla)
+```
+
+### 🚀 Para empezar
+
+1. Lee **`GUIA_RAPIDA.md`** para entender el flujo
+2. Sigue **`INSTALACION_DEPLOY.md`** para instalar localmente
+3. Prueba en desarrollo: `npm run start:swa`
+4. Deploy: `git push origin main` (auto-deploy con GitHub Actions)
+
+### 🔧 Dependencias nuevas
+
+- No se agregaron dependencias externas en frontend (Vanilla JS)
+- Backend: Se usa `@azure/data-tables` (ya existía) + `uuid` para IDs
+
+### 📊 Sin cambios en
+
+- ✅ Sitio público (home, menú, pedidos WhatsApp)
+- ✅ Panel de reseñas existente
+- ✅ Estilos actuales
+- ✅ Flujo actual de pedidos
+- ✅ Dominio y configuración DNS
+
+### 🔐 Seguridad
+
+- PIN de caja almacenado localmente en navegador
+- Admin protegido por GitHub OAuth (Azure Static Web Apps)
+- Validación server-side en funciones
+- Datos persistentes en Azure Table Storage (encriptado)
+
+---

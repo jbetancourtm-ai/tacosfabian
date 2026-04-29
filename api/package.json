@@ -6,6 +6,9 @@
   "type": "module",
   "dependencies": {
     "@azure/data-tables": "^13.3.0"
+  },
+  "devDependencies": {
+    "uuid": "^9.0.0"
   }
 }
 

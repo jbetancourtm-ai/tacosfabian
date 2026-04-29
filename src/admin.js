@@ -299,3 +299,26 @@ if (isAdminSessionUnlocked()) {
 } else {
   setDashboardVisibility(false);
 }
+
+// ============================================================================
+// Integración: Dashboard de Movimientos de Caja
+// ============================================================================
+// Importar módulo de caja dashboard
+import CajaAdminDashboard from './modules/admin/caja-dashboard.js';
+
+// Inicializar dashboard cuando el panel esté unlocked
+const originalUnlockAdminPanel = unlockAdminPanel;
+unlockAdminPanel = function(message) {
+  originalUnlockAdminPanel(message);
+  
+  // Inicializar dashboard de caja
+  setTimeout(() => {
+    if (isAdminSessionUnlocked()) {
+      const cajaDashboard = new CajaAdminDashboard();
+      cajaDashboard.init().catch(error => {
+        console.warn('Error inicializando dashboard de caja:', error);
+      });
+    }
+  }, 500);
+};
+
