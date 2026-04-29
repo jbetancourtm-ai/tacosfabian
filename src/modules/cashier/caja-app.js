@@ -16,7 +16,7 @@ const state = {
 
 // Cache PIN (válido durante la sesión)
 const SESSION_PIN_KEY = 'tacos_fabian_caja_session_pin';
-const PIN_HASH = hashPin('1234'); // PIN por defecto: 1234 (CAMBIAR EN PRODUCCIÓN)
+const PIN_HASH = hashPin('1980'); // PIN: 1980
 
 // ============================================================================
 // DOM Elements
