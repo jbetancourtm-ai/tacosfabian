@@ -16,17 +16,37 @@ const state = {
 };
 
 const products = [
-  { id: 'taco-suadero', nombre: 'Taco de suadero', categoria: 'Tacos', precio: 20 },
-  { id: 'taco-pastor', nombre: 'Taco de pastor', categoria: 'Tacos', precio: 22 },
-  { id: 'taco-campechano', nombre: 'Taco campechano', categoria: 'Tacos', precio: 24 },
-  { id: 'tostada-pastor', nombre: 'Tostada de pastor', categoria: 'Tostadas', precio: 34 },
-  { id: 'tostada-suadero', nombre: 'Tostada de suadero', categoria: 'Tostadas', precio: 34 },
-  { id: 'torta', nombre: 'Torta', categoria: 'Tortas', precio: 42 },
-  { id: 'refresco', nombre: 'Refresco', categoria: 'Bebidas', precio: 18 },
-  { id: 'agua', nombre: 'Agua', categoria: 'Bebidas', precio: 15 },
-  { id: 'propina', nombre: 'Propina', categoria: 'Especial', precio: 1 },
-  { id: 'otro', nombre: 'Otro', categoria: 'Especial', precio: 0, isCustom: true, descripcion: '', customPrice: 0 },
+  { id: 'taco-pastor', nombre: 'Taco de pastor', categoria: 'Tacos', precio: 16 },
+  { id: 'taco-suadero', nombre: 'Taco de suadero', categoria: 'Tacos', precio: 16 },
+  { id: 'taco-longaniza', nombre: 'Taco de longaniza', categoria: 'Tacos', precio: 16 },
+  { id: 'taco-campechano', nombre: 'Taco campechano', categoria: 'Tacos', precio: 18 },
+  { id: 'taco-cochinita', nombre: 'Taco de cochinita pibil', categoria: 'Tacos', precio: 16 },
+  { id: 'tostada-pastor', nombre: 'Tostada de pastor', categoria: 'Tostadas', precio: 17 },
+  { id: 'tostada-suadero', nombre: 'Tostada de suadero', categoria: 'Tostadas', precio: 17 },
+  { id: 'tostada-longaniza', nombre: 'Tostada de longaniza', categoria: 'Tostadas', precio: 17 },
+  { id: 'tostada-campechano', nombre: 'Tostada campechano', categoria: 'Tostadas', precio: 18 },
+  { id: 'tostada-cochinita', nombre: 'Tostada de cochinita pibil', categoria: 'Tostadas', precio: 17 },
+  { id: 'torta-pastor', nombre: 'Torta de pastor', categoria: 'Tortas', precio: 68 },
+  { id: 'torta-suadero', nombre: 'Torta de suadero', categoria: 'Tortas', precio: 68 },
+  { id: 'torta-longaniza', nombre: 'Torta de longaniza', categoria: 'Tortas', precio: 68 },
+  { id: 'torta-campechano', nombre: 'Torta campechano', categoria: 'Tortas', precio: 75 },
+  { id: 'torta-cochinita', nombre: 'Torta de cochinita pibil', categoria: 'Tortas', precio: 68 },
+  { id: 'kilo-suadero', nombre: 'Suadero 1kg', categoria: 'Por kilo', precio: 500 },
+  { id: 'kilo-pastor', nombre: 'Pastor 1kg', categoria: 'Por kilo', precio: 460 },
+  { id: 'kilo-cochinita', nombre: 'Cochinita pibil 1kg', categoria: 'Por kilo', precio: 460 },
+  { id: 'kilo-campechano', nombre: 'Campechano 1kg', categoria: 'Por kilo', precio: 0, pendingPrice: true },
+  { id: 'kilo-longaniza', nombre: 'Longaniza 1kg', categoria: 'Por kilo', precio: 0, pendingPrice: true },
+  { id: 'refresco', nombre: 'Refresco', categoria: 'Bebidas', precio: 30 },
+  { id: 'agua', nombre: 'Agua', categoria: 'Bebidas', precio: 30 },
+  { id: 'propina', nombre: 'Propina', categoria: 'Otros', precio: 1 },
+  { id: 'otro', nombre: 'Otro concepto manual', categoria: 'Otros', precio: 0, isCustom: true, descripcion: '', customPrice: 0 },
 ];
+
+const filterState = {
+  category: 'Todos',
+  query: '',
+};
+
 
 // ============================================================================
 // PIN & Autenticación
@@ -58,10 +78,13 @@ const cajaForm = document.getElementById('cajaForm');
 const shiftSelect = document.getElementById('cajaShift');
 const paymentMethodSelect = document.getElementById('cajaPaymentMethod');
 const observationsInput = document.getElementById('cajaObservations');
+const searchInput = document.getElementById('cajaSearch');
+const categoryFilters = document.getElementById('cajaCategoryFilters');
 const productsContainer = document.getElementById('cajaProductsGrid');
 const ticketItemsContainer = document.getElementById('cajaTicketItems');
 const ticketTotalDisplay = document.getElementById('cajaTicketTotal');
 const ticketCountDisplay = document.getElementById('cajaTicketCount');
+const ticketMethodDisplay = document.getElementById('cajaTicketMethod');
 const clearTicketButton = document.getElementById('cajaClearTicket');
 
 const todayTotalDisplay = document.getElementById('cajaTodayTotal');
@@ -135,6 +158,27 @@ function setupEventListeners() {
         pinInput.value = '';
         pinInput.focus();
       }
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      filterState.query = e.target.value.toLowerCase();
+      renderProductCatalog();
+    });
+  }
+
+  if (categoryFilters) {
+    categoryFilters.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-category]');
+      if (!button) {
+        return;
+      }
+      filterState.category = button.dataset.category;
+      categoryFilters.querySelectorAll('[data-category]').forEach((btn) => {
+        btn.classList.toggle('active', btn === button);
+      });
+      renderProductCatalog();
     });
   }
 
@@ -227,13 +271,16 @@ function getTicketItems() {
 }
 
 function updateTicketSummary() {
-  if (!ticketItemsContainer || !ticketTotalDisplay || !ticketCountDisplay) {
+  if (!ticketItemsContainer || !ticketTotalDisplay || !ticketCountDisplay || !ticketMethodDisplay) {
     return;
   }
 
   const items = getTicketItems();
   const total = items.reduce((sum, item) => sum + item.subtotal, 0);
   const totalUnits = items.reduce((sum, item) => sum + item.cantidad, 0);
+  const paymentMethodLabel = paymentMethodSelect.value
+    ? paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text
+    : 'No seleccionado';
 
   if (items.length === 0) {
     ticketItemsContainer.innerHTML = '<div class="empty-list">No hay productos en el ticket.</div>';
@@ -255,6 +302,7 @@ function updateTicketSummary() {
 
   ticketTotalDisplay.textContent = formatMxCurrency(total);
   ticketCountDisplay.textContent = `${totalUnits} producto${totalUnits !== 1 ? 's' : ''} seleccionados`;
+  ticketMethodDisplay.textContent = paymentMethodLabel;
 }
 
 function clearTicket() {
@@ -274,7 +322,19 @@ function renderProductCatalog() {
     return;
   }
 
-  productsContainer.innerHTML = products
+  const filteredProducts = products.filter((product) => {
+    const categoryMatch = filterState.category === 'Todos' || product.categoria === filterState.category;
+    const query = filterState.query.trim();
+    const searchMatch = !query || product.nombre.toLowerCase().includes(query) || product.categoria.toLowerCase().includes(query);
+    return categoryMatch && searchMatch;
+  });
+
+  if (filteredProducts.length === 0) {
+    productsContainer.innerHTML = '<div class="empty-list">No hay productos que coincidan con la búsqueda.</div>';
+    return;
+  }
+
+  productsContainer.innerHTML = filteredProducts
     .map((product) => {
       const quantity = state.ticketItems[product.id] || 0;
       const unitPrice = product.isCustom ? product.customPrice : product.precio;
@@ -282,14 +342,17 @@ function renderProductCatalog() {
         ? product.customPrice > 0
           ? formatMxCurrency(product.customPrice)
           : 'Precio a capturar'
-        : formatMxCurrency(product.precio);
+        : product.precio > 0
+          ? formatMxCurrency(product.precio)
+          : 'Pendiente de precio';
+      const priceClass = product.precio <= 0 && !product.isCustom ? 'pending' : '';
       const customDescription = product.isCustom ? (product.descripcion || '') : '';
 
       return `
         <article class="product-card" data-product-id="${product.id}">
           <span class="product-tag">${product.categoria}</span>
           <div class="product-name">${product.nombre}</div>
-          <div class="product-price">${priceLabel}</div>
+          <div class="product-price ${priceClass}">${priceLabel}</div>
           ${product.isCustom ? `
             <div class="custom-fields">
               <label for="otroDescription">Descripción</label>
@@ -334,6 +397,12 @@ async function handleFormSubmit(e) {
 
   if (!paymentMethodSelect.value) {
     showNotification('Selecciona un método de pago para registrar la venta.', 'error');
+    return;
+  }
+
+  const invalidPriceItem = selectedItems.find((item) => item.precio_unitario <= 0 && !item.isCustom);
+  if (invalidPriceItem) {
+    showNotification(`Configura el precio de ${invalidPriceItem.nombre} antes de registrar la venta.`, 'error');
     return;
   }
 

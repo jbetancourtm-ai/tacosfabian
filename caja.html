@@ -124,10 +124,82 @@
         color: #374151;
       }
 
+      .caja-filters {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .search-input {
+        width: 100%;
+        border: 1px solid var(--caja-border);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        font-size: 0.95rem;
+        color: var(--caja-text);
+        background: #ffffff;
+      }
+
+      .search-input:focus {
+        border-color: var(--caja-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.12);
+      }
+
+      .category-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .filter-pill {
+        border: 1px solid var(--caja-border);
+        background: white;
+        color: var(--caja-text);
+        padding: 0.6rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .filter-pill:hover,
+      .filter-pill.active {
+        border-color: var(--caja-primary);
+        background: var(--caja-primary);
+        color: white;
+      }
+
       .catalog-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
+      }
+
+      .product-price.pending {
+        color: #b91c1c;
+        font-weight: 700;
+      }
+
+      .ticket-method {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.85rem;
+        padding: 0.85rem 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .ticket-method span {
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+
+      .ticket-method strong {
+        font-size: 0.95rem;
+        color: var(--caja-text);
       }
 
       .product-card {
@@ -720,6 +792,19 @@
             </div>
           </div>
 
+          <div class="caja-filters">
+            <input id="cajaSearch" class="search-input" type="search" placeholder="Buscar producto..." aria-label="Buscar producto" />
+            <div id="cajaCategoryFilters" class="category-filters">
+              <button type="button" data-category="Todos" class="filter-pill active">Todos</button>
+              <button type="button" data-category="Tacos" class="filter-pill">Tacos</button>
+              <button type="button" data-category="Tostadas" class="filter-pill">Tostadas</button>
+              <button type="button" data-category="Tortas" class="filter-pill">Tortas</button>
+              <button type="button" data-category="Por kilo" class="filter-pill">Por kilo</button>
+              <button type="button" data-category="Bebidas" class="filter-pill">Bebidas</button>
+              <button type="button" data-category="Otros" class="filter-pill">Otros</button>
+            </div>
+          </div>
+
           <div id="cajaProductsGrid" class="catalog-grid"></div>
 
           <div class="form-group">
@@ -746,6 +831,10 @@
           <div class="ticket-meta">
             <span id="cajaTicketCount">0 productos seleccionados</span>
             <span class="ticket-hint">Actualiza el ticket con + o -.</span>
+          </div>
+          <div class="ticket-method">
+            <span>Método de pago</span>
+            <strong id="cajaTicketMethod">No seleccionado</strong>
           </div>
           <div class="ticket-items" id="cajaTicketItems">
             <div class="empty-list">No hay productos en el ticket.</div>
