@@ -80,6 +80,12 @@
         gap: 1rem;
         padding: 1rem;
         overflow: auto;
+        min-height: 0;
+      }
+
+      .caja-form,
+      .caja-summary {
+        min-height: 0;
       }
 
       .caja-form {
@@ -851,8 +857,9 @@
         }
 
         .caja-main {
-          padding: 0.75rem 0.75rem 14rem;
+          padding: 0.75rem 0.75rem calc(18rem + env(safe-area-inset-bottom));
           gap: 0.75rem;
+          min-height: 0;
         }
 
         .caja-form {
@@ -1087,6 +1094,14 @@
               <span id="cajaMobileCount">0 productos</span>
               <span id="cajaMobilePayment">Método: no seleccionado</span>
             </div>
+            <div id="cajaMobileReceivedGroup" class="mobile-detail-field" hidden>
+              <label for="cajaReceivedAmount">Recibí con</label>
+              <input id="cajaReceivedAmount" type="number" min="0" step="0.50" inputmode="decimal" placeholder="Recibí con $..." />
+            </div>
+            <div id="cajaMobileChangeGroup" class="mobile-detail-row" hidden>
+              <span>Cambio</span>
+              <strong id="cajaMobileChange">$0.00</strong>
+            </div>
           </div>
           <div id="cajaMobileDetails" class="mobile-checkout-details" hidden>
             <div class="mobile-detail-row">
@@ -1100,14 +1115,6 @@
             <div class="mobile-detail-row">
               <span>Método</span>
               <strong id="cajaMobilePaymentDetail">-</strong>
-            </div>
-            <div id="cajaMobileReceivedGroup" class="mobile-detail-field" hidden>
-              <label for="cajaReceivedAmount">Recibí con</label>
-              <input id="cajaReceivedAmount" type="number" min="0" step="0.50" inputmode="decimal" placeholder="Recibí con $..." />
-            </div>
-            <div id="cajaMobileChangeGroup" class="mobile-detail-row" hidden>
-              <span>Cambio</span>
-              <strong id="cajaMobileChange">$0.00</strong>
             </div>
             <button type="button" id="cajaMobileClearTicket" class="btn btn-secondary">Limpiar ticket</button>
           </div>
