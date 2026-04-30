@@ -380,6 +380,25 @@
         color: var(--caja-primary);
       }
 
+      .folio-display,
+      .change-display {
+        background: #f8f7f4;
+        border: 1px solid #e7e2d9;
+        border-radius: 10px;
+        padding: 0.9rem 1rem;
+        color: #171717;
+        font-weight: 700;
+      }
+
+      .form-row .form-group {
+        margin-bottom: 0;
+      }
+
+      .form-group--inline {
+        display: flex;
+        flex-direction: column;
+      }
+
       .form-actions {
         display: flex;
         gap: 0.75rem;
@@ -778,6 +797,36 @@
                 <option value="efectivo">Efectivo</option>
                 <option value="transferencia">Transferencia</option>
               </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group form-group--inline">
+              <label for="cajaMesaOrigen">Mesa o mostrador</label>
+              <select id="cajaMesaOrigen" required>
+                <option value="">Selecciona mesa o mostrador</option>
+                <option value="Mesa 1">Mesa 1</option>
+                <option value="Mesa 2">Mesa 2</option>
+                <option value="Mesa 3">Mesa 3</option>
+                <option value="Mesa 4">Mesa 4</option>
+                <option value="Mesa 5">Mesa 5</option>
+                <option value="Mostrador">Mostrador</option>
+              </select>
+            </div>
+            <div class="form-group form-group--inline" id="cajaReceivedGroup" hidden>
+              <label for="cajaReceivedAmount">Recibí con</label>
+              <input id="cajaReceivedAmount" type="number" min="0" step="0.50" placeholder="0.00" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Folio</label>
+              <div id="cajaFolioDisplay" class="folio-display">-</div>
+            </div>
+            <div class="form-group" id="cajaChangeGroup" hidden>
+              <label>Cambio</label>
+              <div id="cajaChangeDisplay" class="change-display">-</div>
             </div>
           </div>
 

@@ -82,12 +82,15 @@ class CajaAdminDashboard {
         <table>
           <thead>
             <tr>
+              <th style="min-width: 100px;">Folio</th>
+              <th style="min-width: 120px;">Mesa</th>
               <th style="min-width: 100px;">Fecha/Hora</th>
               <th style="min-width: 120px;">Turno</th>
-              <th style="min-width: 150px;">Producto</th>
+              <th style="min-width: 150px;">Resumen</th>
               <th style="text-align: center; min-width: 60px;">Cant.</th>
               <th style="text-align: right; min-width: 100px;">Total</th>
               <th style="min-width: 100px;">Método</th>
+              <th style="min-width: 100px;">Cambio</th>
             </tr>
           </thead>
           <tbody id="cajaMovementsTable">
@@ -262,7 +265,7 @@ class CajaAdminDashboard {
     if (this.movements.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align: center; padding: 2rem; color: #9ca3af;">
+          <td colspan="9" style="text-align: center; padding: 2rem; color: #9ca3af;">
             Sin movimientos registrados
           </td>
         </tr>
@@ -283,14 +286,17 @@ class CajaAdminDashboard {
 
         return `
           <tr>
+            <td><strong>${this.escapeHtml(m.folio || '—')}</strong></td>
+            <td>${this.escapeHtml(m.mesa_origen || '-')}</td>
             <td>${dateTime}</td>
             <td>${this.capitalizeText(m.turno || '-')}</td>
-            <td>${this.escapeHtml(m.producto_concepto)}</td>
+            <td>${this.escapeHtml(m.resumen_productos || m.producto_concepto || '-')}</td>
             <td style="text-align: center;">${m.cantidad}</td>
             <td style="text-align: right; font-weight: 600; color: #059669;">
               ${this.formatCurrency(m.total)}
             </td>
             <td>${this.capitalizeText(m.metodo_pago || '-')}</td>
+            <td>${this.formatCurrency(m.cambio || 0)}</td>
           </tr>
         `;
       })
@@ -304,7 +310,7 @@ class CajaAdminDashboard {
     const tbody = this.elements.movementsTable;
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" style="text-align: center; padding: 2rem; color: #ef4444;">
+        <td colspan="9" style="text-align: center; padding: 2rem; color: #ef4444;">
           ${message}
         </td>
       </tr>

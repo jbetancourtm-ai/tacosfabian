@@ -65,6 +65,8 @@ function hashPin(pin) {
 // Cache PIN (válido durante la sesión)
 const SESSION_PIN_KEY = 'tacos_fabian_caja_session_pin';
 const PIN_HASH = hashPin('1980'); // PIN: 1980
+const SALES_STORAGE_KEY = 'tacos_fabian_sales_records_v1';
+const SALES_SYNC_CHANNEL = 'tacos-fabian-sales-sync';
 
 // ============================================================================
 // DOM Elements
@@ -85,6 +87,12 @@ const ticketTotalDisplay = document.getElementById('cajaTicketTotal');
 const ticketCountDisplay = document.getElementById('cajaTicketCount');
 const ticketMethodDisplay = document.getElementById('cajaTicketMethod');
 const clearTicketButton = document.getElementById('cajaClearTicket');
+const folioDisplay = document.getElementById('cajaFolioDisplay');
+const mesaOrigenSelect = document.getElementById('cajaMesaOrigen');
+const receivedInput = document.getElementById('cajaReceivedAmount');
+const receivedGroup = document.getElementById('cajaReceivedGroup');
+const changeGroup = document.getElementById('cajaChangeGroup');
+const changeDisplay = document.getElementById('cajaChangeDisplay');
 
 const todayTotalDisplay = document.getElementById('cajaTodayTotal');
 const todayCountDisplay = document.getElementById('cajaTodayCount');
@@ -194,6 +202,14 @@ function setupEventListeners() {
     paymentMethodSelect.addEventListener('change', updateTicketSummary);
   }
 
+  if (mesaOrigenSelect) {
+    mesaOrigenSelect.addEventListener('change', updateTicketSummary);
+  }
+
+  if (receivedInput) {
+    receivedInput.addEventListener('input', updateTicketSummary);
+  }
+
   cajaForm.addEventListener('submit', handleFormSubmit);
 }
 
@@ -268,6 +284,20 @@ function getTicketItems() {
     });
 }
 
+function getCurrentDateStamp() {
+  return new Date().toISOString().split('T')[0].replace(/-/g, '');
+}
+
+function getNextFolioForToday() {
+  const today = new Date().toISOString().split('T')[0];
+  const dailyMovements = loadMovementsLocally().filter((movement) => {
+    const movementDate = new Date(movement.fecha_hora).toISOString().split('T')[0];
+    return movementDate === today;
+  });
+  const sequence = dailyMovements.length + 1;
+  return `TF-${today.replace(/-/g, '')}-${String(sequence).padStart(4, '0')}`;
+}
+
 function updateTicketSummary() {
   if (!ticketItemsContainer || !ticketTotalDisplay || !ticketCountDisplay || !ticketMethodDisplay) {
     return;
@@ -279,6 +309,11 @@ function updateTicketSummary() {
   const paymentMethodLabel = paymentMethodSelect.value
     ? paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text
     : 'No seleccionado';
+  const folioText = items.length > 0 ? getNextFolioForToday() : '-';
+
+  if (folioDisplay) {
+    folioDisplay.textContent = folioText;
+  }
 
   if (items.length === 0) {
     ticketItemsContainer.innerHTML = '<div class="empty-list">No hay productos en el ticket.</div>';
@@ -301,6 +336,25 @@ function updateTicketSummary() {
   ticketTotalDisplay.textContent = formatMxCurrency(total);
   ticketCountDisplay.textContent = `${totalUnits} producto${totalUnits !== 1 ? 's' : ''} seleccionados`;
   ticketMethodDisplay.textContent = paymentMethodLabel;
+
+  if (receivedGroup && changeGroup && changeDisplay) {
+    if (paymentMethodSelect.value === 'efectivo' && items.length > 0) {
+      receivedGroup.hidden = false;
+      changeGroup.hidden = false;
+
+      const receivedValue = parseFloat(receivedInput.value) || 0;
+      const changeValue = parseFloat((receivedValue - total).toFixed(2));
+      changeDisplay.textContent = receivedValue >= total
+        ? formatMxCurrency(changeValue)
+        : 'Monto insuficiente';
+    } else {
+      receivedGroup.hidden = true;
+      changeGroup.hidden = true;
+      if (changeDisplay) {
+        changeDisplay.textContent = '-';
+      }
+    }
+  }
 }
 
 function clearTicket() {
@@ -309,6 +363,18 @@ function clearTicket() {
   if (otherProduct) {
     otherProduct.descripcion = '';
     otherProduct.customPrice = 0;
+  }
+
+  if (receivedInput) {
+    receivedInput.value = '';
+  }
+
+  if (changeGroup) {
+    changeGroup.hidden = true;
+  }
+
+  if (receivedGroup) {
+    receivedGroup.hidden = true;
   }
 
   renderProductCatalog();
@@ -399,10 +465,23 @@ async function handleFormSubmit(e) {
     return;
   }
 
-  const otherItem = selectedItems.find((item) => item.id === 'otro');
-  if (otherItem && (!otherItem.nombre || otherItem.precio_unitario <= 0)) {
-    showNotification('Completa la descripción y el precio del producto Otro.', 'error');
+  if (!mesaOrigenSelect || !mesaOrigenSelect.value) {
+    showNotification('Selecciona Mesa o Mostrador antes de registrar la venta.', 'error');
     return;
+  }
+
+  const paymentMethod = paymentMethodSelect.value;
+  const receivedAmount = parseFloat(receivedInput?.value || '0') || 0;
+
+  if (paymentMethod === 'efectivo') {
+    if (receivedAmount <= 0) {
+      showNotification('Captura el monto recibido para calcular el cambio.', 'error');
+      return;
+    }
+    if (receivedAmount < total) {
+      showNotification('Monto recibido insuficiente.', 'error');
+      return;
+    }
   }
 
   const productSummary = selectedItems
@@ -410,18 +489,16 @@ async function handleFormSubmit(e) {
     .join(', ');
 
   const averagePrice = totalUnits > 0 ? total / totalUnits : 0;
+  const folio = getNextFolioForToday();
+  const cambio = paymentMethod === 'efectivo' ? parseFloat((receivedAmount - total).toFixed(2)) : 0;
 
   const movement = {
+    id: Date.now().toString(),
+    folio,
     fecha_hora: new Date().toISOString(),
     turno: state.currentShift,
-    producto_concepto: productSummary,
-    cantidad: totalUnits,
-    precio_unitario: parseFloat(averagePrice.toFixed(2)),
-    total: parseFloat(total.toFixed(2)),
-    metodo_pago: paymentMethodSelect.value,
-    observaciones: observationsInput.value.trim(),
-    usuario_cajera: 'Cajera',
-    estado: 'activo',
+    mesa_origen: mesaOrigenSelect.value,
+    resumen_productos: productSummary,
     productos: selectedItems.map((item) => ({
       id: item.id,
       nombre: item.nombre,
@@ -429,6 +506,15 @@ async function handleFormSubmit(e) {
       precio_unitario: item.precio_unitario,
       subtotal: item.subtotal,
     })),
+    cantidad_total: totalUnits,
+    precio_unitario: parseFloat(averagePrice.toFixed(2)),
+    total: parseFloat(total.toFixed(2)),
+    metodo_pago: paymentMethod,
+    recibido_con: paymentMethod === 'efectivo' ? parseFloat(receivedAmount.toFixed(2)) : 0,
+    cambio: cambio,
+    observaciones: observationsInput.value.trim(),
+    usuario_cajera: 'Cajera',
+    estado: 'activo',
   };
 
   try {
@@ -444,7 +530,7 @@ async function handleFormSubmit(e) {
     }
 
     saveMovementLocally(movement);
-    showNotification('✓ Movimiento guardado correctamente', 'success');
+    showNotification('Venta registrada correctamente', 'success');
 
     state.ticketItems = {};
     const otherProduct = products.find((item) => item.id === 'otro');
@@ -453,9 +539,18 @@ async function handleFormSubmit(e) {
       otherProduct.customPrice = 0;
     }
 
+    if (receivedInput) {
+      receivedInput.value = '';
+    }
+    if (changeGroup) {
+      changeGroup.hidden = true;
+    }
+    if (receivedGroup) {
+      receivedGroup.hidden = true;
+    }
+
     renderProductCatalog();
     updateTicketSummary();
-    paymentMethodSelect.value = '';
     observationsInput.value = '';
 
     refreshMovements();
@@ -476,12 +571,24 @@ async function handleFormSubmit(e) {
 // Persistencia Local
 // ============================================================================
 function saveMovementLocally(movement) {
-  let movements = JSON.parse(localStorage.getItem('caja_movements') || '[]');
-  movements.push({
-    id: Date.now().toString(),
+  const cajaMovements = JSON.parse(localStorage.getItem('caja_movements') || '[]');
+  const saleRecords = JSON.parse(localStorage.getItem(SALES_STORAGE_KEY) || '[]');
+  const storedMovement = {
+    id: movement.id || Date.now().toString(),
     ...movement,
-  });
-  localStorage.setItem('caja_movements', JSON.stringify(movements));
+  };
+
+  cajaMovements.push(storedMovement);
+  saleRecords.push(storedMovement);
+
+  localStorage.setItem('caja_movements', JSON.stringify(cajaMovements));
+  localStorage.setItem(SALES_STORAGE_KEY, JSON.stringify(saleRecords));
+
+  if ('BroadcastChannel' in window) {
+    const channel = new BroadcastChannel(SALES_SYNC_CHANNEL);
+    channel.postMessage({ type: 'sales:update' });
+    channel.close();
+  }
 }
 
 function loadMovementsLocally() {

@@ -87,6 +87,19 @@
             </article>
           </div>
 
+          <div id="salesByMethodSummary" class="admin-kpis" aria-label="Ventas por método" style="margin-top: 1rem;">
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Efectivo</span>
+              <strong id="salesCashCount" class="admin-kpi__value">0</strong>
+              <small id="salesCashTotal" class="admin-kpi__hint">$0 MXN</small>
+            </article>
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Transferencia</span>
+              <strong id="salesTransferCount" class="admin-kpi__value">0</strong>
+              <small id="salesTransferTotal" class="admin-kpi__hint">$0 MXN</small>
+            </article>
+          </div>
+
           <div class="admin-panel-grid">
             <section class="card admin-panel-card" aria-labelledby="salesTableTitle">
               <div class="admin-panel-card__head">
@@ -101,8 +114,12 @@
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>Folio</th>
+                      <th>Mesa</th>
+                      <th>Método</th>
                       <th>Productos</th>
+                      <th>Recibí</th>
+                      <th>Cambio</th>
                       <th>Total</th>
                       <th>Fecha</th>
                       <th>Estado</th>
