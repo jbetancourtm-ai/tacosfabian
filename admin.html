@@ -1,0 +1,162 @@
+﻿<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Tacos Fabian</title>
+    <meta name="description" content="Panel administrativo de resenas de Tacos Fabian" />
+    <link rel="icon" type="image/svg+xml" href="/logo-tacos-fabian.svg" />
+    <link rel="shortcut icon" href="/logo-tacos-fabian.svg" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <div class="container header-inner">
+        <a class="brand" href="/" aria-label="Volver al inicio">
+          <span class="brand-orbit" aria-hidden="true">
+            <span class="brand-orbit-dot"></span>
+            <span class="brand-mark brand-mark--image">
+              <img class="brand-logo" src="/logo-tacos-fabian.svg" alt="" />
+            </span>
+          </span>
+          <span class="brand-text">
+            <strong>Tacos Fabian</strong>
+            <small>Panel de administracion</small>
+          </span>
+        </a>
+
+        <nav aria-label="Navegacion de administrador">
+          <ul class="menu admin-menu" style="display:flex;position:static;box-shadow:none;border:none;padding:0;background:transparent;">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/.auth/logout">Cerrar sesion</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="section section-soft">
+      <div class="container">
+        <div class="section-head">
+          <h1>Panel de ventas</h1>
+          <p class="muted">Vista protegida para administracion, seguimiento de pedidos y resenas del negocio.</p>
+        </div>
+
+        <section id="adminAccessGate" class="card admin-access-card" aria-labelledby="adminAccessTitle">
+          <div>
+            <p class="section-kicker">Acceso seguro</p>
+            <h2 id="adminAccessTitle">Valida tu clave del panel</h2>
+            <p class="muted">Esta capa extra protege ventas e historial. La clave se guarda solo en este navegador.</p>
+          </div>
+
+          <form id="adminAccessForm" class="admin-access-form">
+            <label class="order-modal__field">
+              <span>Clave de administrador</span>
+              <input id="adminAccessCode" name="adminAccessCode" type="password" autocomplete="current-password" maxlength="64" required />
+            </label>
+            <div class="admin-access-actions">
+              <button class="btn btn-primary" type="submit">Entrar al panel</button>
+              <button id="adminResetSession" class="btn btn-secondary" type="button">Cerrar acceso local</button>
+            </div>
+            <p id="adminAccessStatus" class="muted" aria-live="polite">Usa tu clave para ver ventas y pedidos.</p>
+          </form>
+        </section>
+
+        <section id="adminDashboard" class="admin-dashboard" hidden aria-hidden="true">
+          <div id="adminStatus" class="muted" aria-live="polite">Cargando panel...</div>
+
+          <div class="admin-kpis" aria-label="Resumen de ventas">
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Pedidos</span>
+              <strong id="salesTotalOrders" class="admin-kpi__value">0</strong>
+              <small class="admin-kpi__hint">Historico guardado</small>
+            </article>
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Total vendido</span>
+              <strong id="salesRevenue" class="admin-kpi__value">$0 MXN</strong>
+              <small class="admin-kpi__hint">Acumulado registrado</small>
+            </article>
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Pedidos activos</span>
+              <strong id="salesActiveOrders" class="admin-kpi__value">0</strong>
+              <small class="admin-kpi__hint">Pendiente o enviado</small>
+            </article>
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Completados</span>
+              <strong id="salesCompletedOrders" class="admin-kpi__value">0</strong>
+              <small class="admin-kpi__hint">Cerrados exitosamente</small>
+            </article>
+          </div>
+
+          <div id="salesByMethodSummary" class="admin-kpis" aria-label="Ventas por método" style="margin-top: 1rem;">
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Efectivo</span>
+              <strong id="salesCashCount" class="admin-kpi__value">0</strong>
+              <small id="salesCashTotal" class="admin-kpi__hint">$0 MXN</small>
+            </article>
+            <article class="card admin-kpi">
+              <span class="admin-kpi__label">Transferencia</span>
+              <strong id="salesTransferCount" class="admin-kpi__value">0</strong>
+              <small id="salesTransferTotal" class="admin-kpi__hint">$0 MXN</small>
+            </article>
+          </div>
+
+          <div class="admin-panel-grid">
+            <section class="card admin-panel-card" aria-labelledby="salesTableTitle">
+              <div class="admin-panel-card__head">
+                <div>
+                  <p class="section-kicker">Ingresos</p>
+                  <h2 id="salesTableTitle">Tabla de ventas</h2>
+                </div>
+                <button id="adminClearSales" class="btn btn-secondary" type="button">Limpiar historial local</button>
+              </div>
+
+              <div class="table-wrap" role="region" aria-label="Tabla de ventas" tabindex="0">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Folio</th>
+                      <th>Mesa</th>
+                      <th>Método</th>
+                      <th>Productos</th>
+                      <th>Recibí</th>
+                      <th>Cambio</th>
+                      <th>Total</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="salesTableBody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="card admin-panel-card" aria-labelledby="reviewsTableTitle">
+              <div class="admin-panel-card__head">
+                <div>
+                  <p class="section-kicker">Reputacion</p>
+                  <h2 id="reviewsTableTitle">Resenas recibidas</h2>
+                </div>
+              </div>
+
+              <div class="table-wrap" role="region" aria-label="Tabla de resenas" tabindex="0">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Nombre</th>
+                      <th>Estrellas</th>
+                      <th>Comentario</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminTableBody"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

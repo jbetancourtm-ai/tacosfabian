@@ -1,0 +1,46 @@
+{
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": []
+    },
+    {
+      "route": "/caja",
+      "rewrite": "/caja.html"
+    },
+    {
+      "route": "/caja/*",
+      "rewrite": "/caja.html"
+    },
+    {
+      "route": "/admin",
+      "rewrite": "/admin.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/admin/*",
+      "rewrite": "/admin.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/admin.html",
+      "allowedRoles": ["authenticated"]
+    }
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/.auth/login/github?post_login_redirect_uri=/admin"
+    }
+  },
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/caja", "/caja/*", "/admin", "/admin/*", "/admin.html", "/favicon.ico", "/assets/*"]
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  }
+}
+

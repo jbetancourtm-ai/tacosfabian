@@ -1,0 +1,8 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="256" cy="256" r="246" fill="#FFF4E8"/>
+  <circle cx="256" cy="256" r="220" fill="#FFFFFF" stroke="#FF6A00" stroke-width="14"/>
+  <text x="256" y="120" text-anchor="middle" font-family="Poppins, Arial" font-size="46" font-weight="800" fill="#C94F00">TACOS FABIAN</text>
+  <path d="M166 300 Q256 176 346 300" fill="none" stroke="#FF6A00" stroke-width="20" stroke-linecap="round"/>
+  <path d="M182 294 Q256 226 330 294" fill="none" stroke="#C94F00" stroke-width="10" stroke-linecap="round"/>
+  <text x="256" y="390" text-anchor="middle" font-family="Nunito, Arial" font-size="28" font-weight="700" fill="#2A1B12">Hechos al momento</text>
+</svg>
