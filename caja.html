@@ -18,12 +18,15 @@
     <link rel="stylesheet" href="/src/styles.css" />
     <style>
       :root {
-        --caja-primary: #ff6a00;
+        --caja-primary: #9E2A2B;
+        --caja-primary-hover: #7F1D1D;
         --caja-success: #10b981;
         --caja-danger: #ef4444;
-        --caja-neutral: #f3f4f6;
-        --caja-text: #1f2937;
-        --caja-border: #e5e7eb;
+        --caja-neutral: #F8F7F4;
+        --caja-text: #171717;
+        --caja-text-secondary: #4B5563;
+        --caja-border: #E7E2D9;
+        --caja-card: #FFFFFF;
       }
 
       * {
@@ -65,8 +68,9 @@
       .caja-header h1 {
         margin: 0;
         font-size: 1.25rem;
-        color: var(--caja-text);
+        color: var(--caja-primary);
         font-weight: 700;
+        letter-spacing: -0.5px;
       }
 
       .caja-time {
@@ -101,7 +105,9 @@
         margin-top: 0;
         margin-bottom: 0.5rem;
         font-size: 1.3rem;
-        color: var(--caja-text);
+        color: var(--caja-primary);
+        font-weight: 700;
+        letter-spacing: -0.3px;
       }
 
       .section-description {
@@ -143,13 +149,14 @@
         padding: 0.85rem 1rem;
         font-size: 0.95rem;
         color: var(--caja-text);
-        background: #ffffff;
+        background: var(--caja-card);
+        transition: border-color 0.2s, box-shadow 0.2s;
       }
 
       .search-input:focus {
         border-color: var(--caja-primary);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.12);
+        box-shadow: 0 0 0 3px rgba(158, 42, 43, 0.12);
       }
 
       .category-filters {
@@ -174,12 +181,15 @@
         border-color: var(--caja-primary);
         background: var(--caja-primary);
         color: white;
+        font-weight: 600;
       }
 
       .catalog-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
+        margin-bottom: 2rem;
+        width: 100%;
       }
 
       .product-price.pending {
@@ -209,7 +219,7 @@
       }
 
       .product-card {
-        background: white;
+        background: var(--caja-card);
         border: 1px solid var(--caja-border);
         border-radius: 16px;
         padding: 1rem;
@@ -217,12 +227,13 @@
         flex-direction: column;
         justify-content: space-between;
         min-height: 220px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       }
 
       .product-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 12px 24px rgba(158, 42, 43, 0.12);
+        border-color: var(--caja-primary);
       }
 
       .product-tag {
@@ -377,13 +388,14 @@
         align-items: center;
         margin-top: 1rem;
         padding-top: 1rem;
-        border-top: 1px solid var(--caja-border);
+        border-top: 2px solid var(--caja-border);
         font-size: 1rem;
       }
 
       .ticket-total-row strong {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         color: var(--caja-primary);
+        font-weight: 800;
       }
 
       .folio-display,
@@ -564,27 +576,29 @@
       }
 
       .summary-card {
-        background: white;
+        background: var(--caja-card);
         border-radius: 8px;
         padding: 1.25rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--caja-border);
       }
 
       .summary-card h3 {
         margin-top: 0;
         margin-bottom: 1rem;
         font-size: 0.95rem;
-        color: #6b7280;
+        color: var(--caja-primary);
         text-transform: uppercase;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: 0.5px;
       }
 
       .summary-value {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 2.2rem;
+        font-weight: 800;
         color: var(--caja-primary);
         margin-bottom: 0.5rem;
+        letter-spacing: -1px;
       }
 
       .summary-hint {
@@ -618,9 +632,9 @@
       }
 
       .btn-primary:hover:not(:disabled) {
-        background: #e85a00;
+        background: var(--caja-primary-hover);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(255, 106, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(158, 42, 43, 0.3);
       }
 
       .btn-secondary {
@@ -642,12 +656,13 @@
         position: fixed;
         bottom: 1.5rem;
         right: 1.5rem;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
         animation: slideIn 0.3s ease-out;
-        z-index: 9999;
+        z-index: 10001;
         max-width: 400px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
       }
 
       @keyframes slideIn {
@@ -857,13 +872,25 @@
         }
 
         .caja-main {
-          padding: 0.75rem 0.75rem calc(18rem + env(safe-area-inset-bottom));
+          flex-direction: column;
+          padding: 0.75rem 0.75rem 0;
           gap: 0.75rem;
-          min-height: 0;
+          min-height: 100%;
+          overflow-y: auto;
         }
 
         .caja-form {
+          flex: none;
           padding: 0.9rem;
+          order: 1;
+        }
+
+        .caja-summary {
+          flex: none;
+          flex-direction: column;
+          order: 2;
+          padding-bottom: 0;
+          margin-bottom: calc(19rem + env(safe-area-inset-bottom));
         }
 
         .caja-toolbar,
@@ -889,6 +916,7 @@
         .ticket-card {
           position: relative;
           top: auto;
+          display: none;
         }
 
         .ticket-items {

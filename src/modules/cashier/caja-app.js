@@ -131,6 +131,14 @@ function init() {
     showAccessGate();
   }
 
+  // LIMPIAR ESTADO INICIAL - No cargar venta anterior
+  state.ticketItems = {};
+  const otherProduct = products.find((item) => item.id === 'otro');
+  if (otherProduct) {
+    otherProduct.descripcion = '';
+    otherProduct.customPrice = 0;
+  }
+
   // Actualizar reloj
   updateClock();
   setInterval(updateClock, 1000);
@@ -438,27 +446,45 @@ function toggleMobileDetails() {
 }
 
 function clearTicket() {
+  // Limpiar estado del ticket
   state.ticketItems = {};
+  
+  // Limpiar producto "Otro" si existe
   const otherProduct = products.find((item) => item.id === 'otro');
   if (otherProduct) {
     otherProduct.descripcion = '';
     otherProduct.customPrice = 0;
   }
 
+  // Limpiar campos del formulario
   if (receivedInput) {
     receivedInput.value = '';
   }
-
   if (changeGroup) {
     changeGroup.hidden = true;
   }
-
   if (receivedGroup) {
     receivedGroup.hidden = true;
   }
+  if (changeDisplay) {
+    changeDisplay.textContent = '-';
+  }
 
+  // Limpiar móvil
+  if (mobileReceivedGroup) {
+    mobileReceivedGroup.hidden = true;
+  }
+  if (mobileChangeGroup) {
+    mobileChangeGroup.hidden = true;
+  }
+  if (mobileChangeDisplay) {
+    mobileChangeDisplay.textContent = '$0.00';
+  }
   if (mobileDetails) {
     mobileDetails.hidden = true;
+  }
+  if (mobileCheckout) {
+    mobileCheckout.hidden = true;
   }
   if (mobileToggleLabel) {
     mobileToggleLabel.textContent = 'Ver ticket';
@@ -467,6 +493,7 @@ function clearTicket() {
     mobileToggleArrow.textContent = '▼';
   }
 
+  // Re-renderizar
   renderProductCatalog();
   updateTicketSummary();
 }
@@ -620,29 +647,27 @@ async function handleFormSubmit(e) {
     }
 
     saveMovementLocally(movement);
-    showNotification('Venta registrada correctamente', 'success');
+    showNotification('✓ Venta registrada correctamente', 'success');
 
-    state.ticketItems = {};
-    const otherProduct = products.find((item) => item.id === 'otro');
-    if (otherProduct) {
-      otherProduct.descripcion = '';
-      otherProduct.customPrice = 0;
-    }
-
-    if (receivedInput) {
-      receivedInput.value = '';
-    }
-    if (changeGroup) {
-      changeGroup.hidden = true;
-    }
-    if (receivedGroup) {
-      receivedGroup.hidden = true;
-    }
+    // LIMPIEZA COMPLETA DESPUÉS DE REGISTRAR
+    clearTicket();
+    
+    // Limpiar formulario completamente
+    paymentMethodSelect.value = '';
+    if (mesaOrigenSelect) mesaOrigenSelect.value = '';
+    if (observationsInput) observationsInput.value = '';
+    if (receivedInput) receivedInput.value = '';
+    if (changeGroup) changeGroup.hidden = true;
+    if (receivedGroup) receivedGroup.hidden = true;
+    if (mobileReceivedGroup) mobileReceivedGroup.hidden = true;
+    if (mobileChangeGroup) mobileChangeGroup.hidden = true;
+    if (mobileDetails) mobileDetails.hidden = true;
+    if (mobileCheckout) mobileCheckout.hidden = true;
+    if (mobileToggleLabel) mobileToggleLabel.textContent = 'Ver ticket';
+    if (mobileToggleArrow) mobileToggleArrow.textContent = '▼';
 
     renderProductCatalog();
     updateTicketSummary();
-    observationsInput.value = '';
-
     refreshMovements();
 
     submitBtn.disabled = false;
@@ -791,7 +816,7 @@ function showNotification(message, type = 'success') {
 
   setTimeout(() => {
     toast.remove();
-  }, 3000);
+  }, 4000);
 }
 
 // ============================================================================
