@@ -93,14 +93,248 @@
 
       .caja-form h2 {
         margin-top: 0;
-        margin-bottom: 1.5rem;
-        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        font-size: 1.3rem;
         color: var(--caja-text);
       }
 
-      .form-group {
+      .section-description {
+        margin: 0 0 1.5rem;
+        color: #6b7280;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .caja-toolbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
         margin-bottom: 1.25rem;
       }
+
+      .toolbar-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .toolbar-group label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #374151;
+      }
+
+      .catalog-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      .product-card {
+        background: white;
+        border: 1px solid var(--caja-border);
+        border-radius: 16px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 220px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      }
+
+      .product-tag {
+        display: inline-flex;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+      }
+
+      .product-name {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--caja-text);
+      }
+
+      .product-price {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--caja-primary);
+      }
+
+      .custom-fields {
+        display: grid;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .custom-fields label {
+        font-size: 0.82rem;
+        color: #4b5563;
+        font-weight: 600;
+      }
+
+      .custom-fields input {
+        border: 1px solid var(--caja-border);
+        border-radius: 10px;
+        padding: 0.8rem;
+        font-size: 0.95rem;
+      }
+
+      .product-controls {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.5rem;
+        align-items: center;
+        margin-top: auto;
+      }
+
+      .qty-btn {
+        width: 100%;
+        min-height: 44px;
+        border: none;
+        border-radius: 10px;
+        background: var(--caja-neutral);
+        color: var(--caja-text);
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .qty-btn:hover:not(:disabled) {
+        background: #e5e7eb;
+      }
+
+      .qty-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .product-quantity {
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--caja-text);
+      }
+
+      .product-subtotal {
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: #374151;
+        font-weight: 600;
+      }
+
+      .ticket-card {
+        position: sticky;
+        top: 1rem;
+      }
+
+      .ticket-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: baseline;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .ticket-meta span {
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+
+      .ticket-hint {
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+
+      .ticket-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: 320px;
+        overflow-y: auto;
+      }
+
+      .ticket-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.85rem 1rem;
+        background: #f9fafb;
+        border-radius: 12px;
+      }
+
+      .ticket-item-name {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+
+      .ticket-item-name strong {
+        font-size: 0.95rem;
+        color: var(--caja-text);
+      }
+
+      .ticket-item-name span {
+        font-size: 0.85rem;
+        color: #6b7280;
+      }
+
+      .ticket-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--caja-border);
+        font-size: 1rem;
+      }
+
+      .ticket-total-row strong {
+        font-size: 1.5rem;
+        color: var(--caja-primary);
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+      }
+
+      .caja-summary {
+        flex: 0 0 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .caja-recent {
+        flex: 1;
+      }
+
+      @media (max-width: 1024px) {
+        .catalog-grid {
+          grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        .caja-summary {
+          flex-direction: column;
+        }
+      }
+
 
       .form-group label {
         display: block;
@@ -458,78 +692,36 @@
 
     <!-- Main Content -->
     <main class="caja-main">
-      <!-- Form Section -->
+      <!-- Product Catalog -->
       <section class="caja-form">
-        <h2>Nuevo Movimiento</h2>
+        <h2>Selección Rápida</h2>
+        <p class="section-description">Selecciona productos con + y -, revisa el ticket en tiempo real y registra la venta en segundos.</p>
+
         <form id="cajaForm">
-          <!-- Turno -->
-          <div class="form-group">
-            <label for="cajaShift">Turno</label>
-            <select id="cajaShift" required>
-              <option value="">Selecciona turno</option>
-              <option value="mañana">Mañana (6am - 12pm)</option>
-              <option value="tarde">Tarde (12pm - 6pm)</option>
-              <option value="noche">Noche (6pm - 12am)</option>
-            </select>
-          </div>
-
-          <!-- Producto/Concepto -->
-          <div class="form-group">
-            <label for="cajaProduct">Producto o Concepto</label>
-            <input
-              id="cajaProduct"
-              type="text"
-              placeholder="ej: Tacos de suadero, Refrescos, Propina"
-              required
-            />
-          </div>
-
-          <!-- Cantidad y Precio -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cajaQuantity">Cantidad</label>
-              <input
-                id="cajaQuantity"
-                type="number"
-                min="1"
-                inputmode="numeric"
-                placeholder="Cant."
-                required
-              />
+          <div class="caja-toolbar">
+            <div class="toolbar-group">
+              <label for="cajaShift">Turno</label>
+              <select id="cajaShift" required>
+                <option value="">Selecciona turno</option>
+                <option value="mañana">Mañana (6am - 12pm)</option>
+                <option value="tarde">Tarde (12pm - 6pm)</option>
+                <option value="noche">Noche (6pm - 12am)</option>
+              </select>
             </div>
-            <div class="form-group">
-              <label for="cajaUnitPrice">Precio Unitario ($)</label>
-              <input
-                id="cajaUnitPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                inputmode="decimal"
-                placeholder="$0.00"
-                required
-              />
+            <div class="toolbar-group">
+              <label for="cajaPaymentMethod">Método de Pago</label>
+              <select id="cajaPaymentMethod" required>
+                <option value="">Selecciona método</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="tarjeta">Tarjeta</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="otro">Otro</option>
+              </select>
             </div>
           </div>
 
-          <!-- Total (automático) -->
-          <div class="form-group" style="background: var(--caja-neutral); padding: 1rem; border-radius: 6px;">
-            <label>Total</label>
-            <div class="summary-value" id="cajaTotal">$0.00</div>
-          </div>
+          <div id="cajaProductsGrid" class="catalog-grid"></div>
 
-          <!-- Método de Pago -->
-          <div class="form-group">
-            <label for="cajaPaymentMethod">Método de Pago</label>
-            <select id="cajaPaymentMethod" required>
-              <option value="">Selecciona método</option>
-              <option value="efectivo">Efectivo</option>
-              <option value="tarjeta">Tarjeta</option>
-              <option value="transferencia">Transferencia</option>
-              <option value="otro">Otro</option>
-            </select>
-          </div>
-
-          <!-- Observaciones -->
           <div class="form-group">
             <label for="cajaObservations">Observaciones (opcional)</label>
             <textarea
@@ -540,16 +732,30 @@
             ></textarea>
           </div>
 
-          <!-- Actions -->
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Guardar Movimiento</button>
-            <button type="reset" class="btn btn-secondary">Limpiar</button>
+            <button type="button" id="cajaClearTicket" class="btn btn-secondary">Limpiar Ticket</button>
+            <button type="submit" class="btn btn-primary">Registrar venta</button>
           </div>
         </form>
       </section>
 
       <!-- Summary + Recent Section -->
       <aside class="caja-summary">
+        <section class="summary-card ticket-card">
+          <h3>Ticket de Venta</h3>
+          <div class="ticket-meta">
+            <span id="cajaTicketCount">0 productos seleccionados</span>
+            <span class="ticket-hint">Actualiza el ticket con + o -.</span>
+          </div>
+          <div class="ticket-items" id="cajaTicketItems">
+            <div class="empty-list">No hay productos en el ticket.</div>
+          </div>
+          <div class="ticket-total-row">
+            <span>Total</span>
+            <strong id="cajaTicketTotal">$0.00</strong>
+          </div>
+        </section>
+
         <!-- Today Summary -->
         <section class="summary-card">
           <h3>Hoy</h3>

@@ -12,7 +12,21 @@ const state = {
   movements: [],
   dailyTotal: 0,
   shiftTotal: 0,
+  ticketItems: {},
 };
+
+const products = [
+  { id: 'taco-suadero', nombre: 'Taco de suadero', categoria: 'Tacos', precio: 20 },
+  { id: 'taco-pastor', nombre: 'Taco de pastor', categoria: 'Tacos', precio: 22 },
+  { id: 'taco-campechano', nombre: 'Taco campechano', categoria: 'Tacos', precio: 24 },
+  { id: 'tostada-pastor', nombre: 'Tostada de pastor', categoria: 'Tostadas', precio: 34 },
+  { id: 'tostada-suadero', nombre: 'Tostada de suadero', categoria: 'Tostadas', precio: 34 },
+  { id: 'torta', nombre: 'Torta', categoria: 'Tortas', precio: 42 },
+  { id: 'refresco', nombre: 'Refresco', categoria: 'Bebidas', precio: 18 },
+  { id: 'agua', nombre: 'Agua', categoria: 'Bebidas', precio: 15 },
+  { id: 'propina', nombre: 'Propina', categoria: 'Especial', precio: 1 },
+  { id: 'otro', nombre: 'Otro', categoria: 'Especial', precio: 0, isCustom: true, descripcion: '', customPrice: 0 },
+];
 
 // ============================================================================
 // PIN & Autenticación
@@ -42,12 +56,13 @@ const accessStatus = document.getElementById('cajaAccessStatus');
 
 const cajaForm = document.getElementById('cajaForm');
 const shiftSelect = document.getElementById('cajaShift');
-const productInput = document.getElementById('cajaProduct');
-const quantityInput = document.getElementById('cajaQuantity');
-const unitPriceInput = document.getElementById('cajaUnitPrice');
-const totalDisplay = document.getElementById('cajaTotal');
 const paymentMethodSelect = document.getElementById('cajaPaymentMethod');
 const observationsInput = document.getElementById('cajaObservations');
+const productsContainer = document.getElementById('cajaProductsGrid');
+const ticketItemsContainer = document.getElementById('cajaTicketItems');
+const ticketTotalDisplay = document.getElementById('cajaTicketTotal');
+const ticketCountDisplay = document.getElementById('cajaTicketCount');
+const clearTicketButton = document.getElementById('cajaClearTicket');
 
 const todayTotalDisplay = document.getElementById('cajaTodayTotal');
 const todayCountDisplay = document.getElementById('cajaTodayCount');
@@ -76,6 +91,8 @@ function init() {
 
   // Event listeners
   setupEventListeners();
+  renderProductCatalog();
+  updateTicketSummary();
 
   // Auto-refresh de datos cada 5 segundos
   refreshMovements();
@@ -121,29 +138,176 @@ function setupEventListeners() {
     });
   }
 
-  // Cálculo automático de total
-  [quantityInput, unitPriceInput].forEach((input) => {
-    input.addEventListener('change', calculateTotal);
-    input.addEventListener('input', calculateTotal);
-  });
+  if (productsContainer) {
+    productsContainer.addEventListener('click', handleProductCardClick);
+    productsContainer.addEventListener('input', handleProductCardInput);
+  }
 
-  // Actualizar turno cuando cambia
+  if (clearTicketButton) {
+    clearTicketButton.addEventListener('click', clearTicket);
+  }
+
   shiftSelect.addEventListener('change', (e) => {
     state.currentShift = e.target.value;
     refreshMovements();
   });
 
-  // Envío del formulario
   cajaForm.addEventListener('submit', handleFormSubmit);
 }
 
-function calculateTotal() {
-  const quantity = parseFloat(quantityInput.value) || 0;
-  const unitPrice = parseFloat(unitPriceInput.value) || 0;
-  const total = quantity * unitPrice;
+function handleProductCardClick(event) {
+  const button = event.target.closest('[data-action]');
+  if (!button) {
+    return;
+  }
 
-  totalDisplay.textContent = formatMxCurrency(total);
-  totalDisplay.dataset.value = total;
+  const productCard = button.closest('.product-card');
+  const productId = productCard?.dataset.productId;
+  const delta = button.dataset.action === 'increment' ? 1 : -1;
+
+  changeTicketItemQuantity(productId, delta);
+}
+
+function handleProductCardInput(event) {
+  const input = event.target;
+  const productCard = input.closest('.product-card');
+  if (!productCard || productCard.dataset.productId !== 'otro') {
+    return;
+  }
+
+  const product = products.find((item) => item.id === 'otro');
+  if (!product) {
+    return;
+  }
+
+  if (input.id === 'otroDescription') {
+    product.descripcion = input.value;
+  }
+
+  if (input.id === 'otroPrice') {
+    product.customPrice = parseFloat(input.value) || 0;
+  }
+
+  updateTicketSummary();
+}
+
+function changeTicketItemQuantity(productId, delta) {
+  if (!productId) {
+    return;
+  }
+
+  const currentQuantity = state.ticketItems[productId] || 0;
+  const nextQuantity = Math.max(0, currentQuantity + delta);
+
+  if (nextQuantity === 0) {
+    delete state.ticketItems[productId];
+  } else {
+    state.ticketItems[productId] = nextQuantity;
+  }
+
+  renderProductCatalog();
+  updateTicketSummary();
+}
+
+function getTicketItems() {
+  return products
+    .filter((product) => state.ticketItems[product.id] > 0)
+    .map((product) => {
+      const quantity = state.ticketItems[product.id] || 0;
+      const unitPrice = product.isCustom ? (product.customPrice || 0) : product.precio;
+      const nombre = product.isCustom ? (product.descripcion?.trim() || 'Otro') : product.nombre;
+      return {
+        ...product,
+        nombre,
+        cantidad: quantity,
+        precio_unitario: unitPrice,
+        subtotal: unitPrice * quantity,
+      };
+    });
+}
+
+function updateTicketSummary() {
+  if (!ticketItemsContainer || !ticketTotalDisplay || !ticketCountDisplay) {
+    return;
+  }
+
+  const items = getTicketItems();
+  const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+  const totalUnits = items.reduce((sum, item) => sum + item.cantidad, 0);
+
+  if (items.length === 0) {
+    ticketItemsContainer.innerHTML = '<div class="empty-list">No hay productos en el ticket.</div>';
+  } else {
+    ticketItemsContainer.innerHTML = items
+      .map(
+        (item) => `
+          <div class="ticket-item">
+            <div class="ticket-item-name">
+              <strong>${item.cantidad}x ${item.nombre}</strong>
+              <span>${formatMxCurrency(item.precio_unitario)} c/u</span>
+            </div>
+            <div>${formatMxCurrency(item.subtotal)}</div>
+          </div>
+        `
+      )
+      .join('');
+  }
+
+  ticketTotalDisplay.textContent = formatMxCurrency(total);
+  ticketCountDisplay.textContent = `${totalUnits} producto${totalUnits !== 1 ? 's' : ''} seleccionados`;
+}
+
+function clearTicket() {
+  state.ticketItems = {};
+  const otherProduct = products.find((item) => item.id === 'otro');
+  if (otherProduct) {
+    otherProduct.descripcion = '';
+    otherProduct.customPrice = 0;
+  }
+
+  renderProductCatalog();
+  updateTicketSummary();
+}
+
+function renderProductCatalog() {
+  if (!productsContainer) {
+    return;
+  }
+
+  productsContainer.innerHTML = products
+    .map((product) => {
+      const quantity = state.ticketItems[product.id] || 0;
+      const unitPrice = product.isCustom ? product.customPrice : product.precio;
+      const priceLabel = product.isCustom
+        ? product.customPrice > 0
+          ? formatMxCurrency(product.customPrice)
+          : 'Precio a capturar'
+        : formatMxCurrency(product.precio);
+      const customDescription = product.isCustom ? (product.descripcion || '') : '';
+
+      return `
+        <article class="product-card" data-product-id="${product.id}">
+          <span class="product-tag">${product.categoria}</span>
+          <div class="product-name">${product.nombre}</div>
+          <div class="product-price">${priceLabel}</div>
+          ${product.isCustom ? `
+            <div class="custom-fields">
+              <label for="otroDescription">Descripción</label>
+              <input id="otroDescription" type="text" placeholder="Descripción del producto" value="${customDescription.replace(/"/g, '&quot;')}" />
+              <label for="otroPrice">Precio unitario</label>
+              <input id="otroPrice" type="number" min="0" step="0.50" placeholder="0.00" value="${product.customPrice > 0 ? product.customPrice : ''}" />
+            </div>
+          ` : ''}
+          <div class="product-controls">
+            <button type="button" class="qty-btn" data-action="decrement" ${quantity === 0 ? 'disabled' : ''}>-</button>
+            <span class="product-quantity">${quantity}</span>
+            <button type="button" class="qty-btn" data-action="increment">+</button>
+          </div>
+          <div class="product-subtotal">${quantity > 0 ? formatMxCurrency(unitPrice * quantity) : '&nbsp;'}</div>
+        </article>
+      `;
+    })
+    .join('');
 }
 
 async function handleFormSubmit(e) {
@@ -154,32 +318,62 @@ async function handleFormSubmit(e) {
     return;
   }
 
-  const movement = {
-    fecha_hora: new Date().toISOString(),
-    turno: shiftSelect.value,
-    producto_concepto: productInput.value,
-    cantidad: parseInt(quantityInput.value),
-    precio_unitario: parseFloat(unitPriceInput.value),
-    total: parseFloat(totalDisplay.dataset.value || 0),
-    metodo_pago: paymentMethodSelect.value,
-    observaciones: observationsInput.value,
-    usuario_cajera: 'Cajera',
-    estado: 'activo',
-  };
+  const selectedItems = getTicketItems();
+  const totalUnits = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
+  const total = selectedItems.reduce((sum, item) => sum + item.subtotal, 0);
 
-  // Validación básica
-  if (!movement.turno || !movement.producto_concepto || movement.cantidad <= 0 || movement.precio_unitario <= 0) {
-    showNotification('Completa todos los campos requeridos', 'error');
+  if (totalUnits === 0) {
+    showNotification('Selecciona al menos un producto antes de registrar la venta.', 'error');
     return;
   }
 
+  if (!shiftSelect.value) {
+    showNotification('Selecciona un turno antes de continuar.', 'error');
+    return;
+  }
+
+  if (!paymentMethodSelect.value) {
+    showNotification('Selecciona un método de pago para registrar la venta.', 'error');
+    return;
+  }
+
+  const otherItem = selectedItems.find((item) => item.id === 'otro');
+  if (otherItem && (!otherItem.nombre || otherItem.precio_unitario <= 0)) {
+    showNotification('Completa la descripción y el precio del producto Otro.', 'error');
+    return;
+  }
+
+  const productSummary = selectedItems
+    .map((item) => `${item.cantidad}x ${item.nombre}`)
+    .join(', ');
+
+  const averagePrice = totalUnits > 0 ? total / totalUnits : 0;
+
+  const movement = {
+    fecha_hora: new Date().toISOString(),
+    turno: shiftSelect.value,
+    producto_concepto: productSummary,
+    cantidad: totalUnits,
+    precio_unitario: parseFloat(averagePrice.toFixed(2)),
+    total: parseFloat(total.toFixed(2)),
+    metodo_pago: paymentMethodSelect.value,
+    observaciones: observationsInput.value.trim(),
+    usuario_cajera: 'Cajera',
+    estado: 'activo',
+    productos: selectedItems.map((item) => ({
+      id: item.id,
+      nombre: item.nombre,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+      subtotal: item.subtotal,
+    })),
+  };
+
   try {
-    // Guardar movimiento
     const submitBtn = cajaForm.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Guardando...';
 
-    // Intentar guardar en backend (opcional), luego en localStorage
     try {
       const api = getAPIService();
       await api.createMovement(movement);
@@ -187,28 +381,34 @@ async function handleFormSubmit(e) {
       console.warn('Backend no disponible, guardando localmente:', error);
     }
 
-    // Guardar localmente
     saveMovementLocally(movement);
-
-    // Feedback visual
     showNotification('✓ Movimiento guardado correctamente', 'success');
 
-    // Reset formulario
-    cajaForm.reset();
-    totalDisplay.textContent = '$0.00';
-    totalDisplay.dataset.value = 0;
+    state.ticketItems = {};
+    const otherProduct = products.find((item) => item.id === 'otro');
+    if (otherProduct) {
+      otherProduct.descripcion = '';
+      otherProduct.customPrice = 0;
+    }
 
-    // Refresh datos
+    renderProductCatalog();
+    updateTicketSummary();
+    paymentMethodSelect.value = '';
+    observationsInput.value = '';
+
     refreshMovements();
 
-    // Reset estado del botón
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Guardar Movimiento';
+    submitBtn.textContent = 'Registrar venta';
   } catch (error) {
     console.error('Error al guardar movimiento:', error);
     showNotification('Error al guardar. Intenta de nuevo.', 'error');
   }
 }
+
+// ============================================================================
+// Persistencia Local
+
 
 // ============================================================================
 // Persistencia Local
