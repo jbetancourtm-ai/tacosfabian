@@ -14,6 +14,20 @@ const state = {
   shiftTotal: 0,
 };
 
+// ============================================================================
+// PIN & Autenticación
+// ============================================================================
+function hashPin(pin) {
+  // Simple hash para PIN (en producción usar comparación server-side)
+  let hash = 0;
+  for (let i = 0; i < pin.length; i++) {
+    const char = pin.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Conversión a entero de 32bit
+  }
+  return hash.toString();
+}
+
 // Cache PIN (válido durante la sesión)
 const SESSION_PIN_KEY = 'tacos_fabian_caja_session_pin';
 const PIN_HASH = hashPin('1980'); // PIN: 1980
@@ -68,20 +82,6 @@ function init() {
   setInterval(refreshMovements, 5000);
 }
 
-// ============================================================================
-// PIN & Autenticación
-// ============================================================================
-function hashPin(pin) {
-  // Simple hash para PIN (en producción usar comparación server-side)
-  let hash = 0;
-  for (let i = 0; i < pin.length; i++) {
-    const char = pin.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Conversión a entero de 32bit
-  }
-  return hash.toString();
-}
-
 function showAccessGate() {
   accessGate.removeAttribute('hidden');
 }
@@ -96,27 +96,31 @@ function authenticateUser() {
   cajaForm.focus();
 }
 
-accessForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const pin = pinInput.value.trim();
-
-  if (hashPin(pin) === PIN_HASH) {
-    sessionStorage.setItem(SESSION_PIN_KEY, PIN_HASH);
-    pinInput.value = '';
-    accessStatus.style.display = 'none';
-    authenticateUser();
-  } else {
-    accessStatus.textContent = 'PIN incorrecto. Intenta de nuevo.';
-    accessStatus.style.display = 'block';
-    pinInput.value = '';
-    pinInput.focus();
-  }
-});
-
 // ============================================================================
 // Event Listeners
 // ============================================================================
 function setupEventListeners() {
+  // Acceso a caja - Validación de PIN
+  if (accessForm) {
+    accessForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const pin = pinInput.value.trim();
+      const pinHash = hashPin(pin);
+
+      if (pinHash === PIN_HASH) {
+        sessionStorage.setItem(SESSION_PIN_KEY, PIN_HASH);
+        pinInput.value = '';
+        accessStatus.style.display = 'none';
+        authenticateUser();
+      } else {
+        accessStatus.textContent = 'PIN incorrecto. Intenta de nuevo.';
+        accessStatus.style.display = 'block';
+        pinInput.value = '';
+        pinInput.focus();
+      }
+    });
+  }
+
   // Cálculo automático de total
   [quantityInput, unitPriceInput].forEach((input) => {
     input.addEventListener('change', calculateTotal);
