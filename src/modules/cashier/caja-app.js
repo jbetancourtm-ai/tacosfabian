@@ -93,6 +93,22 @@ const receivedInput = document.getElementById('cajaReceivedAmount');
 const receivedGroup = document.getElementById('cajaReceivedGroup');
 const changeGroup = document.getElementById('cajaChangeGroup');
 const changeDisplay = document.getElementById('cajaChangeDisplay');
+const mobileCheckout = document.getElementById('cajaMobileCheckout');
+const mobileToggle = document.getElementById('cajaMobileToggle');
+const mobileToggleLabel = document.getElementById('cajaMobileToggleLabel');
+const mobileToggleArrow = document.getElementById('cajaMobileToggleArrow');
+const mobileDetails = document.getElementById('cajaMobileDetails');
+const mobileTotalDisplay = document.getElementById('cajaMobileTotal');
+const mobileCountDisplay = document.getElementById('cajaMobileCount');
+const mobilePaymentDisplay = document.getElementById('cajaMobilePayment');
+const mobilePaymentDetail = document.getElementById('cajaMobilePaymentDetail');
+const mobileFolioDisplay = document.getElementById('cajaMobileFolio');
+const mobileMesaDisplay = document.getElementById('cajaMobileMesa');
+const mobileReceivedGroup = document.getElementById('cajaMobileReceivedGroup');
+const mobileChangeGroup = document.getElementById('cajaMobileChangeGroup');
+const mobileChangeDisplay = document.getElementById('cajaMobileChange');
+const mobileClearTicketButton = document.getElementById('cajaMobileClearTicket');
+const mobileRegisterButton = document.getElementById('cajaMobileRegister');
 
 const todayTotalDisplay = document.getElementById('cajaTodayTotal');
 const todayCountDisplay = document.getElementById('cajaTodayCount');
@@ -210,6 +226,22 @@ function setupEventListeners() {
     receivedInput.addEventListener('input', updateTicketSummary);
   }
 
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', toggleMobileDetails);
+  }
+
+  if (mobileClearTicketButton) {
+    mobileClearTicketButton.addEventListener('click', clearTicket);
+  }
+
+  if (mobileRegisterButton) {
+    mobileRegisterButton.addEventListener('click', () => {
+      if (cajaForm) {
+        cajaForm.requestSubmit();
+      }
+    });
+  }
+
   cajaForm.addEventListener('submit', handleFormSubmit);
 }
 
@@ -310,9 +342,30 @@ function updateTicketSummary() {
     ? paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text
     : 'No seleccionado';
   const folioText = items.length > 0 ? getNextFolioForToday() : '-';
+  const isCash = paymentMethodSelect.value === 'efectivo';
+  const receivedValue = parseFloat(receivedInput?.value || '0') || 0;
+  const changeValue = parseFloat((receivedValue - total).toFixed(2));
 
   if (folioDisplay) {
     folioDisplay.textContent = folioText;
+  }
+  if (mobileFolioDisplay) {
+    mobileFolioDisplay.textContent = folioText;
+  }
+  if (mobileMesaDisplay) {
+    mobileMesaDisplay.textContent = mesaOrigenSelect?.value || '-';
+  }
+  if (mobilePaymentDetail) {
+    mobilePaymentDetail.textContent = paymentMethodLabel;
+  }
+  if (mobileTotalDisplay) {
+    mobileTotalDisplay.textContent = formatMxCurrency(total);
+  }
+  if (mobileCountDisplay) {
+    mobileCountDisplay.textContent = `${totalUnits} producto${totalUnits !== 1 ? 's' : ''}`;
+  }
+  if (mobilePaymentDisplay) {
+    mobilePaymentDisplay.textContent = `Método: ${paymentMethodLabel}`;
   }
 
   if (items.length === 0) {
@@ -337,13 +390,15 @@ function updateTicketSummary() {
   ticketCountDisplay.textContent = `${totalUnits} producto${totalUnits !== 1 ? 's' : ''} seleccionados`;
   ticketMethodDisplay.textContent = paymentMethodLabel;
 
+  if (mobileCheckout) {
+    mobileCheckout.hidden = false;
+  }
+
+  const hasProducts = items.length > 0;
   if (receivedGroup && changeGroup && changeDisplay) {
-    if (paymentMethodSelect.value === 'efectivo' && items.length > 0) {
+    if (isCash && hasProducts) {
       receivedGroup.hidden = false;
       changeGroup.hidden = false;
-
-      const receivedValue = parseFloat(receivedInput.value) || 0;
-      const changeValue = parseFloat((receivedValue - total).toFixed(2));
       changeDisplay.textContent = receivedValue >= total
         ? formatMxCurrency(changeValue)
         : 'Monto insuficiente';
@@ -355,6 +410,31 @@ function updateTicketSummary() {
       }
     }
   }
+
+  if (mobileReceivedGroup && mobileChangeGroup && mobileChangeDisplay) {
+    if (isCash && hasProducts) {
+      mobileReceivedGroup.hidden = false;
+      mobileChangeGroup.hidden = false;
+      mobileChangeDisplay.textContent = receivedValue >= total
+        ? formatMxCurrency(changeValue)
+        : 'Falta dinero';
+      mobileChangeDisplay.style.color = receivedValue >= total ? '#059669' : '#b91c1c';
+    } else {
+      mobileReceivedGroup.hidden = true;
+      mobileChangeGroup.hidden = true;
+      mobileChangeDisplay.textContent = '$0.00';
+      mobileChangeDisplay.style.color = '#171717';
+    }
+  }
+}
+
+function toggleMobileDetails() {
+  if (!mobileDetails || !mobileToggleLabel || !mobileToggleArrow) return;
+
+  const isExpanded = mobileDetails.hidden;
+  mobileDetails.hidden = !isExpanded;
+  mobileToggleLabel.textContent = isExpanded ? 'Ocultar ticket' : 'Ver ticket';
+  mobileToggleArrow.textContent = isExpanded ? '▲' : '▼';
 }
 
 function clearTicket() {
@@ -375,6 +455,16 @@ function clearTicket() {
 
   if (receivedGroup) {
     receivedGroup.hidden = true;
+  }
+
+  if (mobileDetails) {
+    mobileDetails.hidden = true;
+  }
+  if (mobileToggleLabel) {
+    mobileToggleLabel.textContent = 'Ver ticket';
+  }
+  if (mobileToggleArrow) {
+    mobileToggleArrow.textContent = '▼';
   }
 
   renderProductCatalog();
