@@ -107,7 +107,7 @@
 
       .caja-toolbar {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 1rem;
         margin-bottom: 1.25rem;
       }
@@ -772,22 +772,11 @@
         <form id="cajaForm">
           <div class="caja-toolbar">
             <div class="toolbar-group">
-              <label for="cajaShift">Turno</label>
-              <select id="cajaShift" required>
-                <option value="">Selecciona turno</option>
-                <option value="mañana">Mañana (6am - 12pm)</option>
-                <option value="tarde">Tarde (12pm - 6pm)</option>
-                <option value="noche">Noche (6pm - 12am)</option>
-              </select>
-            </div>
-            <div class="toolbar-group">
               <label for="cajaPaymentMethod">Método de Pago</label>
               <select id="cajaPaymentMethod" required>
                 <option value="">Selecciona método</option>
                 <option value="efectivo">Efectivo</option>
-                <option value="tarjeta">Tarjeta</option>
                 <option value="transferencia">Transferencia</option>
-                <option value="otro">Otro</option>
               </select>
             </div>
           </div>

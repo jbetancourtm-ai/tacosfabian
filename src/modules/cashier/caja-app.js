@@ -8,7 +8,7 @@ import { getAPIService } from '../../services/api-service.js';
 // Estado de la aplicación
 const state = {
   authenticated: false,
-  currentShift: null,
+  currentShift: 'Horario único',
   movements: [],
   dailyTotal: 0,
   shiftTotal: 0,
@@ -75,7 +75,6 @@ const pinInput = document.getElementById('cajaPinInput');
 const accessStatus = document.getElementById('cajaAccessStatus');
 
 const cajaForm = document.getElementById('cajaForm');
-const shiftSelect = document.getElementById('cajaShift');
 const paymentMethodSelect = document.getElementById('cajaPaymentMethod');
 const observationsInput = document.getElementById('cajaObservations');
 const searchInput = document.getElementById('cajaSearch');
@@ -191,10 +190,9 @@ function setupEventListeners() {
     clearTicketButton.addEventListener('click', clearTicket);
   }
 
-  shiftSelect.addEventListener('change', (e) => {
-    state.currentShift = e.target.value;
-    refreshMovements();
-  });
+  if (paymentMethodSelect) {
+    paymentMethodSelect.addEventListener('change', updateTicketSummary);
+  }
 
   cajaForm.addEventListener('submit', handleFormSubmit);
 }
@@ -390,13 +388,8 @@ async function handleFormSubmit(e) {
     return;
   }
 
-  if (!shiftSelect.value) {
-    showNotification('Selecciona un turno antes de continuar.', 'error');
-    return;
-  }
-
-  if (!paymentMethodSelect.value) {
-    showNotification('Selecciona un método de pago para registrar la venta.', 'error');
+  if (!paymentMethodSelect.value || !['efectivo', 'transferencia'].includes(paymentMethodSelect.value)) {
+    showNotification('Selecciona Efectivo o Transferencia como método de pago.', 'error');
     return;
   }
 
@@ -420,7 +413,7 @@ async function handleFormSubmit(e) {
 
   const movement = {
     fecha_hora: new Date().toISOString(),
-    turno: shiftSelect.value,
+    turno: state.currentShift,
     producto_concepto: productSummary,
     cantidad: totalUnits,
     precio_unitario: parseFloat(averagePrice.toFixed(2)),
