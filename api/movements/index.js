@@ -55,13 +55,27 @@ export default async function (context, req) {
 
 async function handleCreateMovement(context, req) {
   try {
-    const movement = req.body;
+    const movement = normalizeMovement(req.body || {});
 
     // Validar datos requeridos
-    const required = ['fecha_hora', 'turno', 'producto_concepto', 'cantidad', 'precio_unitario', 'total', 'metodo_pago'];
+    const required = ['folio', 'fecha_hora', 'mesa_origen', 'producto_concepto', 'cantidad', 'precio_unitario', 'total', 'metodo_pago'];
     for (const field of required) {
       if (!movement[field]) {
         return badRequest(context, `Campo faltante: ${field}`);
+      }
+    }
+
+    if (!Array.isArray(movement.productos) || movement.productos.length === 0) {
+      return badRequest(context, 'Campo faltante: productos');
+    }
+
+    if (Number(movement.total) <= 0) {
+      return badRequest(context, 'El total debe ser mayor a 0');
+    }
+
+    if (movement.metodo_pago === 'efectivo') {
+      if (!Number.isFinite(Number(movement.recibido_con)) || Number(movement.recibido_con) < Number(movement.total)) {
+        return badRequest(context, 'Monto recibido insuficiente');
       }
     }
 
@@ -71,7 +85,7 @@ async function handleCreateMovement(context, req) {
         const entity = {
           partitionKey: sanitizePartitionKey(new Date(movement.fecha_hora).toISOString().split('T')[0]),
           rowKey: uuidv4(),
-          ...movement,
+          ...toTableEntity(movement),
           fecha_creacion: new Date().toISOString(),
         };
 
@@ -104,6 +118,56 @@ async function handleCreateMovement(context, req) {
     context.log.error('Error creando movimiento:', error);
     return serverError(context, 'Error al crear movimiento');
   }
+}
+
+function normalizeMovement(input) {
+  const productos = Array.isArray(input.productos) ? input.productos : [];
+  const cantidadTotal = Number(input.cantidad_total ?? input.cantidad ?? productos.reduce((sum, item) => sum + (Number(item.cantidad) || 0), 0));
+  const resumenProductos = input.resumen_productos
+    || input.producto_concepto
+    || productos.map((item) => `${Number(item.cantidad) || 0}x ${item.nombre || 'Producto'}`).join(', ');
+  const total = Number(input.total) || 0;
+  const metodoPago = String(input.metodo_pago || '').toLowerCase();
+  const rawReceived = Number(input.recibido_con);
+  const recibidoCon = metodoPago === 'efectivo' && Number.isFinite(rawReceived) ? rawReceived : null;
+  const cambio = metodoPago === 'efectivo'
+    ? Number(input.cambio ?? ((recibidoCon || 0) - total).toFixed(2))
+    : 0;
+  const precioUnitario = Number(input.precio_unitario) || (cantidadTotal > 0 ? total / cantidadTotal : total);
+
+  return {
+    ...input,
+    folio: input.folio || `TF-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Date.now()}`,
+    fecha_hora: input.fecha_hora || new Date().toISOString(),
+    turno: input.turno || 'Horario unico',
+    mesa_origen: input.mesa_origen || '',
+    producto_concepto: resumenProductos,
+    resumen_productos: resumenProductos,
+    productos,
+    cantidad: cantidadTotal,
+    cantidad_total: cantidadTotal,
+    precio_unitario: Number(precioUnitario.toFixed(2)),
+    total: Number(total.toFixed(2)),
+    metodo_pago: metodoPago,
+    recibido_con: metodoPago === 'efectivo' && recibidoCon != null ? Number(recibidoCon.toFixed(2)) : null,
+    cambio: Number(cambio.toFixed(2)),
+    observaciones: input.observaciones || '',
+    usuario_cajera: input.usuario_cajera || 'caja',
+    estado: input.estado || 'registrado',
+  };
+}
+
+function toTableEntity(movement) {
+  const entity = {
+    ...movement,
+    productos: JSON.stringify(movement.productos),
+  };
+  Object.keys(entity).forEach((key) => {
+    if (entity[key] == null) {
+      delete entity[key];
+    }
+  });
+  return entity;
 }
 
 async function handleGetDaily(context, req) {

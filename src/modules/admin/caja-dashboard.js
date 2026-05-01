@@ -291,7 +291,7 @@ class CajaAdminDashboard {
             <td>${dateTime}</td>
             <td>${this.capitalizeText(m.turno || '-')}</td>
             <td>${this.escapeHtml(m.resumen_productos || m.producto_concepto || '-')}</td>
-            <td style="text-align: center;">${m.cantidad}</td>
+            <td style="text-align: center;">${m.cantidad_total || m.cantidad || 0}</td>
             <td style="text-align: right; font-weight: 600; color: #059669;">
               ${this.formatCurrency(m.total)}
             </td>

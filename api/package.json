@@ -5,9 +5,7 @@
   "main": "reviews/index.js",
   "type": "module",
   "dependencies": {
-    "@azure/data-tables": "^13.3.0"
-  },
-  "devDependencies": {
+    "@azure/data-tables": "^13.3.0",
     "uuid": "^9.0.0"
   }
 }

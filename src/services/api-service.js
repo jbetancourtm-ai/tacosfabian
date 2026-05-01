@@ -29,7 +29,14 @@ class APIService {
       try {
         const response = await fetch(url, defaultOptions);
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          let errorDetail = response.statusText;
+          try {
+            const errorBody = await response.json();
+            errorDetail = errorBody?.error || errorBody?.message || errorDetail;
+          } catch (_) {
+            // Si el backend no responde JSON, usamos el statusText.
+          }
+          throw new Error(`HTTP ${response.status}: ${errorDetail}`);
         }
         return await response.json();
       } catch (error) {

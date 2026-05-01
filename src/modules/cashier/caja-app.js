@@ -615,9 +615,15 @@ async function handleFormSubmit(e) {
   const selectedItems = getTicketItems();
   const totalUnits = selectedItems.reduce((sum, item) => sum + item.cantidad, 0);
   const total = selectedItems.reduce((sum, item) => sum + item.subtotal, 0);
+  const roundedTotal = parseFloat(total.toFixed(2));
 
-  if (totalUnits === 0) {
+  if (totalUnits === 0 || selectedItems.length === 0) {
     showNotification('Selecciona al menos un producto antes de registrar la venta.', 'error');
+    return;
+  }
+
+  if (roundedTotal <= 0) {
+    showNotification('El total debe ser mayor a $0.00 para registrar la venta.', 'error');
     return;
   }
 
@@ -658,6 +664,7 @@ async function handleFormSubmit(e) {
   const averagePrice = totalUnits > 0 ? total / totalUnits : 0;
   const folio = getNextFolioForToday();
   const cambio = paymentMethod === 'efectivo' ? parseFloat((receivedAmount - total).toFixed(2)) : 0;
+  const primaryItem = selectedItems[0];
 
   const movement = {
     id: Date.now().toString(),
@@ -665,6 +672,7 @@ async function handleFormSubmit(e) {
     fecha_hora: new Date().toISOString(),
     turno: state.currentShift,
     mesa_origen: mesaOrigenSelect.value,
+    producto_concepto: productSummary,
     resumen_productos: productSummary,
     productos: selectedItems.map((item) => ({
       id: item.id,
@@ -674,27 +682,23 @@ async function handleFormSubmit(e) {
       subtotal: item.subtotal,
     })),
     cantidad_total: totalUnits,
+    cantidad: totalUnits,
     precio_unitario: parseFloat(averagePrice.toFixed(2)),
-    total: parseFloat(total.toFixed(2)),
+    total: roundedTotal,
     metodo_pago: paymentMethod,
-    recibido_con: paymentMethod === 'efectivo' ? parseFloat(receivedAmount.toFixed(2)) : 0,
+    recibido_con: paymentMethod === 'efectivo' ? parseFloat(receivedAmount.toFixed(2)) : null,
     cambio: cambio,
     observaciones: observationsInput.value.trim(),
-    usuario_cajera: 'Cajera',
-    estado: 'activo',
+    usuario_cajera: 'caja',
+    estado: 'registrado',
+    producto_principal: primaryItem?.nombre || productSummary,
   };
 
   try {
-    const submitBtn = cajaForm.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Guardando...';
+    setSavingState(true);
 
-    try {
-      const api = getAPIService();
-      await api.createMovement(movement);
-    } catch (error) {
-      console.warn('Backend no disponible, guardando localmente:', error);
-    }
+    const api = getAPIService();
+    await api.createMovement(movement);
 
     saveMovementLocally(movement);
     showNotification('✓ Venta registrada correctamente', 'success');
@@ -719,13 +723,30 @@ async function handleFormSubmit(e) {
     renderProductCatalog();
     updateTicketSummary();
     refreshMovements();
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Registrar venta';
   } catch (error) {
     console.error('Error al guardar movimiento:', error);
-    showNotification('Error al guardar. Intenta de nuevo.', 'error');
+    showNotification(getSaveErrorMessage(error), 'error');
+  } finally {
+    setSavingState(false);
+    updateRegisterButtonState();
   }
+}
+
+function setSavingState(isSaving) {
+  const submitBtn = cajaForm.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = isSaving;
+    submitBtn.textContent = isSaving ? 'Guardando...' : 'Registrar venta';
+  }
+  if (mobileRegisterButton) {
+    mobileRegisterButton.disabled = isSaving;
+    mobileRegisterButton.textContent = isSaving ? 'Guardando...' : 'Registrar venta';
+  }
+}
+
+function getSaveErrorMessage(error) {
+  const message = error?.message || 'Error desconocido';
+  return `No se pudo guardar la venta. ${message}`;
 }
 
 // ============================================================================
@@ -766,7 +787,7 @@ function getMovementsByShift(shift, date = null) {
 
   return allMovements.filter((m) => {
     const mDate = new Date(m.fecha_hora).toISOString().split('T')[0];
-    return m.turno === shift && mDate === targetDate && m.estado === 'activo';
+    return m.turno === shift && mDate === targetDate && m.estado !== 'cancelado';
   });
 }
 
@@ -776,7 +797,7 @@ function getDailyMovements(date = null) {
 
   return allMovements.filter((m) => {
     const mDate = new Date(m.fecha_hora).toISOString().split('T')[0];
-    return mDate === targetDate && m.estado === 'activo';
+    return mDate === targetDate && m.estado !== 'cancelado';
   });
 }
 
@@ -813,10 +834,13 @@ function updateRecentItems(movements) {
   movements.forEach((movement) => {
     const item = document.createElement('div');
     item.className = 'recent-item';
+    const productSummary = movement.resumen_productos || movement.producto_concepto || 'Venta registrada';
+    const quantity = Number(movement.cantidad_total || movement.cantidad || 0);
+    const unitPrice = Number(movement.precio_unitario || 0);
     item.innerHTML = `
       <div class="recent-product">
-        <strong>${movement.producto_concepto.substring(0, 20)}</strong>
-        <div style="font-size: 0.8rem; color: #9ca3af;">x${movement.cantidad} @ $${movement.precio_unitario.toFixed(2)}</div>
+        <strong>${productSummary.substring(0, 32)}</strong>
+        <div style="font-size: 0.8rem; color: #9ca3af;">x${quantity} @ ${formatMxCurrency(unitPrice)}</div>
       </div>
       <div class="recent-price">${formatMxCurrency(movement.total)}</div>
     `;
