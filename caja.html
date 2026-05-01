@@ -53,7 +53,10 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        min-height: 100vh;
+        min-height: 100dvh;
         height: 100vh;
+        height: 100dvh;
         margin: 0;
         padding: 0;
       }
@@ -74,20 +77,20 @@
         min-width: 0;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.65rem;
       }
 
       .caja-brand-logo,
       .access-logo {
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
         object-fit: contain;
         flex: 0 0 auto;
       }
 
       .caja-brand-mark {
-        width: 42px;
-        height: 42px;
+        width: 38px;
+        height: 38px;
         border-radius: 12px;
         display: inline-flex;
         align-items: center;
@@ -99,8 +102,8 @@
       }
 
       .caja-brand-mark svg {
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
       }
 
       .caja-title-block {
@@ -128,11 +131,10 @@
 
       .caja-eyebrow {
         color: var(--caja-text-secondary);
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 700;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.04em;
         line-height: 1;
-        text-transform: uppercase;
       }
 
       .caja-time {
@@ -993,7 +995,7 @@
         border: 1px solid var(--caja-border);
         border-radius: 20px;
         padding: 2rem;
-        max-width: 420px;
+        max-width: 300px;
         width: calc(100vw - 2rem);
         box-sizing: border-box;
         box-shadow: var(--caja-shadow);
@@ -1003,28 +1005,27 @@
       .access-brand {
         display: grid;
         justify-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.25rem;
+        gap: 0.65rem;
+        margin-bottom: 1.1rem;
       }
 
       .access-logo {
-        width: 58px;
-        height: 58px;
+        width: 48px;
+        height: 48px;
       }
 
       .access-kicker {
         margin: 0;
-        color: var(--caja-primary);
+        color: var(--caja-text-secondary);
         font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.02em;
       }
 
       .access-modal h2 {
         margin: 0;
         color: var(--caja-text);
-        font-size: 1.55rem;
+        font-size: 1.5rem;
         letter-spacing: 0;
       }
 
@@ -1036,9 +1037,7 @@
       }
 
       .access-subtitle {
-        font-weight: 700;
-        color: var(--caja-text);
-        margin-bottom: 0.4rem;
+        display: none;
       }
 
       .access-form {
@@ -1048,6 +1047,8 @@
       }
 
       .access-form input {
+        width: 100%;
+        box-sizing: border-box;
         padding: 0.95rem 1rem;
         border: 1px solid var(--caja-border);
         border-radius: 12px;
@@ -1067,6 +1068,8 @@
       }
 
       .access-form button {
+        width: 100%;
+        box-sizing: border-box;
         padding: 0.95rem 1rem;
         background: var(--caja-primary);
         color: white;
@@ -1333,7 +1336,8 @@
         .access-modal {
           border-radius: 18px;
           padding: 1.5rem;
-          width: calc(100vw - 1.5rem);
+          max-width: 330px;
+          width: calc(100vw - 2rem);
         }
 
         .access-logo {
@@ -1343,6 +1347,10 @@
 
         .access-modal h2 {
           font-size: 1.35rem;
+        }
+
+        .access-modal p {
+          font-size: 0.95rem;
         }
 
         .caja-brand-mark {
@@ -1357,6 +1365,114 @@
           font-size: 0.66rem;
         }
       }
+
+      @media (max-width: 1024px) and (orientation: landscape) {
+        body.caja-view {
+          height: auto;
+          min-height: 100dvh;
+          overflow: auto;
+        }
+
+        .caja-header {
+          padding: 0.55rem 0.85rem;
+        }
+
+        .caja-brand-logo {
+          width: 34px;
+          height: 34px;
+        }
+
+        .caja-brand-mark {
+          width: 34px;
+          height: 34px;
+        }
+
+        .caja-header h1 {
+          font-size: 1rem;
+        }
+
+        .caja-main {
+          flex-direction: row;
+          align-items: flex-start;
+          min-height: calc(100dvh - 3.75rem);
+          overflow: visible;
+        }
+
+        .caja-form {
+          min-width: 0;
+          padding-bottom: 1rem;
+        }
+
+        .catalog-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ticket-card {
+          display: block;
+          position: sticky;
+          top: 0.75rem;
+        }
+
+        .caja-summary {
+          flex: 0 0 min(34vw, 320px);
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 0;
+        }
+
+        .caja-mobile-checkout {
+          display: none !important;
+        }
+
+        .caja-recent {
+          max-height: 38vh;
+        }
+
+        .caja-access-gate {
+          align-items: flex-start;
+          overflow-y: auto;
+          padding: 0.5rem;
+        }
+
+        .access-modal {
+          max-width: 380px;
+          padding: 1rem;
+          border-radius: 16px;
+        }
+
+        .access-brand {
+          gap: 0.35rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .access-logo {
+          width: 38px;
+          height: 38px;
+        }
+
+        .access-kicker {
+          font-size: 0.7rem;
+        }
+
+        .access-modal h2 {
+          font-size: 1.25rem;
+        }
+
+        .access-modal p {
+          margin-bottom: 0.75rem;
+          font-size: 0.9rem;
+          line-height: 1.35;
+        }
+
+        .access-form {
+          gap: 0.6rem;
+        }
+
+        .access-form input,
+        .access-form button {
+          padding: 0.75rem 0.9rem;
+        }
+      }
     </style>
   </head>
   <body class="caja-view">
@@ -1365,11 +1481,11 @@
       <div class="access-modal">
         <div class="access-brand">
           <img class="access-logo" src="/logo-tacos-fabian.svg" alt="Tacos Fabian" />
-          <p class="access-kicker">Sistema interno de ventas</p>
+          <p class="access-kicker">Sistema de ventas</p>
           <h2 id="accessTitle">Acceso a Caja</h2>
         </div>
-        <p class="access-subtitle">Tacos Fabian · Sistema interno de ventas</p>
-        <p>Ingresa el PIN autorizado para comenzar a registrar ventas.</p>
+        <p class="access-subtitle">Sistema de ventas</p>
+        <p>Ingresa el PIN autorizado para continuar.</p>
         <form id="cajaAccessForm" class="access-form">
           <input
             id="cajaPinInput"
@@ -1399,8 +1515,8 @@
           </svg>
         </span>
         <div class="caja-title-block">
-          <span class="caja-eyebrow">POS interno</span>
-          <h1>Tacos Fabian · Caja de Ventas</h1>
+          <span class="caja-eyebrow">Sistema de ventas</span>
+          <h1>Caja de Ventas</h1>
         </div>
       </div>
       <h1>💰 Caja - Registro de Ventas</h1>
