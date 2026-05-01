@@ -531,6 +531,168 @@
         .caja-summary {
           flex-direction: column;
         }
+
+        /* Corrección: Agregar padding-bottom al catálogo para que el ticket fijo no tape los productos */
+        .caja-form {
+          padding-bottom: calc(23rem + env(safe-area-inset-bottom));
+          margin-bottom: 0;
+        }
+
+        /* El ticket lateral se oculta en móvil */
+        .ticket-card {
+          display: none;
+        }
+
+        /* Panel móvil del ticket como bottom sheet */
+        .caja-mobile-checkout {
+          display: flex;
+          position: fixed;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          max-height: min(65vh, 34rem);
+          flex-direction: column;
+          gap: 0.75rem;
+          padding: 0.85rem 0.85rem calc(0.85rem + env(safe-area-inset-bottom));
+          background: rgba(248, 247, 244, 0.98);
+          box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.12);
+          border-top: 1px solid #e7e2d9;
+          z-index: 30;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          border-radius: 24px 24px 0 0;
+        }
+
+        /* Toggle siempre visible */
+        .mobile-checkout-toggle {
+          display: flex;
+          width: 100%;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.9rem 1rem;
+          border: 1px solid #e7e2d9;
+          border-radius: 14px;
+          background: #ffffff;
+          color: #171717;
+          font-weight: 700;
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        /* Resumen siempre visible */
+        .mobile-checkout-summary {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          padding: 0.85rem 1rem;
+          border-radius: 14px;
+          background: #ffffff;
+          border: 1px solid #e7e2d9;
+          flex-shrink: 0;
+        }
+
+        .mobile-checkout-summary > div {
+          display: flex;
+          justify-content: space-between;
+          gap: 0.75rem;
+          align-items: baseline;
+        }
+
+        .mobile-checkout-summary span {
+          font-size: 0.78rem;
+          color: #4b5563;
+        }
+
+        .mobile-checkout-summary strong {
+          font-size: 1.2rem;
+          color: #171717;
+        }
+
+        /* Campo Recibí con SIEMPRE visible cuando es efectivo */
+        .mobile-detail-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+        }
+
+        .mobile-detail-field label {
+          font-size: 0.82rem;
+          color: #4b5563;
+          font-weight: 600;
+        }
+
+        .mobile-detail-field input {
+          width: 100%;
+          border-radius: 14px;
+          border: 1px solid #e7e2d9;
+          padding: 1rem;
+          font-size: 1rem;
+          font-weight: 700;
+          color: #171717;
+          background: #f8f7f4;
+        }
+
+        .mobile-detail-field input.is-invalid {
+          border-color: #ef4444;
+          background: #fff7f7;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+        }
+
+        /* Detalles expandibles */
+        .mobile-checkout-details {
+          display: grid;
+          gap: 0.75rem;
+          padding: 0.95rem 1rem 0.85rem;
+          border-radius: 16px;
+          background: #ffffff;
+          border: 1px solid #e7e2d9;
+          flex-shrink: 0;
+        }
+
+        .mobile-detail-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+          font-size: 0.95rem;
+        }
+
+        .mobile-detail-row strong {
+          color: #171717;
+        }
+
+        /* Botón registrar siempre visible y al final */
+        #cajaMobileRegister {
+          width: 100%;
+          padding: 1rem;
+          border-radius: 14px;
+          font-size: 1rem;
+          letter-spacing: 0.02em;
+          flex-shrink: 0;
+          position: sticky;
+          bottom: 0;
+          background: #ff6a00;
+          color: white;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;
+        }
+
+        #cajaMobileRegister:disabled {
+          background: #9ca3af;
+          cursor: not-allowed;
+        }
+
+        #cajaMobileClearTicket {
+          width: 100%;
+          padding: 0.95rem;
+          border-radius: 14px;
+          flex-shrink: 0;
+        }
+
+        #cajaMobileReceivedAmount {
+          font-size: 1.05rem;
+        }
       }
 
 
@@ -964,13 +1126,17 @@
           left: 0;
           right: 0;
           bottom: 0;
+          max-height: min(65vh, 34rem);
           flex-direction: column;
           gap: 0.5rem;
           padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
           background: rgba(255, 255, 255, 0.98);
           box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
           border-top: 1px solid #E7E2D9;
-          z-index: 999;
+          z-index: 30;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          border-radius: 24px 24px 0 0;
         }
 
         .mobile-checkout-toggle,
@@ -986,6 +1152,9 @@
           border-radius: 12px;
           font-size: 1rem;
           letter-spacing: 0.02em;
+          position: sticky;
+          bottom: 0;
+          flex-shrink: 0;
         }
 
         #cajaMobileClearTicket {
@@ -1000,6 +1169,7 @@
 
         .caja-form {
           margin-bottom: 0;
+          padding-bottom: calc(24rem + env(safe-area-inset-bottom));
         }
 
         .summary-card {
@@ -1171,7 +1341,7 @@
               <span id="cajaMobileCount">0 productos</span>
               <span id="cajaMobilePayment">Método: no seleccionado</span>
             </div>
-            <div id="cajaMobileReceivedGroup" class="mobile-detail-field" hidden>
+            <div id="cajaMobileReceivedGroup" class="mobile-detail-field">
               <label for="cajaReceivedAmount">Recibí con</label>
               <input id="cajaReceivedAmount" type="number" min="0" step="0.50" inputmode="decimal" placeholder="Recibí con $..." />
             </div>

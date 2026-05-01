@@ -403,6 +403,8 @@ function updateTicketSummary() {
   }
 
   const hasProducts = items.length > 0;
+  
+  // Desktop: mostrar/ocultar según método
   if (receivedGroup && changeGroup && changeDisplay) {
     if (isCash && hasProducts) {
       receivedGroup.hidden = false;
@@ -419,19 +421,67 @@ function updateTicketSummary() {
     }
   }
 
+  // MÓVIL: El campo "Recibí con" SIEMPRE debe ser visible cuando hay productos y es efectivo
+  // No usar hidden para que siempre sea visible en el panel inferior
   if (mobileReceivedGroup && mobileChangeGroup && mobileChangeDisplay) {
     if (isCash && hasProducts) {
+      // En móvil siempre visible (no hidden)
       mobileReceivedGroup.hidden = false;
       mobileChangeGroup.hidden = false;
+      mobileReceivedGroup.style.display = 'flex';
+      mobileChangeGroup.style.display = 'flex';
       mobileChangeDisplay.textContent = receivedValue >= total
         ? formatMxCurrency(changeValue)
         : 'Falta dinero';
       mobileChangeDisplay.style.color = receivedValue >= total ? '#059669' : '#b91c1c';
+      receivedInput?.classList.toggle('is-invalid', receivedValue > 0 && receivedValue < total);
     } else {
+      // En móvil ocultar solo si no hay efectivo
       mobileReceivedGroup.hidden = true;
       mobileChangeGroup.hidden = true;
+      mobileReceivedGroup.style.display = 'none';
+      mobileChangeGroup.style.display = 'none';
       mobileChangeDisplay.textContent = '$0.00';
       mobileChangeDisplay.style.color = '#171717';
+      receivedInput?.classList.remove('is-invalid');
+    }
+  }
+  
+  // Actualizar estado del botón de registrar en móvil
+  updateRegisterButtonState();
+}
+
+// Actualizar estado del botón de registrar en móvil
+function updateRegisterButtonState() {
+  const items = getTicketItems();
+  const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+  const isCash = paymentMethodSelect.value === 'efectivo';
+  const receivedValue = parseFloat(receivedInput?.value || '0') || 0;
+  const hasProducts = items.length > 0;
+  
+  // Actualizar botón móvil
+  if (mobileRegisterButton) {
+    if (!hasProducts) {
+      mobileRegisterButton.disabled = true;
+      mobileRegisterButton.title = 'Agrega productos al ticket';
+    } else if (isCash && receivedValue < total) {
+      mobileRegisterButton.disabled = true;
+      mobileRegisterButton.title = 'Monto insuficiente';
+    } else {
+      mobileRegisterButton.disabled = false;
+      mobileRegisterButton.title = 'Registrar venta';
+    }
+  }
+  
+  // Actualizar botón desktop si existe
+  const desktopRegisterButton = document.querySelector('#cajaForm button[type="submit"]');
+  if (desktopRegisterButton) {
+    if (!hasProducts) {
+      desktopRegisterButton.disabled = true;
+    } else if (isCash && receivedValue < total) {
+      desktopRegisterButton.disabled = true;
+    } else {
+      desktopRegisterButton.disabled = false;
     }
   }
 }
