@@ -877,12 +877,16 @@
           gap: 0.75rem;
           min-height: 100%;
           overflow-y: auto;
+          overflow-x: hidden;
         }
 
         .caja-form {
           flex: none;
           padding: 0.9rem;
           order: 1;
+          width: 100%;
+          box-sizing: border-box;
+          overflow: visible;
         }
 
         .caja-summary {
@@ -890,7 +894,9 @@
           flex-direction: column;
           order: 2;
           padding-bottom: 0;
-          margin-bottom: calc(19rem + env(safe-area-inset-bottom));
+          margin-bottom: calc(22rem + env(safe-area-inset-bottom));
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .caja-toolbar,
@@ -909,18 +915,47 @@
           font-size: 0.95rem;
         }
 
+        .catalog-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+          width: 100%;
+          overflow: visible;
+        }
+
         .product-card {
-          min-height: 220px;
+          min-height: 200px;
+          padding: 0.75rem;
+        }
+
+        .product-name {
+          font-size: 0.9rem;
+        }
+
+        .product-price {
+          font-size: 0.9rem;
+        }
+
+        .product-controls {
+          margin-top: 0.5rem;
+        }
+
+        .product-subtotal {
+          margin-top: 0.5rem;
+          font-size: 0.8rem;
         }
 
         .ticket-card {
           position: relative;
           top: auto;
-          display: none;
+          display: block;
+          margin-bottom: 0.75rem;
         }
 
         .ticket-items {
-          max-height: 220px;
+          max-height: 180px;
+          overflow-y: auto;
         }
 
         .caja-mobile-checkout {
@@ -930,11 +965,11 @@
           right: 0;
           bottom: 0;
           flex-direction: column;
-          gap: 0.75rem;
-          padding: 0.85rem 0.85rem calc(0.85rem + env(safe-area-inset-bottom));
-          background: rgba(248, 247, 244, 0.98);
-          box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.12);
-          border-top: 1px solid #e7e2d9;
+          gap: 0.5rem;
+          padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+          background: rgba(255, 255, 255, 0.98);
+          box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+          border-top: 1px solid #E7E2D9;
           z-index: 999;
         }
 
@@ -942,29 +977,43 @@
         .mobile-checkout-summary,
         .mobile-checkout-details,
         #cajaMobileRegister {
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         #cajaMobileRegister {
           width: 100%;
-          padding: 1rem;
-          border-radius: 14px;
+          padding: 0.9rem;
+          border-radius: 12px;
           font-size: 1rem;
           letter-spacing: 0.02em;
         }
 
         #cajaMobileClearTicket {
           width: 100%;
-          padding: 0.95rem;
-          border-radius: 14px;
+          padding: 0.85rem;
+          border-radius: 12px;
         }
 
         #cajaMobileReceivedAmount {
-          font-size: 1.05rem;
+          font-size: 1rem;
         }
 
         .caja-form {
           margin-bottom: 0;
+        }
+
+        .summary-card {
+          padding: 1rem;
+        }
+
+        .summary-value {
+          font-size: 1.8rem;
+        }
+
+        .caja-recent {
+          min-height: 200px;
+          max-height: 250px;
+          overflow-y: auto;
         }
       }
     </style>
