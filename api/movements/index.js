@@ -287,6 +287,7 @@ function success(context, data) {
     headers: { 'Content-Type': 'application/json' },
     body: data,
   };
+  return context.res;
 }
 
 function badRequest(context, message) {
@@ -295,6 +296,7 @@ function badRequest(context, message) {
     headers: { 'Content-Type': 'application/json' },
     body: { error: message },
   };
+  return context.res;
 }
 
 function notFound(context) {
@@ -303,6 +305,7 @@ function notFound(context) {
     headers: { 'Content-Type': 'application/json' },
     body: { error: 'Endpoint no encontrado' },
   };
+  return context.res;
 }
 
 function serverError(context, message) {
@@ -311,4 +314,5 @@ function serverError(context, message) {
     headers: { 'Content-Type': 'application/json' },
     body: { error: message },
   };
+  return context.res;
 }
