@@ -6,7 +6,7 @@
     <title>Caja | Tacos Fabian - Sistema de Ventas</title>
     <meta name="description" content="Sistema de punto de venta para Tacos Fabian" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#ff6a00" />
+    <meta name="theme-color" content="#9E2A2B" />
     <link rel="icon" type="image/svg+xml" href="/logo-tacos-fabian.svg" />
     <link rel="shortcut icon" href="/logo-tacos-fabian.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,13 +20,15 @@
       :root {
         --caja-primary: #9E2A2B;
         --caja-primary-hover: #7F1D1D;
-        --caja-success: #10b981;
+        --caja-success: #0F9B81;
         --caja-danger: #ef4444;
         --caja-neutral: #F8F7F4;
         --caja-text: #171717;
         --caja-text-secondary: #4B5563;
         --caja-border: #E7E2D9;
         --caja-card: #FFFFFF;
+        --caja-shadow: 0 18px 42px rgba(23, 23, 23, 0.08);
+        --caja-soft-shadow: 0 8px 24px rgba(23, 23, 23, 0.06);
       }
 
       * {
@@ -44,7 +46,9 @@
       }
 
       body.caja-view {
-        background: var(--caja-neutral);
+        background:
+          radial-gradient(circle at top left, rgba(158, 42, 43, 0.06), transparent 30rem),
+          var(--caja-neutral);
         font-family: "Poppins", sans-serif;
         overflow: hidden;
         display: flex;
@@ -55,27 +59,88 @@
       }
 
       .caja-header {
-        background: white;
+        background: rgba(255, 255, 255, 0.96);
         border-bottom: 1px solid var(--caja-border);
-        padding: 1rem;
+        padding: 0.85rem 1rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        gap: 1rem;
+        box-shadow: var(--caja-soft-shadow);
         flex-shrink: 0;
+      }
+
+      .caja-brand {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .caja-brand-logo,
+      .access-logo {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        flex: 0 0 auto;
+      }
+
+      .caja-brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #9E2A2B, #7F1D1D);
+        color: #fff;
+        box-shadow: 0 10px 24px rgba(158, 42, 43, 0.22);
+        flex: 0 0 auto;
+      }
+
+      .caja-brand-mark svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .caja-title-block {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+
+      .caja-header > h1 {
+        display: none;
       }
 
       .caja-header h1 {
         margin: 0;
-        font-size: 1.25rem;
-        color: var(--caja-primary);
+        font-size: clamp(1rem, 1.7vw, 1.25rem);
+        color: var(--caja-text);
+        font-weight: 800;
+        letter-spacing: 0;
+        line-height: 1.15;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .caja-eyebrow {
+        color: var(--caja-text-secondary);
+        font-size: 0.72rem;
         font-weight: 700;
-        letter-spacing: -0.5px;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-transform: uppercase;
       }
 
       .caja-time {
+        min-width: max-content;
+        text-align: right;
         font-size: 0.9rem;
-        color: #6b7280;
+        color: var(--caja-text-secondary);
+        font-weight: 600;
       }
 
       .caja-main {
@@ -94,10 +159,11 @@
 
       .caja-form {
         flex: 1;
-        background: white;
-        border-radius: 8px;
+        background: var(--caja-card);
+        border: 1px solid var(--caja-border);
+        border-radius: 14px;
         padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--caja-soft-shadow);
         min-width: 320px;
       }
 
@@ -112,7 +178,7 @@
 
       .section-description {
         margin: 0 0 1.5rem;
-        color: #6b7280;
+        color: var(--caja-text-secondary);
         font-size: 0.95rem;
         line-height: 1.5;
       }
@@ -133,7 +199,7 @@
       .toolbar-group label {
         font-size: 0.9rem;
         font-weight: 600;
-        color: #374151;
+        color: var(--caja-text);
       }
 
       .caja-filters {
@@ -167,7 +233,7 @@
 
       .filter-pill {
         border: 1px solid var(--caja-border);
-        background: white;
+        background: var(--caja-card);
         color: var(--caja-text);
         padding: 0.6rem 0.85rem;
         border-radius: 999px;
@@ -203,14 +269,14 @@
         align-items: center;
         margin-bottom: 0.85rem;
         padding: 0.85rem 1rem;
-        background: #f8fafc;
+        background: var(--caja-neutral);
         border-radius: 12px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--caja-border);
       }
 
       .ticket-method span {
         font-size: 0.9rem;
-        color: #6b7280;
+        color: var(--caja-text-secondary);
       }
 
       .ticket-method strong {
@@ -221,7 +287,7 @@
       .product-card {
         background: var(--caja-card);
         border: 1px solid var(--caja-border);
-        border-radius: 16px;
+        border-radius: 14px;
         padding: 1rem;
         display: flex;
         flex-direction: column;
@@ -238,8 +304,8 @@
 
       .product-tag {
         display: inline-flex;
-        background: #fef3c7;
-        color: #92400e;
+        background: rgba(158, 42, 43, 0.09);
+        color: var(--caja-primary);
         padding: 0.25rem 0.5rem;
         border-radius: 999px;
         font-size: 0.75rem;
@@ -269,7 +335,7 @@
 
       .custom-fields label {
         font-size: 0.82rem;
-        color: #4b5563;
+        color: var(--caja-text-secondary);
         font-weight: 600;
       }
 
@@ -302,7 +368,7 @@
       }
 
       .qty-btn:hover:not(:disabled) {
-        background: #e5e7eb;
+        background: #efeae1;
       }
 
       .qty-btn:disabled {
@@ -320,7 +386,7 @@
       .product-subtotal {
         margin-top: 0.75rem;
         font-size: 0.9rem;
-        color: #374151;
+        color: var(--caja-text-secondary);
         font-weight: 600;
       }
 
@@ -340,7 +406,7 @@
 
       .ticket-meta span {
         font-size: 0.9rem;
-        color: #6b7280;
+        color: var(--caja-text-secondary);
       }
 
       .ticket-hint {
@@ -362,7 +428,7 @@
         gap: 0.5rem;
         align-items: center;
         padding: 0.85rem 1rem;
-        background: #f9fafb;
+        background: var(--caja-neutral);
         border-radius: 12px;
       }
 
@@ -379,7 +445,7 @@
 
       .ticket-item-name span {
         font-size: 0.85rem;
-        color: #6b7280;
+        color: var(--caja-text-secondary);
       }
 
       .ticket-total-row {
@@ -671,7 +737,7 @@
           flex-shrink: 0;
           position: sticky;
           bottom: 0;
-          background: #ff6a00;
+          background: var(--caja-primary);
           color: white;
           font-weight: 700;
           border: none;
@@ -721,7 +787,7 @@
       .form-group textarea:focus {
         outline: none;
         border-color: var(--caja-primary);
-        box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+        box-shadow: 0 0 0 3px rgba(158, 42, 43, 0.12);
       }
 
       .form-row {
@@ -739,9 +805,9 @@
 
       .summary-card {
         background: var(--caja-card);
-        border-radius: 8px;
+        border-radius: 14px;
         padding: 1.25rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--caja-soft-shadow);
         border: 1px solid var(--caja-border);
       }
 
@@ -778,7 +844,7 @@
         flex: 1;
         padding: 0.875rem 1rem;
         border: none;
-        border-radius: 6px;
+        border-radius: 10px;
         font-family: inherit;
         font-weight: 600;
         font-size: 0.95rem;
@@ -806,7 +872,7 @@
       }
 
       .btn-secondary:hover:not(:disabled) {
-        background: #e5e7eb;
+        background: #efeae1;
       }
 
       .btn:disabled {
@@ -856,9 +922,10 @@
       }
 
       .recent-list {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        background: var(--caja-card);
+        border: 1px solid var(--caja-border);
+        border-radius: 14px;
+        box-shadow: var(--caja-soft-shadow);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -911,31 +978,67 @@
       .caja-access-gate {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background:
+          radial-gradient(circle at 50% 15%, rgba(158, 42, 43, 0.22), transparent 28rem),
+          rgba(23, 23, 23, 0.46);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 10000;
+        padding: 1rem;
       }
 
       .access-modal {
-        background: white;
-        border-radius: 12px;
+        background: var(--caja-card);
+        border: 1px solid var(--caja-border);
+        border-radius: 20px;
         padding: 2rem;
-        max-width: 400px;
-        width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 420px;
+        width: calc(100vw - 2rem);
+        box-sizing: border-box;
+        box-shadow: var(--caja-shadow);
+        text-align: center;
+      }
+
+      .access-brand {
+        display: grid;
+        justify-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .access-logo {
+        width: 58px;
+        height: 58px;
+      }
+
+      .access-kicker {
+        margin: 0;
+        color: var(--caja-primary);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
       .access-modal h2 {
-        margin-top: 0;
-        margin-bottom: 1rem;
+        margin: 0;
         color: var(--caja-text);
+        font-size: 1.55rem;
+        letter-spacing: 0;
       }
 
       .access-modal p {
-        color: #6b7280;
-        margin-bottom: 1.5rem;
+        color: var(--caja-text-secondary);
+        margin: 0 0 1.5rem;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+      }
+
+      .access-subtitle {
+        font-weight: 700;
+        color: var(--caja-text);
+        margin-bottom: 0.4rem;
       }
 
       .access-form {
@@ -945,28 +1048,37 @@
       }
 
       .access-form input {
-        padding: 0.875rem;
+        padding: 0.95rem 1rem;
         border: 1px solid var(--caja-border);
-        border-radius: 6px;
+        border-radius: 12px;
         font-size: 1rem;
         font-family: inherit;
         text-align: center;
         letter-spacing: 0.25em;
+        color: var(--caja-text);
+        background: var(--caja-neutral);
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      .access-form input:focus {
+        outline: none;
+        border-color: var(--caja-primary);
+        box-shadow: 0 0 0 3px rgba(158, 42, 43, 0.12);
       }
 
       .access-form button {
-        padding: 0.875rem;
+        padding: 0.95rem 1rem;
         background: var(--caja-primary);
         color: white;
         border: none;
-        border-radius: 6px;
-        font-weight: 600;
+        border-radius: 12px;
+        font-weight: 800;
         cursor: pointer;
         transition: background 0.2s;
       }
 
       .access-form button:hover {
-        background: #e85a00;
+        background: var(--caja-primary-hover);
       }
 
       @media (max-width: 1024px) {
@@ -995,6 +1107,27 @@
 
         .caja-header h1 {
           font-size: 1.1rem;
+        }
+
+        .caja-brand {
+          flex: 1 1 auto;
+          min-width: 0;
+          gap: 0.6rem;
+        }
+
+        .caja-brand-logo,
+        .caja-brand-mark {
+          width: 36px;
+          height: 36px;
+        }
+
+        .caja-brand-mark {
+          border-radius: 10px;
+        }
+
+        .caja-brand-mark svg {
+          width: 19px;
+          height: 19px;
         }
 
         .caja-main {
@@ -1027,6 +1160,11 @@
 
         .caja-header h1 {
           font-size: 1.05rem;
+        }
+
+        .caja-time {
+          flex: 0 0 auto;
+          font-size: 0.82rem;
         }
 
         .section-description {
@@ -1186,14 +1324,52 @@
           overflow-y: auto;
         }
       }
+
+      @media (max-width: 480px) {
+        .caja-access-gate {
+          padding: 0.75rem;
+        }
+
+        .access-modal {
+          border-radius: 18px;
+          padding: 1.5rem;
+          width: calc(100vw - 1.5rem);
+        }
+
+        .access-logo {
+          width: 52px;
+          height: 52px;
+        }
+
+        .access-modal h2 {
+          font-size: 1.35rem;
+        }
+
+        .caja-brand-mark {
+          display: none;
+        }
+
+        .caja-header h1 {
+          font-size: 0.98rem;
+        }
+
+        .caja-eyebrow {
+          font-size: 0.66rem;
+        }
+      }
     </style>
   </head>
   <body class="caja-view">
     <!-- Access Gate -->
     <section id="cajaAccessGate" class="caja-access-gate" hidden aria-labelledby="accessTitle">
       <div class="access-modal">
-        <h2 id="accessTitle">Acceso a Caja</h2>
-        <p>Ingresa el PIN para comenzar a registrar ventas.</p>
+        <div class="access-brand">
+          <img class="access-logo" src="/logo-tacos-fabian.svg" alt="Tacos Fabian" />
+          <p class="access-kicker">Sistema interno de ventas</p>
+          <h2 id="accessTitle">Acceso a Caja</h2>
+        </div>
+        <p class="access-subtitle">Tacos Fabian · Sistema interno de ventas</p>
+        <p>Ingresa el PIN autorizado para comenzar a registrar ventas.</p>
         <form id="cajaAccessForm" class="access-form">
           <input
             id="cajaPinInput"
@@ -1213,6 +1389,20 @@
 
     <!-- Header -->
     <header class="caja-header">
+      <div class="caja-brand">
+        <img class="caja-brand-logo" src="/logo-tacos-fabian.svg" alt="Tacos Fabian" />
+        <span class="caja-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" focusable="false">
+            <path d="M7 10h10a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Z" stroke="currentColor" stroke-width="1.8" />
+            <path d="M8 10V8.5A3.5 3.5 0 0 1 11.5 5h1A3.5 3.5 0 0 1 16 8.5V10" stroke="currentColor" stroke-width="1.8" />
+            <path d="M12 13v4M10.5 14h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </span>
+        <div class="caja-title-block">
+          <span class="caja-eyebrow">POS interno</span>
+          <h1>Tacos Fabian · Caja de Ventas</h1>
+        </div>
+      </div>
       <h1>💰 Caja - Registro de Ventas</h1>
       <div class="caja-time">
         <div id="cajaCurrentTime">--:--</div>
