@@ -13,6 +13,7 @@ const state = {
   dailyTotal: 0,
   shiftTotal: 0,
   ticketItems: {},
+  lastSale: null,
 };
 
 const products = [
@@ -109,6 +110,11 @@ const mobileChangeGroup = document.getElementById('cajaMobileChangeGroup');
 const mobileChangeDisplay = document.getElementById('cajaMobileChange');
 const mobileClearTicketButton = document.getElementById('cajaMobileClearTicket');
 const mobileRegisterButton = document.getElementById('cajaMobileRegister');
+const printActions = document.getElementById('cajaPrintActions');
+const printCustomerButton = document.getElementById('cajaPrintCustomer');
+const printBusinessButton = document.getElementById('cajaPrintBusiness');
+const printBothButton = document.getElementById('cajaPrintBoth');
+const printTicketContainer = document.getElementById('cajaPrintTicket');
 
 const todayTotalDisplay = document.getElementById('cajaTodayTotal');
 const todayCountDisplay = document.getElementById('cajaTodayCount');
@@ -248,6 +254,18 @@ function setupEventListeners() {
         cajaForm.requestSubmit();
       }
     });
+  }
+
+  if (printCustomerButton) {
+    printCustomerButton.addEventListener('click', () => printLastSale('cliente'));
+  }
+
+  if (printBusinessButton) {
+    printBusinessButton.addEventListener('click', () => printLastSale('negocio'));
+  }
+
+  if (printBothButton) {
+    printBothButton.addEventListener('click', () => printLastSale('ambas'));
   }
 
   cajaForm.addEventListener('submit', handleFormSubmit);
@@ -701,6 +719,8 @@ async function handleFormSubmit(e) {
     await api.createMovement(movement);
 
     saveMovementLocally(movement);
+    state.lastSale = movement;
+    renderPrintActions();
     showNotification('✓ Venta registrada correctamente', 'success');
 
     // LIMPIEZA COMPLETA DESPUÉS DE REGISTRAR
@@ -747,6 +767,102 @@ function setSavingState(isSaving) {
 function getSaveErrorMessage(error) {
   const message = error?.message || 'Error desconocido';
   return `No se pudo guardar la venta. ${message}`;
+}
+
+// ============================================================================
+// Impresion de ticket
+// ============================================================================
+function renderPrintActions() {
+  if (!printActions) return;
+
+  if (state.lastSale) {
+    printActions.removeAttribute('hidden');
+  } else {
+    printActions.setAttribute('hidden', '');
+  }
+}
+
+function printLastSale(mode = 'cliente') {
+  if (!state.lastSale || !printTicketContainer) {
+    showNotification('No hay una venta reciente para imprimir.', 'error');
+    return;
+  }
+
+  printTicketContainer.innerHTML = buildPrintableTicket(state.lastSale, mode);
+
+  window.setTimeout(() => {
+    window.print();
+  }, 50);
+}
+
+function buildPrintableTicket(sale, mode) {
+  const copies = mode === 'ambas'
+    ? ['cliente', 'negocio']
+    : [mode];
+
+  return copies
+    .map((copyType) => buildTicketCopy(sale, copyType))
+    .join('');
+}
+
+function buildTicketCopy(sale, copyType) {
+  const saleDate = new Date(sale.fecha_hora || Date.now());
+  const dateLabel = new Intl.DateTimeFormat('es-MX', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(saleDate);
+  const timeLabel = new Intl.DateTimeFormat('es-MX', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(saleDate);
+  const products = Array.isArray(sale.productos) ? sale.productos : [];
+  const receivedLabel = sale.recibido_con == null ? '-' : formatMxCurrency(sale.recibido_con);
+  const changeLabel = sale.cambio == null ? '-' : formatMxCurrency(sale.cambio);
+  const copyLabel = copyType === 'negocio' ? '<div class="print-ticket__copy">COPIA NEGOCIO</div>' : '';
+
+  const itemRows = products.map((item) => `
+    <tr>
+      <td>${escapeHtml(item.nombre || 'Producto')}</td>
+      <td>${Number(item.cantidad || 0)}</td>
+      <td>${formatMxCurrency(item.precio_unitario)}</td>
+      <td>${formatMxCurrency(item.subtotal)}</td>
+    </tr>
+  `).join('');
+
+  return `
+    <article class="print-ticket__copy-block">
+      <div class="print-ticket__center">
+        <div class="print-ticket__brand">Tacos Fabian</div>
+        ${copyLabel}
+        <div>Gracias por su compra</div>
+      </div>
+      <div class="print-ticket__rule"></div>
+      <div class="print-ticket__row"><span>Folio</span><strong>${escapeHtml(sale.folio || '-')}</strong></div>
+      <div class="print-ticket__row"><span>Fecha</span><span>${dateLabel}</span></div>
+      <div class="print-ticket__row"><span>Hora</span><span>${timeLabel}</span></div>
+      <div class="print-ticket__row"><span>Mesa</span><span>${escapeHtml(sale.mesa_origen || '-')}</span></div>
+      <div class="print-ticket__rule"></div>
+      <table class="print-ticket__items">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cant</th>
+            <th>P.U.</th>
+            <th>Subt.</th>
+          </tr>
+        </thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+      <div class="print-ticket__rule"></div>
+      <div class="print-ticket__row print-ticket__total"><span>Total</span><span>${formatMxCurrency(sale.total)}</span></div>
+      <div class="print-ticket__row"><span>Pago</span><span>${escapeHtml(formatPaymentMethod(sale.metodo_pago))}</span></div>
+      <div class="print-ticket__row"><span>Recibido</span><span>${receivedLabel}</span></div>
+      <div class="print-ticket__row"><span>Cambio</span><span>${changeLabel}</span></div>
+      <div class="print-ticket__rule"></div>
+      <div class="print-ticket__center">Gracias por su compra</div>
+    </article>
+  `;
 }
 
 // ============================================================================
@@ -858,6 +974,21 @@ function formatMxCurrency(value) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value || 0);
+}
+
+function formatPaymentMethod(method) {
+  if (method === 'efectivo') return 'Efectivo';
+  if (method === 'transferencia') return 'Transferencia';
+  return method || '-';
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function updateClock() {
