@@ -114,6 +114,8 @@ const printActions = document.getElementById('cajaPrintActions');
 const printCustomerButton = document.getElementById('cajaPrintCustomer');
 const printBusinessButton = document.getElementById('cajaPrintBusiness');
 const printBothButton = document.getElementById('cajaPrintBoth');
+const startNewSaleButton = document.getElementById('cajaStartNewSale');
+const reprintLastButton = document.getElementById('cajaReprintLast');
 const printTicketContainer = document.getElementById('cajaPrintTicket');
 
 const todayTotalDisplay = document.getElementById('cajaTodayTotal');
@@ -267,6 +269,18 @@ function setupEventListeners() {
   if (printBothButton) {
     printBothButton.addEventListener('click', () => printLastSale('ambas'));
   }
+
+  if (startNewSaleButton) {
+    startNewSaleButton.addEventListener('click', startNewSale);
+  }
+
+  if (reprintLastButton) {
+    reprintLastButton.addEventListener('click', () => printLastSale('cliente'));
+  }
+
+  window.addEventListener('afterprint', () => {
+    startNewSale();
+  });
 
   cajaForm.addEventListener('submit', handleFormSubmit);
 }
@@ -785,6 +799,28 @@ function renderPrintActions(focus = false) {
   }
 }
 
+function startNewSale() {
+  clearTicket();
+  if (paymentMethodSelect) paymentMethodSelect.value = '';
+  if (mesaOrigenSelect) mesaOrigenSelect.value = '';
+  if (observationsInput) observationsInput.value = '';
+  if (receivedInput) receivedInput.value = '';
+  if (changeGroup) changeGroup.hidden = true;
+  if (receivedGroup) receivedGroup.hidden = true;
+  if (mobileReceivedGroup) mobileReceivedGroup.hidden = true;
+  if (mobileChangeGroup) mobileChangeGroup.hidden = true;
+  if (mobileDetails) mobileDetails.hidden = true;
+  if (mobileCheckout) mobileCheckout.hidden = true;
+  if (mobileToggleLabel) mobileToggleLabel.textContent = 'Ver ticket';
+  if (mobileToggleArrow) mobileToggleArrow.textContent = 'â–¼';
+  if (printActions) printActions.setAttribute('hidden', '');
+  if (printTicketContainer) printTicketContainer.innerHTML = '';
+
+  renderProductCatalog();
+  updateTicketSummary();
+  updateRegisterButtonState();
+}
+
 function printLastSale(mode = 'cliente') {
   if (!state.lastSale || !printTicketContainer) {
     showNotification('No hay una venta reciente para imprimir.', 'error');
@@ -795,6 +831,7 @@ function printLastSale(mode = 'cliente') {
 
   window.setTimeout(() => {
     window.print();
+    window.setTimeout(startNewSale, 500);
   }, 50);
 }
 
