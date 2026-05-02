@@ -719,8 +719,6 @@ async function handleFormSubmit(e) {
     await api.createMovement(movement);
 
     saveMovementLocally(movement);
-    state.lastSale = movement;
-    renderPrintActions();
     showNotification('✓ Venta registrada correctamente', 'success');
 
     // LIMPIEZA COMPLETA DESPUÉS DE REGISTRAR
@@ -743,6 +741,8 @@ async function handleFormSubmit(e) {
     renderProductCatalog();
     updateTicketSummary();
     refreshMovements();
+    state.lastSale = movement;
+    renderPrintActions(true);
   } catch (error) {
     console.error('Error al guardar movimiento:', error);
     showNotification(getSaveErrorMessage(error), 'error');
@@ -772,11 +772,14 @@ function getSaveErrorMessage(error) {
 // ============================================================================
 // Impresion de ticket
 // ============================================================================
-function renderPrintActions() {
+function renderPrintActions(focus = false) {
   if (!printActions) return;
 
   if (state.lastSale) {
     printActions.removeAttribute('hidden');
+    if (focus) {
+      printActions.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   } else {
     printActions.setAttribute('hidden', '');
   }
