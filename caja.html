@@ -910,7 +910,7 @@
 
       .print-actions-card {
         display: grid;
-        gap: 0.75rem;
+        gap: 0.85rem;
       }
 
       .print-actions-card[hidden] {
@@ -919,24 +919,26 @@
 
       .print-actions-card {
         border-color: rgba(158, 42, 43, 0.22);
-        box-shadow: 0 16px 34px rgba(23, 23, 23, 0.08);
+        box-shadow: 0 18px 38px rgba(23, 23, 23, 0.1);
       }
 
       .print-actions {
         display: grid;
-        gap: 0.6rem;
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
       }
 
       .print-actions .btn {
         width: 100%;
-        min-height: 46px;
+        min-height: 44px;
         padding: 0.75rem 0.9rem;
         font-size: 0.9rem;
+        flex: none;
       }
 
       .print-actions .btn-primary {
-        min-height: 48px;
-        font-size: 0.94rem;
+        min-height: 52px;
+        font-size: 0.96rem;
       }
 
       .print-hint {
@@ -944,6 +946,48 @@
         color: var(--caja-text-secondary);
         font-size: 0.82rem;
         line-height: 1.4;
+      }
+
+      .print-ready-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem;
+      }
+
+      .print-ready-pill {
+        padding: 0.75rem;
+        border: 1px solid var(--caja-border);
+        border-radius: 12px;
+        background: #fbfaf8;
+      }
+
+      .print-ready-pill span {
+        display: block;
+        margin-bottom: 0.22rem;
+        color: var(--caja-text-secondary);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .print-ready-pill strong {
+        color: var(--caja-text);
+        font-size: 1rem;
+        line-height: 1.1;
+      }
+
+      .print-secondary-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+
+      .print-secondary-actions .btn {
+        min-height: 40px;
+        padding: 0.6rem 0.7rem;
+        font-size: 0.8rem;
+        box-shadow: none;
       }
 
       .print-ticket {
@@ -1500,12 +1544,14 @@
           margin-bottom: 0.35rem;
         }
 
-        .print-actions {
+        .print-actions,
+        .print-secondary-actions {
           grid-template-columns: 1fr;
           gap: 0.5rem;
         }
 
-        #cajaReprintLast {
+        #cajaReprintLast,
+        #cajaPrintBusiness {
           font-size: 0.82rem;
           min-height: 42px;
         }
@@ -2056,14 +2102,25 @@
         </section>
 
         <section id="cajaPrintActions" class="summary-card print-actions-card" hidden>
-          <h3>Impresi&oacute;n</h3>
-          <p class="print-hint">Venta guardada. Imprime el ticket antes de entregar el pedido.</p>
+          <h3>Ticket listo</h3>
+          <div class="print-ready-meta">
+            <div class="print-ready-pill">
+              <span>Folio</span>
+              <strong id="cajaPrintFolio">-</strong>
+            </div>
+            <div class="print-ready-pill">
+              <span>Total</span>
+              <strong id="cajaPrintTotal">$0.00</strong>
+            </div>
+          </div>
+          <p class="print-hint">Puedes imprimir el comprobante de esta venta</p>
           <div class="print-actions">
-            <button type="button" id="cajaPrintCustomer" class="btn btn-primary">Imprimir ticket cliente</button>
-            <button type="button" id="cajaPrintBusiness" class="btn btn-secondary">Imprimir copia negocio</button>
-            <button type="button" id="cajaPrintBoth" class="btn btn-secondary">Imprimir 2 copias</button>
+            <button type="button" id="cajaPrintCustomer" class="btn btn-primary">Imprimir ticket</button>
+            <div class="print-secondary-actions">
+              <button type="button" id="cajaPrintBusiness" class="btn btn-secondary">Copia negocio</button>
+              <button type="button" id="cajaReprintLast" class="btn btn-secondary">Reimprimir</button>
+            </div>
             <button type="button" id="cajaStartNewSale" class="btn btn-secondary">Nueva venta</button>
-            <button type="button" id="cajaReprintLast" class="btn btn-secondary">Reimprimir &uacute;ltimo ticket</button>
           </div>
         </section>
 
