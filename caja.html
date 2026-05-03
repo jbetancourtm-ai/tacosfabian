@@ -1617,6 +1617,236 @@
           padding: 0.75rem 0.9rem;
         }
       }
+
+      /* POS layout: el cobro vive en un panel fijo y el scroll queda en productos. */
+      body.caja-view {
+        height: auto;
+        min-height: 100dvh;
+        overflow: auto;
+      }
+
+      .caja-main {
+        overflow: visible;
+        min-height: auto;
+      }
+
+      .caja-form {
+        min-width: 0;
+        overflow: visible;
+      }
+
+      #cajaForm {
+        min-height: 0;
+      }
+
+      .catalog-grid {
+        align-content: start;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding-right: 0.25rem;
+      }
+
+      .form-actions,
+      .ticket-card,
+      .caja-summary > .summary-card:not(.print-actions-card),
+      .caja-summary > .caja-recent {
+        display: none !important;
+      }
+
+      .caja-summary {
+        pointer-events: none;
+        z-index: 60;
+      }
+
+      .caja-mobile-checkout,
+      .print-actions-card {
+        pointer-events: auto;
+      }
+
+      .caja-mobile-checkout:not([hidden]) {
+        display: flex;
+      }
+
+      .caja-mobile-checkout {
+        gap: 0.65rem;
+        overflow: visible;
+        overscroll-behavior: auto;
+      }
+
+      .mobile-checkout-toggle,
+      .mobile-checkout-details {
+        display: none !important;
+      }
+
+      .mobile-checkout-summary {
+        gap: 0.65rem;
+      }
+
+      .mobile-checkout-summary > div {
+        align-items: center;
+      }
+
+      .checkout-payment-field,
+      .mobile-detail-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .checkout-payment-field label,
+      .mobile-detail-field label {
+        color: var(--caja-text-secondary);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .checkout-payment-field select,
+      .mobile-detail-field input {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid var(--caja-border);
+        border-radius: 12px;
+        background: var(--caja-neutral);
+        color: var(--caja-text);
+        font: inherit;
+        font-size: 1rem;
+        font-weight: 700;
+        padding: 0.75rem 0.9rem;
+      }
+
+      .checkout-payment-field select:focus,
+      .mobile-detail-field input:focus {
+        border-color: var(--caja-primary);
+        box-shadow: 0 0 0 3px var(--caja-focus);
+        outline: none;
+      }
+
+      #cajaMobileRegister {
+        width: 100%;
+        min-height: 54px;
+        flex: 0 0 auto;
+      }
+
+      @media (max-width: 639px) {
+        .caja-main {
+          display: block;
+          padding: 0.75rem 0.75rem calc(18.5rem + env(safe-area-inset-bottom));
+        }
+
+        .caja-form {
+          width: 100%;
+          padding: 0.9rem;
+          padding-bottom: 0.9rem;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .catalog-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          max-height: clamp(10rem, calc(100dvh - 31rem), 26rem);
+          margin-bottom: 1rem;
+        }
+
+        .caja-summary {
+          position: static;
+          width: auto;
+        }
+
+        .caja-mobile-checkout {
+          position: fixed;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          top: auto;
+          width: auto;
+          max-height: none;
+          padding: 0.75rem 0.85rem calc(0.85rem + env(safe-area-inset-bottom));
+          border: 1px solid var(--caja-border);
+          border-width: 1px 0 0;
+          border-radius: 18px 18px 0 0;
+          background: rgba(255, 255, 255, 0.98);
+          box-shadow: 0 -12px 34px rgba(23, 23, 23, 0.16);
+          z-index: 70;
+        }
+
+        .mobile-checkout-summary {
+          padding: 0.75rem 0.85rem;
+        }
+
+        .mobile-checkout-summary strong {
+          font-size: 1.35rem;
+        }
+      }
+
+      @media (min-width: 640px) {
+        body.caja-view {
+          overflow: auto;
+        }
+
+        .caja-main {
+          display: block;
+          height: calc(100dvh - 4.6rem);
+          padding: 1rem calc(360px + 1.25rem) 1rem 1rem;
+        }
+
+        .caja-form {
+          height: 100%;
+          padding-bottom: 1rem;
+        }
+
+        .catalog-grid {
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          max-height: calc(100dvh - 20rem);
+          margin-bottom: 1rem;
+        }
+
+        .caja-summary {
+          position: fixed;
+          top: 4.6rem;
+          right: 1rem;
+          bottom: 1rem;
+          width: 340px;
+          display: block;
+        }
+
+        .caja-mobile-checkout {
+          position: fixed;
+          top: 4.6rem;
+          right: 1rem;
+          bottom: 1rem;
+          left: auto;
+          width: 340px;
+          max-height: none;
+          padding: 1rem;
+          border: 1px solid var(--caja-border);
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.98);
+          box-shadow: var(--caja-shadow);
+          z-index: 70;
+        }
+
+        .mobile-checkout-summary {
+          padding: 1rem;
+        }
+      }
+
+      @media (min-width: 1025px) {
+        .caja-main {
+          padding-right: calc(390px + 1.5rem);
+        }
+
+        .catalog-grid {
+          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+          max-height: calc(100dvh - 20.5rem);
+        }
+
+        .caja-summary,
+        .caja-mobile-checkout {
+          width: 370px;
+        }
+      }
     </style>
   </head>
   <body class="caja-view">
@@ -1669,17 +1899,6 @@
         <p class="section-description">Selecciona productos con + y -, revisa el ticket en tiempo real y registra la venta en segundos.</p>
 
         <form id="cajaForm">
-          <div class="caja-toolbar">
-            <div class="toolbar-group">
-              <label for="cajaPaymentMethod">Método de Pago</label>
-              <select id="cajaPaymentMethod" required>
-                <option value="">Selecciona método</option>
-                <option value="efectivo">Efectivo</option>
-                <option value="transferencia">Transferencia</option>
-              </select>
-            </div>
-          </div>
-
           <div class="form-row">
             <div class="form-group form-group--inline">
               <label for="cajaMesaOrigen">Mesa o mostrador</label>
@@ -1789,6 +2008,14 @@
             <div>
               <span>Total a cobrar</span>
               <strong id="cajaMobileTotal">$0.00</strong>
+            </div>
+            <div class="checkout-payment-field">
+              <label for="cajaPaymentMethod">Método de Pago</label>
+              <select id="cajaPaymentMethod" form="cajaForm" required>
+                <option value="">Selecciona método</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+              </select>
             </div>
             <div>
               <span id="cajaMobileCount">0 productos</span>
