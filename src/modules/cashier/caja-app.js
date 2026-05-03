@@ -119,6 +119,13 @@ const printBothButton = document.getElementById('cajaPrintBoth');
 const startNewSaleButton = document.getElementById('cajaStartNewSale');
 const reprintLastButton = document.getElementById('cajaReprintLast');
 const printTicketContainer = document.getElementById('cajaPrintTicket');
+const cashCutToggle = document.getElementById('cajaCutToggle');
+const cashCutPanel = document.getElementById('cajaCashCutPanel');
+const cashCutClose = document.getElementById('cajaCutClose');
+const cashCutSummary = document.getElementById('cajaCashCutSummary');
+const cashCutPrintButton = document.getElementById('cajaCutPrint');
+const cashCutSaveButton = document.getElementById('cajaCutSave');
+const cashCutStatus = document.getElementById('cajaCutStatus');
 
 const todayTotalDisplay = document.getElementById('cajaTodayTotal');
 const todayCountDisplay = document.getElementById('cajaTodayCount');
@@ -278,6 +285,24 @@ function setupEventListeners() {
 
   if (reprintLastButton) {
     reprintLastButton.addEventListener('click', () => printLastSale('cliente'));
+  }
+
+  if (cashCutToggle) {
+    cashCutToggle.addEventListener('click', () => renderCashCutPanel(true));
+  }
+
+  if (cashCutClose) {
+    cashCutClose.addEventListener('click', () => {
+      if (cashCutPanel) cashCutPanel.hidden = true;
+    });
+  }
+
+  if (cashCutPrintButton) {
+    cashCutPrintButton.addEventListener('click', printCashCut);
+  }
+
+  if (cashCutSaveButton) {
+    cashCutSaveButton.addEventListener('click', saveCashCut);
   }
 
   window.addEventListener('afterprint', () => {
@@ -874,9 +899,8 @@ function buildTicketCopy(sale, copyType) {
 
   const itemRows = products.map((item) => `
     <tr>
-      <td>${escapeHtml(item.nombre || 'Producto')}</td>
       <td>${Number(item.cantidad || 0)}</td>
-      <td>${formatMxCurrency(item.precio_unitario)}</td>
+      <td>${escapeHtml(item.nombre || 'Producto')}</td>
       <td>${formatMxCurrency(item.subtotal)}</td>
     </tr>
   `).join('');
@@ -885,8 +909,8 @@ function buildTicketCopy(sale, copyType) {
     <article class="print-ticket__copy-block">
       <div class="print-ticket__center">
         <div class="print-ticket__brand">Tacos Fabian</div>
+        <div class="print-ticket__subtitle">Ticket de venta</div>
         ${copyLabel}
-        <div>Gracias por su compra</div>
       </div>
       <div class="print-ticket__rule"></div>
       <div class="print-ticket__row"><span>Folio</span><strong>${escapeHtml(sale.folio || '-')}</strong></div>
@@ -897,21 +921,169 @@ function buildTicketCopy(sale, copyType) {
       <table class="print-ticket__items">
         <thead>
           <tr>
-            <th>Producto</th>
             <th>Cant</th>
-            <th>P.U.</th>
-            <th>Subt.</th>
+            <th>Producto</th>
+            <th>Importe</th>
           </tr>
         </thead>
         <tbody>${itemRows}</tbody>
       </table>
       <div class="print-ticket__rule"></div>
+      <div class="print-ticket__row"><span>Subtotal</span><span>${formatMxCurrency(sale.total)}</span></div>
       <div class="print-ticket__row print-ticket__total"><span>Total</span><span>${formatMxCurrency(sale.total)}</span></div>
       <div class="print-ticket__row"><span>Pago</span><span>${escapeHtml(formatPaymentMethod(sale.metodo_pago))}</span></div>
       <div class="print-ticket__row"><span>Recibido</span><span>${receivedLabel}</span></div>
       <div class="print-ticket__row"><span>Cambio</span><span>${changeLabel}</span></div>
       <div class="print-ticket__rule"></div>
       <div class="print-ticket__center">Gracias por su compra</div>
+      <div class="print-ticket__center print-ticket__note">Conserve su ticket</div>
+    </article>
+  `;
+}
+
+// ============================================================================
+// Corte de caja
+// ============================================================================
+function getCashCutSummary(date = new Date()) {
+  const targetDate = new Date(date).toISOString().split('T')[0];
+  const movements = getDailyMovements(targetDate).sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+  const byPayment = movements.reduce((summary, movement) => {
+    const method = movement.metodo_pago || 'otro';
+    summary[method] = (summary[method] || 0) + (Number(movement.total) || 0);
+    return summary;
+  }, {});
+  const byMesa = {};
+  const byProduct = {};
+
+  movements.forEach((movement) => {
+    const mesa = movement.mesa_origen || 'Sin mesa';
+    byMesa[mesa] = (byMesa[mesa] || 0) + (Number(movement.total) || 0);
+    const movementProducts = Array.isArray(movement.productos) ? movement.productos : [];
+    movementProducts.forEach((product) => {
+      const name = product.nombre || 'Producto';
+      if (!byProduct[name]) {
+        byProduct[name] = { quantity: 0, total: 0 };
+      }
+      byProduct[name].quantity += Number(product.cantidad) || 0;
+      byProduct[name].total += Number(product.subtotal) || 0;
+    });
+  });
+
+  return {
+    id: `CORTE-${targetDate.replace(/-/g, '')}-${Date.now()}`,
+    fecha_operacion: targetDate,
+    fecha_corte: new Date().toISOString(),
+    total: movements.reduce((sum, movement) => sum + (Number(movement.total) || 0), 0),
+    efectivo: byPayment.efectivo || 0,
+    transferencia: byPayment.transferencia || 0,
+    ventas_count: movements.length,
+    primer_folio: movements[0]?.folio || '-',
+    ultimo_folio: movements[movements.length - 1]?.folio || '-',
+    ventas_por_mesa: byMesa,
+    ventas_por_producto: byProduct,
+  };
+}
+
+function renderCashCutPanel(open = false) {
+  if (!cashCutPanel || !cashCutSummary) return;
+  const summary = getCashCutSummary();
+  cashCutSummary.innerHTML = buildCashCutSummaryHtml(summary);
+  if (cashCutStatus) {
+    cashCutStatus.textContent = summary.ventas_count > 0
+      ? 'Revisa el resumen antes de guardar o imprimir. No se borran ventas.'
+      : 'Sin ventas registradas para cortar hoy.';
+  }
+  if (open) {
+    cashCutPanel.hidden = false;
+  }
+}
+
+function buildCashCutSummaryHtml(summary) {
+  const productRows = Object.entries(summary.ventas_por_producto)
+    .sort((a, b) => b[1].quantity - a[1].quantity)
+    .slice(0, 6)
+    .map(([name, data]) => `<li>${escapeHtml(name)} · ${data.quantity} pzas · ${formatMxCurrency(data.total)}</li>`)
+    .join('') || '<li>Sin productos</li>';
+  const mesaRows = Object.entries(summary.ventas_por_mesa)
+    .sort((a, b) => b[1] - a[1])
+    .map(([mesa, total]) => `<li>${escapeHtml(mesa)} · ${formatMxCurrency(total)}</li>`)
+    .join('') || '<li>Sin mesas</li>';
+
+  return `
+    <div class="cash-cut-metric"><span>Fecha corte</span><strong>${new Date(summary.fecha_corte).toLocaleDateString('es-MX')}</strong></div>
+    <div class="cash-cut-metric"><span>Hora corte</span><strong>${new Date(summary.fecha_corte).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</strong></div>
+    <div class="cash-cut-metric"><span>Total vendido</span><strong>${formatMxCurrency(summary.total)}</strong></div>
+    <div class="cash-cut-metric"><span>Ventas</span><strong>${summary.ventas_count}</strong></div>
+    <div class="cash-cut-metric"><span>Efectivo</span><strong>${formatMxCurrency(summary.efectivo)}</strong></div>
+    <div class="cash-cut-metric"><span>Transferencia</span><strong>${formatMxCurrency(summary.transferencia)}</strong></div>
+    <div class="cash-cut-metric"><span>Primer folio</span><strong>${escapeHtml(summary.primer_folio)}</strong></div>
+    <div class="cash-cut-metric"><span>Último folio</span><strong>${escapeHtml(summary.ultimo_folio)}</strong></div>
+    <div class="cash-cut-list"><span>Ventas por mesa/mostrador</span><ul>${mesaRows}</ul></div>
+    <div class="cash-cut-list"><span>Productos vendidos</span><ul>${productRows}</ul></div>
+  `;
+}
+
+function saveCashCut() {
+  const summary = getCashCutSummary();
+  if (!summary.ventas_count) {
+    if (cashCutStatus) cashCutStatus.textContent = 'No hay ventas para guardar en el corte de hoy.';
+    return;
+  }
+  if (!window.confirm('Guardar corte de caja del día? Las ventas históricas no se eliminarán.')) {
+    return;
+  }
+
+  const cuts = JSON.parse(localStorage.getItem('tacos_fabian_cash_cuts_v1') || '[]');
+  cuts.push(summary);
+  localStorage.setItem('tacos_fabian_cash_cuts_v1', JSON.stringify(cuts));
+  if (cashCutStatus) {
+    cashCutStatus.textContent = `Corte guardado ${new Date(summary.fecha_corte).toLocaleString('es-MX')}.`;
+  }
+}
+
+function printCashCut() {
+  const summary = getCashCutSummary();
+  if (!summary.ventas_count || !printTicketContainer) {
+    showNotification('No hay ventas para imprimir en el corte de hoy.', 'error');
+    return;
+  }
+  printTicketContainer.innerHTML = buildPrintableCashCut(summary);
+  window.setTimeout(() => window.print(), 50);
+}
+
+function buildPrintableCashCut(summary) {
+  const cutDate = new Date(summary.fecha_corte);
+  const productRows = Object.entries(summary.ventas_por_producto)
+    .sort((a, b) => b[1].quantity - a[1].quantity)
+    .map(([name, data]) => `<div class="print-ticket__row"><span>${escapeHtml(name)} x${data.quantity}</span><span>${formatMxCurrency(data.total)}</span></div>`)
+    .join('');
+  const mesaRows = Object.entries(summary.ventas_por_mesa)
+    .sort((a, b) => b[1] - a[1])
+    .map(([mesa, total]) => `<div class="print-ticket__row"><span>${escapeHtml(mesa)}</span><span>${formatMxCurrency(total)}</span></div>`)
+    .join('');
+
+  return `
+    <article class="print-ticket__copy-block">
+      <div class="print-ticket__center">
+        <div class="print-ticket__brand">Tacos Fabian</div>
+        <div class="print-ticket__subtitle">Corte de caja</div>
+      </div>
+      <div class="print-ticket__rule"></div>
+      <div class="print-ticket__row"><span>Fecha operación</span><span>${summary.fecha_operacion}</span></div>
+      <div class="print-ticket__row"><span>Fecha corte</span><span>${cutDate.toLocaleString('es-MX')}</span></div>
+      <div class="print-ticket__row"><span>Primer folio</span><span>${escapeHtml(summary.primer_folio)}</span></div>
+      <div class="print-ticket__row"><span>Último folio</span><span>${escapeHtml(summary.ultimo_folio)}</span></div>
+      <div class="print-ticket__rule"></div>
+      <div class="print-ticket__row print-ticket__total"><span>Total</span><span>${formatMxCurrency(summary.total)}</span></div>
+      <div class="print-ticket__row"><span>Efectivo</span><span>${formatMxCurrency(summary.efectivo)}</span></div>
+      <div class="print-ticket__row"><span>Transferencia</span><span>${formatMxCurrency(summary.transferencia)}</span></div>
+      <div class="print-ticket__row"><span>Ventas</span><span>${summary.ventas_count}</span></div>
+      <div class="print-ticket__rule"></div>
+      <div class="print-ticket__subtitle">Mesa / mostrador</div>
+      ${mesaRows || '<div class="print-ticket__center">Sin ventas</div>'}
+      <div class="print-ticket__rule"></div>
+      <div class="print-ticket__subtitle">Productos</div>
+      ${productRows || '<div class="print-ticket__center">Sin productos</div>'}
     </article>
   `;
 }

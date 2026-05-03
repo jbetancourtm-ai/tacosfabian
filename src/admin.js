@@ -362,3 +362,12 @@ unlockAdminPanel = function(message) {
   }, 500);
 };
 
+if (isAdminSessionUnlocked()) {
+  setTimeout(() => {
+    const cajaDashboard = new CajaAdminDashboard();
+    cajaDashboard.init().catch(error => {
+      console.warn('Error inicializando dashboard de caja:', error);
+    });
+  }, 500);
+}
+
