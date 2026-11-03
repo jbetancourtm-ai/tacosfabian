@@ -18,29 +18,65 @@ class APIService {
   async fetch(endpoint, options = {}) {
     const url = `${this.baseUrl}${endpoint}`;
     const defaultOptions = {
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
       },
       ...options,
     };
 
+    if (options.headers) {
+      defaultOptions.headers = {
+        ...defaultOptions.headers,
+        ...options.headers,
+      };
+    }
+
+    const parseJsonBody = async (response) => {
+      const contentType = response.headers.get('content-type') || '';
+      const hasBody = response.status !== 204 && response.status !== 205 && response.headers.get('content-length') !== '0';
+
+      if (!hasBody) {
+        return null;
+      }
+
+      const text = await response.text();
+      if (!text) {
+        return null;
+      }
+
+      if (contentType.includes('application/json')) {
+        try {
+          return JSON.parse(text);
+        } catch (error) {
+          return null;
+        }
+      }
+
+      return text;
+    };
+
     let lastError;
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
       try {
         const response = await fetch(url, defaultOptions);
+        const payload = await parseJsonBody(response);
+
         if (!response.ok) {
           let errorDetail = response.statusText;
-          try {
-            const errorBody = await response.json();
-            errorDetail = errorBody?.error || errorBody?.message || errorDetail;
-          } catch (_) {
-            // Si el backend no responde JSON, usamos el statusText.
+          if (payload && typeof payload === 'object') {
+            errorDetail = payload.error || payload.message || errorDetail;
           }
-          throw new Error(`HTTP ${response.status}: ${errorDetail}`);
+          const error = new Error(`HTTP ${response.status}: ${errorDetail}`);
+          error.status = response.status;
+          throw error;
         }
-        return await response.json();
+
+        return payload;
       } catch (error) {
         lastError = error;
+        // Nunca repetir PINs, permisos, conflictos ni rate limits (HTTP 4xx).
+        if (error.status >= 400 && error.status < 500) throw error;
         if (attempt < this.maxRetries - 1) {
           await this.delay(this.retryDelay * (attempt + 1));
         }
@@ -64,12 +100,28 @@ class APIService {
   }
 
   /**
+   * Auth: Verificar sesión activa de caja en el servidor
+   */
+  async validateCajaSession() {
+    return this.fetch('/auth/session', {
+      method: 'GET',
+    });
+  }
+
+  /**
    * Movements: Crear nuevo movimiento de venta
    */
   async createMovement(movement) {
+    const payload = { ...movement };
+    const idempotencyKey = payload.operationId || payload.folio || `sale-${payload.id || Date.now()}`;
+    payload.operationId = idempotencyKey;
+
     return this.fetch('/movements/create', {
       method: 'POST',
-      body: JSON.stringify(movement),
+      headers: {
+        'X-Idempotency-Key': idempotencyKey,
+      },
+      body: JSON.stringify(payload),
     });
   }
 

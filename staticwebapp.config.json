@@ -1,7 +1,19 @@
 {
   "routes": [
     {
-      "route": "/api/*",
+      "route": "/api/auth/*",
+      "allowedRoles": []
+    },
+    {
+      "route": "/api/reviews/*",
+      "allowedRoles": []
+    },
+    {
+      "route": "/api/movements/*",
+      "allowedRoles": []
+    },
+    {
+      "route": "/api/sales-summary/*",
       "allowedRoles": []
     },
     {
@@ -15,16 +27,16 @@
     {
       "route": "/admin",
       "rewrite": "/admin.html",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": ["admin"]
     },
     {
       "route": "/admin/*",
       "rewrite": "/admin.html",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": ["admin"]
     },
     {
       "route": "/admin.html",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": ["admin"]
     }
   ],
   "responseOverrides": {

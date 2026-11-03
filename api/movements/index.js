@@ -6,43 +6,100 @@
  */
 
 import { TableClient, AzureNamedKeyCredential } from '@azure/data-tables';
-import { v4 as uuidv4 } from 'uuid';
+import { createHash } from 'node:crypto';
+import { getCallerRole, requireRole } from '../lib/auth.js';
 
 const TABLE_NAME = process.env.MOVEMENTS_TABLE_NAME || 'SalesMovements';
+const STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
 const STORAGE_ACCOUNT = process.env.AZURE_STORAGE_ACCOUNT_NAME || 'tacosfabianstg';
 const STORAGE_KEY = process.env.AZURE_STORAGE_ACCOUNT_KEY || '';
 
-// Para desarrollo local, usar valores por defecto si no están disponibles
 let tableClient = null;
 
+function normalizeRoleName(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function requireAuthorizedRole(req, allowedRoles) {
+  if (!allowedRoles || allowedRoles.length === 0) {
+    return true;
+  }
+
+  return requireRole(req, allowedRoles.map(normalizeRoleName));
+}
+
+function getSessionRole(req) {
+  const roles = getCallerRole(req);
+  return roles[0] || null;
+}
+
+function idempotencyKeyFromRequest(req, movement) {
+  const requestKey = req.headers['x-idempotency-key'] || req.headers['X-Idempotency-Key'];
+  if (requestKey) {
+    return String(requestKey).trim();
+  }
+
+  if (movement?.operationId) {
+    return String(movement.operationId).trim();
+  }
+
+  if (movement?.folio) {
+    return String(movement.folio).trim();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function hashPayload(payload) {
+  return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+}
+
 function getTableClient() {
-  if (!tableClient && STORAGE_ACCOUNT && STORAGE_KEY) {
-    try {
+  if (tableClient) {
+    return tableClient;
+  }
+
+  try {
+    if (STORAGE_CONNECTION_STRING) {
+      tableClient = TableClient.fromConnectionString(STORAGE_CONNECTION_STRING, TABLE_NAME);
+      return tableClient;
+    }
+
+    if (STORAGE_ACCOUNT && STORAGE_KEY) {
       const credential = new AzureNamedKeyCredential(STORAGE_ACCOUNT, STORAGE_KEY);
       tableClient = new TableClient(
         `https://${STORAGE_ACCOUNT}.table.core.windows.net`,
         TABLE_NAME,
         credential
       );
-    } catch (error) {
-      console.warn('No se pudo conectar a Table Storage, usando mock en memoria');
+      return tableClient;
     }
-  }
-  return tableClient;
-}
 
-// Mock en memoria para desarrollo
-const mockMovements = [];
+    throw new Error('No hay configuración de Azure Storage disponible para movimientos.');
+  } catch (error) {
+    console.warn('No se pudo inicializar Table Storage para movimientos:', error?.message || error);
+    throw error;
+  }
+}
 
 export default async function (context, req) {
   try {
     const { operation } = context.bindingData;
 
     if (req.method === 'POST' && operation === 'create') {
+      if (!requireAuthorizedRole(req, ['caja', 'admin'])) {
+        return unauthorized(context, 'No autorizado para registrar ventas.');
+      }
       return await handleCreateMovement(context, req);
     } else if (req.method === 'GET' && operation === 'daily') {
+      if (!requireAuthorizedRole(req, ['admin', 'caja'])) {
+        return unauthorized(context, 'No autorizado para consultar ventas del día.');
+      }
       return await handleGetDaily(context, req);
     } else if (req.method === 'GET' && operation === 'shift') {
+      if (!requireAuthorizedRole(req, ['admin', 'caja'])) {
+        return unauthorized(context, 'No autorizado para consultar movimientos por turno.');
+      }
       return await handleGetShift(context, req);
     } else {
       return notFound(context);
@@ -81,39 +138,61 @@ async function handleCreateMovement(context, req) {
 
     try {
       const client = getTableClient();
-      if (client) {
-        const entity = {
-          partitionKey: sanitizePartitionKey(new Date(movement.fecha_hora).toISOString().split('T')[0]),
-          rowKey: uuidv4(),
-          ...toTableEntity(movement),
-          fecha_creacion: new Date().toISOString(),
-        };
+      const idempotencyKey = idempotencyKeyFromRequest(req, movement);
+      const partitionKey = sanitizePartitionKey(new Date(movement.fecha_hora).toISOString().split('T')[0]);
+      const payloadHash = hashPayload({
+        folio: movement.folio,
+        fecha_hora: movement.fecha_hora,
+        mesa_origen: movement.mesa_origen,
+        total: Number(movement.total),
+        metodo_pago: movement.metodo_pago,
+        productos: movement.productos,
+      });
 
+      const entity = {
+        partitionKey,
+        rowKey: idempotencyKey,
+        idempotency_key: idempotencyKey,
+        payload_hash: payloadHash,
+        ...toTableEntity(movement),
+        fecha_creacion: new Date().toISOString(),
+      };
+
+      try {
         await client.createEntity(entity);
-
         return success(context, {
           id: entity.rowKey,
           message: 'Movimiento guardado',
           data: entity,
+          duplicate: false,
         });
+      } catch (createError) {
+        const existsCode = createError?.statusCode || createError?.code;
+        if (existsCode !== 409 && existsCode !== 'ResourceExists' && existsCode !== 'EntityAlreadyExists') {
+          throw createError;
+        }
+
+        const existing = await client.getEntity(partitionKey, idempotencyKey).catch(() => null);
+        if (!existing) {
+          throw createError;
+        }
+
+        const existingHash = existing.payload_hash || existing.payloadHash || '';
+        if (existingHash === payloadHash) {
+          return success(context, {
+            id: idempotencyKey,
+            message: 'Movimiento ya existente',
+            data: existing,
+            duplicate: true,
+          });
+        }
+
+        return conflict(context, 'La clave de idempotencia ya está asociada a otro contenido.');
       }
     } catch (dbError) {
-      context.log.warn('Error con Table Storage, usando mock:', dbError);
+      context.log.error('Error con Table Storage al crear movimiento:', dbError);
+      return serverError(context, `Error de persistencia en Table Storage: ${dbError?.message || 'desconocido'}`);
     }
-
-    // Fallback a mock
-    const mockEntity = {
-      id: uuidv4(),
-      ...movement,
-      fecha_creacion: new Date().toISOString(),
-    };
-    mockMovements.push(mockEntity);
-
-    return success(context, {
-      id: mockEntity.id,
-      message: 'Movimiento guardado (local)',
-      data: mockEntity,
-    });
   } catch (error) {
     context.log.error('Error creando movimiento:', error);
     return serverError(context, 'Error al crear movimiento');
@@ -177,41 +256,28 @@ async function handleGetDaily(context, req) {
 
     try {
       const client = getTableClient();
-      if (client) {
-        const entities = [];
-        const iterator = client.listEntities({
-          queryOptions: {
-            filter: `PartitionKey eq '${partitionKey}'`,
-          },
-        });
+      const entities = [];
+      const iterator = client.listEntities({
+        queryOptions: {
+          filter: `PartitionKey eq '${partitionKey}'`,
+        },
+      });
 
-        for await (const entity of iterator) {
-          if (entity.estado !== 'cancelado') {
-            entities.push(entity);
-          }
+      for await (const entity of iterator) {
+        if (entity.estado !== 'cancelado') {
+          entities.push(entity);
         }
-
-        return success(context, {
-          date,
-          count: entities.length,
-          movements: entities,
-        });
       }
+
+      return success(context, {
+        date,
+        count: entities.length,
+        movements: entities,
+      });
     } catch (dbError) {
-      context.log.warn('Error con Table Storage:', dbError);
+      context.log.error('Error con Table Storage al consultar movimientos diarios:', dbError);
+      return serverError(context, `Error de consulta en Table Storage: ${dbError?.message || 'desconocido'}`);
     }
-
-    // Fallback a mock
-    const movements = mockMovements.filter((m) => {
-      const mDate = new Date(m.fecha_hora).toISOString().split('T')[0];
-      return mDate === date && m.estado !== 'cancelado';
-    });
-
-    return success(context, {
-      date,
-      count: movements.length,
-      movements,
-    });
   } catch (error) {
     context.log.error('Error obteniendo movimientos diarios:', error);
     return serverError(context, 'Error al obtener movimientos');
@@ -229,44 +295,30 @@ async function handleGetShift(context, req) {
 
     try {
       const client = getTableClient();
-      if (client) {
-        const entities = [];
-        const partitionKey = sanitizePartitionKey(date);
-        const iterator = client.listEntities({
-          queryOptions: {
-            filter: `PartitionKey eq '${partitionKey}' and turno eq '${shift}'`,
-          },
-        });
+      const entities = [];
+      const partitionKey = sanitizePartitionKey(date);
+      const iterator = client.listEntities({
+        queryOptions: {
+          filter: `PartitionKey eq '${partitionKey}' and turno eq '${shift}'`,
+        },
+      });
 
-        for await (const entity of iterator) {
-          if (entity.estado !== 'cancelado') {
-            entities.push(entity);
-          }
+      for await (const entity of iterator) {
+        if (entity.estado !== 'cancelado') {
+          entities.push(entity);
         }
-
-        return success(context, {
-          shift,
-          date,
-          count: entities.length,
-          movements: entities,
-        });
       }
+
+      return success(context, {
+        shift,
+        date,
+        count: entities.length,
+        movements: entities,
+      });
     } catch (dbError) {
-      context.log.warn('Error con Table Storage:', dbError);
+      context.log.error('Error con Table Storage al consultar movimientos por turno:', dbError);
+      return serverError(context, `Error de consulta en Table Storage: ${dbError?.message || 'desconocido'}`);
     }
-
-    // Fallback a mock
-    const movements = mockMovements.filter((m) => {
-      const mDate = new Date(m.fecha_hora).toISOString().split('T')[0];
-      return mDate === date && m.turno === shift && m.estado !== 'cancelado';
-    });
-
-    return success(context, {
-      shift,
-      date,
-      count: movements.length,
-      movements,
-    });
   } catch (error) {
     context.log.error('Error obteniendo movimientos por turno:', error);
     return serverError(context, 'Error al obtener movimientos');
@@ -293,6 +345,24 @@ function success(context, data) {
 function badRequest(context, message) {
   context.res = {
     status: 400,
+    headers: { 'Content-Type': 'application/json' },
+    body: { error: message },
+  };
+  return context.res;
+}
+
+function unauthorized(context, message) {
+  context.res = {
+    status: 401,
+    headers: { 'Content-Type': 'application/json' },
+    body: { error: message },
+  };
+  return context.res;
+}
+
+function conflict(context, message) {
+  context.res = {
+    status: 409,
     headers: { 'Content-Type': 'application/json' },
     body: { error: message },
   };

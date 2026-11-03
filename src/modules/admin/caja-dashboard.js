@@ -5,14 +5,13 @@
 
 import { getAPIService } from '../../services/api-service.js';
 
-const MOVEMENTS_KEY = 'caja_movements';
-
 class CajaAdminDashboard {
   constructor() {
     this.apiService = getAPIService();
     this.refreshInterval = 5000;
     this.movements = [];
-    this.filterDate = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    this.filterDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     this.autoRefreshTimer = null;
   }
 
@@ -170,31 +169,39 @@ class CajaAdminDashboard {
   }
 
   async loadMovements() {
-    const dateToLoad = this.filterDate || new Date().toISOString().split('T')[0];
+    const dateToLoad = this.filterDate;
     try {
       const result = await this.apiService.getDailyMovements(dateToLoad);
-      this.movements = this.normalizeMovements(result.movements || []);
-      if (!this.movements.length) {
-        this.movements = this.loadMovementsFromLocalStorage(dateToLoad);
+      if (!result || !Array.isArray(result.movements)) {
+        throw new Error('Respuesta de movimientos no válida');
       }
+      this.movements = this.normalizeMovements(result.movements);
+      this.renderDashboard();
+      if (this.elements.printBtn) this.elements.printBtn.disabled = false;
+      if (this.elements.csvBtn) this.elements.csvBtn.disabled = false;
     } catch (error) {
-      console.warn('API no disponible, usando localStorage:', error);
-      this.movements = this.loadMovementsFromLocalStorage(dateToLoad);
+      console.warn('No se pudieron consultar movimientos del servidor:', error.message);
+      this.movements = [];
+      this.renderDashboard();
+      // No presentar 0 ventas como dato verdadero si la API está caída.
+      this.elements.ownerKpiGrid.innerHTML = '<p role="alert">Ventas no disponibles: error consultando el servidor. Reintenta con Actualizar.</p>';
+      this.elements.movementsTable.innerHTML = '<tr><td colspan="8">No se pudieron consultar ventas.</td></tr>';
+      if (this.elements.printBtn) this.elements.printBtn.disabled = true;
+      if (this.elements.csvBtn) this.elements.csvBtn.disabled = true;
     }
-    this.renderDashboard();
-  }
-
-  loadMovementsFromLocalStorage(date) {
-    const all = JSON.parse(localStorage.getItem(MOVEMENTS_KEY) || '[]');
-    return this.normalizeMovements(all).filter((movement) => movement.operationDate === date && movement.estado !== 'cancelado');
   }
 
   normalizeMovements(items) {
     return items.map((movement) => {
       const date = new Date(movement.fecha_hora || movement.timestamp || Date.now());
+      let productos = movement.productos;
+      if (typeof productos === 'string') {
+        try { productos = JSON.parse(productos); } catch { productos = []; }
+      }
       return {
         ...movement,
-        operationDate: date.toISOString().split('T')[0],
+        productos: Array.isArray(productos) ? productos : [],
+        operationDate: Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0],
         total: Number(movement.total) || 0,
         cambio: Number(movement.cambio) || 0,
         recibido_con: movement.recibido_con == null ? null : Number(movement.recibido_con),
@@ -269,7 +276,7 @@ class CajaAdminDashboard {
             <td>${date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</td>
             <td>${this.escapeHtml(movement.mesa_origen || '-')}</td>
             <td>${this.escapeHtml(movement.resumen_productos || movement.producto_concepto || '-')}</td>
-            <td>${this.capitalizeText(movement.metodo_pago || '-')}</td>
+            <td>${this.escapeHtml(this.capitalizeText(movement.metodo_pago || '-'))}</td>
             <td>${this.formatCurrency(movement.total)}</td>
             <td>${this.formatCurrency(movement.cambio || 0)}</td>
             <td>${this.escapeHtml(movement.estado || 'registrado')}</td>
@@ -285,7 +292,7 @@ class CajaAdminDashboard {
     this.elements.saleDetailPanel.hidden = false;
     this.elements.saleDetailPanel.innerHTML = `
       <h3>Detalle ${this.escapeHtml(sale.folio || '-')}</h3>
-      <p class="muted">${this.escapeHtml(sale.mesa_origen || '-')} · ${this.capitalizeText(sale.metodo_pago || '-')} · ${this.formatCurrency(sale.total)}</p>
+      <p class="muted">${this.escapeHtml(sale.mesa_origen || '-')} · ${this.escapeHtml(this.capitalizeText(sale.metodo_pago || '-'))} · ${this.formatCurrency(sale.total)}</p>
       <div class="pos-list">
         ${products.map((product) => `<div class="pos-list-row"><span>${this.escapeHtml(product.nombre)} x${Number(product.cantidad || 0)}</span><strong>${this.formatCurrency(product.subtotal)}</strong></div>`).join('') || '<div class="pos-list-row"><span>Sin productos</span><strong>-</strong></div>'}
       </div>
@@ -302,7 +309,7 @@ class CajaAdminDashboard {
       <table>
         <thead><tr><th>Folio</th><th>Hora</th><th>Mesa</th><th>Productos</th><th>Método</th><th>Total</th></tr></thead>
         <tbody>
-          ${this.movements.map((movement) => `<tr><td>${this.escapeHtml(movement.folio || '-')}</td><td>${new Date(movement.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</td><td>${this.escapeHtml(movement.mesa_origen || '-')}</td><td>${this.escapeHtml(movement.resumen_productos || movement.producto_concepto || '-')}</td><td>${this.capitalizeText(movement.metodo_pago || '-')}</td><td>${this.formatCurrency(movement.total)}</td></tr>`).join('')}
+          ${this.movements.map((movement) => `<tr><td>${this.escapeHtml(movement.folio || '-')}</td><td>${new Date(movement.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</td><td>${this.escapeHtml(movement.mesa_origen || '-')}</td><td>${this.escapeHtml(movement.resumen_productos || movement.producto_concepto || '-')}</td><td>${this.escapeHtml(this.capitalizeText(movement.metodo_pago || '-'))}</td><td>${this.formatCurrency(movement.total)}</td></tr>`).join('')}
         </tbody>
       </table>
     `;

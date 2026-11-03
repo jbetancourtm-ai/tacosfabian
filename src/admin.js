@@ -1,373 +1,174 @@
-const adminAccessGate = document.querySelector("#adminAccessGate");
-const adminAccessForm = document.querySelector("#adminAccessForm");
-const adminAccessCode = document.querySelector("#adminAccessCode");
-const adminAccessStatus = document.querySelector("#adminAccessStatus");
-const adminResetSession = document.querySelector("#adminResetSession");
-const adminDashboard = document.querySelector("#adminDashboard");
-const adminStatus = document.querySelector("#adminStatus");
-const adminTableBody = document.querySelector("#adminTableBody");
-const salesTableBody = document.querySelector("#salesTableBody");
-const salesTotalOrders = document.querySelector("#salesTotalOrders");
-const salesRevenue = document.querySelector("#salesRevenue");
-const salesActiveOrders = document.querySelector("#salesActiveOrders");
-const salesCompletedOrders = document.querySelector("#salesCompletedOrders");
-const salesCashCount = document.querySelector("#salesCashCount");
-const salesCashTotal = document.querySelector("#salesCashTotal");
-const salesTransferCount = document.querySelector("#salesTransferCount");
-const salesTransferTotal = document.querySelector("#salesTransferTotal");
-const adminClearSales = document.querySelector("#adminClearSales");
-
-const SALES_STORAGE_KEY = "tacos_fabian_sales_records_v1";
-const CAJA_MOVEMENTS_KEY = "caja_movements";
-const SALES_SYNC_CHANNEL = "tacos-fabian-sales-sync";
-const ADMIN_ACCESS_CODE_KEY = "tacos_fabian_admin_access_code_v1";
-const ADMIN_SESSION_KEY = "tacos_fabian_admin_session_v1";
-
-function escapeHtml(text) {
-  return String(text)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function starsLabel(stars) {
-  const total = Math.max(1, Math.min(5, Number(stars) || 0));
-  return `${"\u2605".repeat(total)}${"\u2606".repeat(5 - total)}`;
-}
-
-function formatDateTime(dateValue) {
-  if (!dateValue) return "Sin fecha";
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return "Sin fecha";
-
-  return new Intl.DateTimeFormat("es-MX", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
-}
-
-function formatMxCurrency(value) {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    maximumFractionDigits: 0,
-  }).format(Number(value) || 0);
-}
-
-function readSalesRecords() {
-  try {
-    const rawValue = window.localStorage.getItem(SALES_STORAGE_KEY) || window.localStorage.getItem(CAJA_MOVEMENTS_KEY);
-    if (!rawValue) return [];
-
-    const parsedValue = JSON.parse(rawValue);
-    return Array.isArray(parsedValue) ? parsedValue : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeSalesRecords(records) {
-  const serialized = JSON.stringify(records);
-  window.localStorage.setItem(SALES_STORAGE_KEY, serialized);
-  window.localStorage.setItem(CAJA_MOVEMENTS_KEY, serialized);
-}
-
-function getStoredAdminCode() {
-  return window.localStorage.getItem(ADMIN_ACCESS_CODE_KEY) || "";
-}
-
-function isAdminSessionUnlocked() {
-  return window.sessionStorage.getItem(ADMIN_SESSION_KEY) === "open";
-}
-
-function setDashboardVisibility(isVisible) {
-  if (adminAccessGate instanceof HTMLElement) adminAccessGate.hidden = isVisible;
-  if (adminDashboard instanceof HTMLElement) {
-    adminDashboard.hidden = !isVisible;
-    adminDashboard.setAttribute("aria-hidden", String(!isVisible));
-  }
-}
-
-function renderReviewsTable(items) {
-  if (!(adminTableBody instanceof HTMLElement)) return;
-
-  if (!Array.isArray(items) || items.length === 0) {
-    adminTableBody.innerHTML = "<tr><td colspan=\"4\">Sin registros</td></tr>";
-    return;
-  }
-
-  adminTableBody.innerHTML = items
-    .map((item) => {
-      const date = formatDateTime(item.date);
-      const name = escapeHtml(item.name || "Sin nombre");
-      const comment = escapeHtml(item.comment || "");
-      const stars = Number(item.stars) || 0;
-
-      return `
-        <tr>
-          <td>${date}</td>
-          <td>${name}</td>
-          <td class="stars" aria-label="${stars} de 5 estrellas">${starsLabel(stars)}</td>
-          <td>${comment}</td>
-        </tr>
-      `;
-    })
-    .join("");
-}
-
-function renderSalesDashboard(records) {
-  if (
-    !(salesTableBody instanceof HTMLElement) ||
-    !(salesTotalOrders instanceof HTMLElement) ||
-    !(salesRevenue instanceof HTMLElement) ||
-    !(salesActiveOrders instanceof HTMLElement) ||
-    !(salesCompletedOrders instanceof HTMLElement)
-  ) {
-    return;
-  }
-
-  const totalOrders = records.length;
-  const totalRevenue = records.reduce((sum, item) => sum + (Number(item.total) || 0), 0);
-  const activeOrders = records.filter((item) => item.status === "pendiente" || item.status === "enviado").length;
-  const completedOrders = records.filter((item) => item.status === "completado").length;
-
-  salesTotalOrders.textContent = String(totalOrders);
-  salesRevenue.textContent = formatMxCurrency(totalRevenue);
-  salesActiveOrders.textContent = String(activeOrders);
-  salesCompletedOrders.textContent = String(completedOrders);
-
-  if (!records.length) {
-    salesTableBody.innerHTML = "<tr><td colspan=\"9\">Todavia no hay ventas registradas en este navegador.</td></tr>";
-    adminStatus.textContent = "Sin ventas registradas por ahora.";
-    return;
-  }
-
-  const paymentSummary = records.reduce((summary, registro) => {
-    const method = String(registro.metodo_pago || 'Otro').toLowerCase();
-    if (!summary[method]) {
-      summary[method] = { count: 0, total: 0 };
-    }
-    summary[method].count += 1;
-    summary[method].total += Number(registro.total) || 0;
-    return summary;
-  }, {});
-
-  if (salesCashCount instanceof HTMLElement) {
-    salesCashCount.textContent = String(paymentSummary.efectivo?.count || 0);
-  }
-  if (salesCashTotal instanceof HTMLElement) {
-    salesCashTotal.textContent = formatMxCurrency(paymentSummary.efectivo?.total || 0);
-  }
-  if (salesTransferCount instanceof HTMLElement) {
-    salesTransferCount.textContent = String(paymentSummary.transferencia?.count || 0);
-  }
-  if (salesTransferTotal instanceof HTMLElement) {
-    salesTransferTotal.textContent = formatMxCurrency(paymentSummary.transferencia?.total || 0);
-  }
-
-  adminStatus.textContent = `${totalOrders} ventas registradas. ${activeOrders} activas y ${completedOrders} completadas.`;
-  salesTableBody.innerHTML = records
-    .map((item) => {
-      const productSummary = item.resumen_productos || (Array.isArray(item.productos) && item.productos.length
-        ? item.productos
-            .map((product) => `${Number(product.cantidad) || 0}x ${escapeHtml(product.nombre || 'Producto')}`)
-            .join('<br />')
-        : 'Sin detalle');
-      const internalId = escapeHtml(item.id || item.folio || 'Sin ID');
-      const folio = escapeHtml(item.folio || item.id || 'Sin Folio');
-      const total = formatMxCurrency(item.total);
-      const createdAt = formatDateTime(item.fecha_hora || item.createdAt || item.updatedAt);
-      const status = String(item.estado || item.status || 'pendiente');
-      const method = escapeHtml(item.metodo_pago || 'N/A');
-      const mesa = escapeHtml(item.mesa_origen || 'N/A');
-      const recibido = item.recibido_con != null ? formatMxCurrency(item.recibido_con) : '-';
-      const cambio = item.cambio != null ? formatMxCurrency(item.cambio) : '-';
-
-      return `
-        <tr>
-          <td><strong>${folio}</strong></td>
-          <td>${mesa}</td>
-          <td>${method}</td>
-          <td>${productSummary}</td>
-          <td>${recibido}</td>
-          <td>${cambio}</td>
-          <td>${total}</td>
-          <td>${createdAt}</td>
-          <td>
-            <label class="sr-only" for="status-${internalId}">Estado de la venta ${internalId}</label>
-            <select id="status-${internalId}" class="admin-status-select" data-sales-order-id="${internalId}">
-              <option value="pendiente" ${status === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-              <option value="enviado" ${status === 'enviado' ? 'selected' : ''}>Enviado</option>
-              <option value="completado" ${status === 'completado' ? 'selected' : ''}>Completado</option>
-            </select>
-          </td>
-        </tr>
-      `;
-    })
-    .join('');
-}
-
-function syncSalesDashboard() {
-  renderSalesDashboard(readSalesRecords());
-}
-
-function updateOrderStatus(orderId, status) {
-  const nextRecords = readSalesRecords().map((item) => {
-    if (item.id !== orderId && item.folio !== orderId) return item;
-
-    return {
-      ...item,
-      estado: status,
-      status,
-      updatedAt: new Date().toISOString(),
-    };
-  });
-
-  writeSalesRecords(nextRecords);
-  syncSalesDashboard();
-}
-
-async function loadAdminReviews() {
-  try {
-    const response = await fetch("/api/reviews", {
-      headers: { Accept: "application/json" },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}`);
-    }
-
-    const payload = await response.json();
-    renderReviewsTable(payload.items || []);
-  } catch {
-    if (adminTableBody instanceof HTMLElement) {
-      adminTableBody.innerHTML = "<tr><td colspan=\"4\">Error al cargar datos</td></tr>";
-    }
-  }
-}
-
-function unlockAdminPanel(message) {
-  window.sessionStorage.setItem(ADMIN_SESSION_KEY, "open");
-  setDashboardVisibility(true);
-  adminAccessStatus.textContent = message;
-  syncSalesDashboard();
-  loadAdminReviews();
-}
-
-if (adminAccessForm instanceof HTMLFormElement) {
-  adminAccessForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const candidateCode = String(adminAccessCode?.value || "").trim();
-    const savedCode = getStoredAdminCode();
-
-    if (candidateCode.length < 4) {
-      adminAccessStatus.textContent = "Usa una clave de al menos 4 caracteres.";
-      adminAccessCode?.focus();
-      return;
-    }
-
-    if (!savedCode) {
-      window.localStorage.setItem(ADMIN_ACCESS_CODE_KEY, candidateCode);
-      unlockAdminPanel("Clave creada y acceso concedido en este navegador.");
-      adminAccessForm.reset();
-      return;
-    }
-
-    if (candidateCode !== savedCode) {
-      adminAccessStatus.textContent = "Clave incorrecta. Verifica e intenta de nuevo.";
-      adminAccessCode?.focus();
-      adminAccessCode?.select();
-      return;
-    }
-
-    unlockAdminPanel("Acceso correcto. Panel actualizado en tiempo real.");
-    adminAccessForm.reset();
-  });
-}
-
-if (adminResetSession instanceof HTMLButtonElement) {
-  adminResetSession.addEventListener("click", () => {
-    window.sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    setDashboardVisibility(false);
-    adminAccessStatus.textContent = "Acceso local cerrado.";
-    adminAccessForm?.reset();
-  });
-}
-
-if (adminClearSales instanceof HTMLButtonElement) {
-  adminClearSales.addEventListener("click", () => {
-    const shouldClear = window.confirm("Esto borrara el historial de ventas guardado en este navegador. Quieres continuar?");
-    if (!shouldClear) return;
-
-    writeSalesRecords([]);
-    syncSalesDashboard();
-  });
-}
-
-if (salesTableBody instanceof HTMLElement) {
-  salesTableBody.addEventListener("change", (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLSelectElement)) return;
-
-    const orderId = target.dataset.salesOrderId;
-    if (!orderId) return;
-
-    updateOrderStatus(orderId, target.value);
-  });
-}
-
-window.addEventListener("storage", (event) => {
-  if ((event.key === SALES_STORAGE_KEY || event.key === CAJA_MOVEMENTS_KEY) && isAdminSessionUnlocked()) {
-    syncSalesDashboard();
-  }
-});
-
-if ("BroadcastChannel" in window) {
-  const channel = new BroadcastChannel(SALES_SYNC_CHANNEL);
-  channel.addEventListener("message", (event) => {
-    if (event.data?.type === "sales:update" && isAdminSessionUnlocked()) {
-      syncSalesDashboard();
-    }
-  });
-}
-
-if (isAdminSessionUnlocked()) {
-  unlockAdminPanel("Acceso recuperado en esta sesion.");
-} else {
-  setDashboardVisibility(false);
-}
-
-// ============================================================================
-// Integración: Dashboard de Movimientos de Caja
-// ============================================================================
-// Importar módulo de caja dashboard
+/**
+ * Administrador de Tacos Fabian.
+ * Autorización: identidad real y rol personalizado "admin" de Azure Static Web Apps.
+ * Fuente de verdad de ventas: /api/movements/daily (Azure Table Storage).
+ * No se guardan claves ni movimientos comerciales en el navegador.
+ */
+import { getAPIService } from './services/api-service.js';
 import CajaAdminDashboard from './modules/admin/caja-dashboard.js';
 
-// Inicializar dashboard cuando el panel esté unlocked
-const originalUnlockAdminPanel = unlockAdminPanel;
-unlockAdminPanel = function(message) {
-  originalUnlockAdminPanel(message);
-  
-  // Inicializar dashboard de caja
-  setTimeout(() => {
-    if (isAdminSessionUnlocked()) {
-      const cajaDashboard = new CajaAdminDashboard();
-      cajaDashboard.init().catch(error => {
-        console.warn('Error inicializando dashboard de caja:', error);
-      });
-    }
-  }, 500);
+const api = getAPIService();
+const gate = document.querySelector('#adminAccessGate');
+const gateStatus = document.querySelector('#adminAccessStatus');
+const dashboard = document.querySelector('#adminDashboard');
+const adminStatus = document.querySelector('#adminStatus');
+const table = document.querySelector('#salesTableBody');
+const reviewsTable = document.querySelector('#adminTableBody');
+let ownerDashboard;
+let adminAuthorized = false;
+
+const $ = (selector) => document.querySelector(selector);
+const mxn = (value) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(Number(value) || 0);
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const todayLocal = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-if (isAdminSessionUnlocked()) {
-  setTimeout(() => {
-    const cajaDashboard = new CajaAdminDashboard();
-    cajaDashboard.init().catch(error => {
-      console.warn('Error inicializando dashboard de caja:', error);
-    });
-  }, 500);
+function setAuthorized(authorized, message = '') {
+  adminAuthorized = authorized;
+  if (gate) gate.hidden = authorized;
+  if (dashboard) {
+    dashboard.hidden = !authorized;
+    dashboard.setAttribute('aria-hidden', String(!authorized));
+  }
+  if (gateStatus) gateStatus.textContent = message;
 }
 
+async function verifyAdminIdentity() {
+  const response = await fetch('/.auth/me', { credentials: 'same-origin', cache: 'no-store' });
+  if (!response.ok) throw new Error('No se pudo validar la sesión de Azure.');
+  const payload = await response.json();
+  const principal = payload?.clientPrincipal;
+  return Boolean(principal?.userId && Array.isArray(principal.userRoles) && principal.userRoles.includes('admin'));
+}
+
+function normalizeSale(sale) {
+  let products = sale.productos;
+  if (typeof products === 'string') {
+    try { products = JSON.parse(products); } catch { products = []; }
+  }
+  return { ...sale, productos: Array.isArray(products) ? products : [], total: Number(sale.total) || 0 };
+}
+
+function updateKpi(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = String(value);
+}
+
+function resetSalesDisplay(message) {
+  for (const id of ['salesTotalOrders', 'salesRevenue', 'salesActiveOrders', 'salesCompletedOrders', 'salesCashCount', 'salesCashTotal', 'salesTransferCount', 'salesTransferTotal']) {
+    updateKpi(id, '—');
+  }
+  if (table) table.innerHTML = `<tr><td colspan="9">${escapeHtml(message)}</td></tr>`;
+  if (adminStatus) adminStatus.textContent = message;
+}
+
+function renderSales(sales, date) {
+  const total = sales.reduce((n, s) => n + s.total, 0);
+  const active = sales.filter((s) => ['registrado', 'pendiente', 'enviado'].includes(String(s.estado || '').toLowerCase())).length;
+  const completed = sales.filter((s) => String(s.estado || '').toLowerCase() === 'completado').length;
+  const byMethod = (method) => sales.filter((s) => String(s.metodo_pago || '').toLowerCase() === method);
+  const cash = byMethod('efectivo');
+  const transfers = byMethod('transferencia');
+  updateKpi('salesTotalOrders', sales.length);
+  updateKpi('salesRevenue', mxn(total));
+  updateKpi('salesActiveOrders', active);
+  updateKpi('salesCompletedOrders', completed);
+  updateKpi('salesCashCount', cash.length);
+  updateKpi('salesCashTotal', mxn(cash.reduce((n, s) => n + s.total, 0)));
+  updateKpi('salesTransferCount', transfers.length);
+  updateKpi('salesTransferTotal', mxn(transfers.reduce((n, s) => n + s.total, 0)));
+  if (adminStatus) adminStatus.textContent = `Ventas del ${date}: ${sales.length} movimientos obtenidos del servidor.`;
+  if (!table) return;
+  table.innerHTML = sales.length ? sales.map((s) => {
+    const summary = s.resumen_productos || s.producto_concepto ||
+      s.productos.map((p) => `${p.cantidad || 0}x ${p.nombre || 'Producto'}`).join(', ');
+    const stamp = new Date(s.fecha_hora);
+    const when = Number.isNaN(stamp.getTime()) ? '—' : stamp.toLocaleString('es-MX');
+    // Estado en modo consulta: cambiarlo en el navegador no actualiza Azure Table Storage.
+    return `<tr>
+      <td><strong>${escapeHtml(s.folio)}</strong></td>
+      <td>${escapeHtml(s.mesa_origen)}</td>
+      <td>${escapeHtml(s.metodo_pago)}</td>
+      <td>${escapeHtml(summary)}</td>
+      <td>${s.recibido_con == null ? '—' : mxn(s.recibido_con)}</td>
+      <td>${s.cambio == null ? '—' : mxn(s.cambio)}</td>
+      <td>${mxn(s.total)}</td>
+      <td>${escapeHtml(when)}</td>
+      <td>${escapeHtml(s.estado || 'registrado')}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="9">Sin ventas para la fecha de hoy.</td></tr>';
+}
+
+async function loadSales() {
+  if (!adminAuthorized) return;
+  const date = ownerDashboard?.filterDate || todayLocal();
+  try {
+    const result = await api.getDailyMovements(date);
+    if (!result || !Array.isArray(result.movements)) throw new Error('Respuesta de ventas no válida.');
+    renderSales(result.movements.map(normalizeSale), date);
+  } catch (error) {
+    resetSalesDisplay('No se pudieron consultar las ventas. No se muestran datos almacenados en el navegador.');
+    console.warn('Consulta administrativa de ventas no disponible:', error.message);
+  }
+}
+
+function starText(input) {
+  const n = Math.max(0, Math.min(5, Number(input) || 0));
+  return `${'★'.repeat(n)}${'☆'.repeat(5 - n)}`;
+}
+
+async function loadReviews() {
+  if (!adminAuthorized || !reviewsTable) return;
+  try {
+    const response = await fetch('/api/reviews', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error('Reseñas no disponibles');
+    const payload = await response.json();
+    const rows = Array.isArray(payload?.items) ? payload.items : [];
+    reviewsTable.innerHTML = rows.length ? rows.map((r) => {
+      const d = new Date(r.date);
+      const when = Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('es-MX');
+      return `<tr><td>${escapeHtml(when)}</td><td>${escapeHtml(r.name || 'Sin nombre')}</td><td>${escapeHtml(starText(r.stars))}</td><td>${escapeHtml(r.comment || '')}</td></tr>`;
+    }).join('') : '<tr><td colspan="4">Sin reseñas registradas.</td></tr>';
+  } catch {
+    reviewsTable.innerHTML = '<tr><td colspan="4">No se pudieron consultar las reseñas.</td></tr>';
+  }
+}
+
+async function initializeAdmin() {
+  setAuthorized(false, 'Verificando sesión y rol admin...');
+  try {
+    const isAdmin = await verifyAdminIdentity();
+    if (!isAdmin) {
+      setAuthorized(false, 'Acceso denegado: tu cuenta no tiene el rol admin autorizado.');
+      return;
+    }
+    setAuthorized(true);
+    ownerDashboard = new CajaAdminDashboard();
+    await Promise.all([loadSales(), loadReviews(), ownerDashboard.init()]);
+    $('#cajaFilterDate')?.addEventListener('change', () => void loadSales());
+    $('#adminRefreshSales')?.addEventListener('click', () => {
+      void loadSales();
+      void ownerDashboard?.loadMovements();
+    });
+    // Revalidar identidad al regresar a la pestaña antes de mostrar nuevas consultas.
+    window.addEventListener('pageshow', async () => {
+      try {
+        if (!await verifyAdminIdentity()) {
+          ownerDashboard?.destroy();
+          resetSalesDisplay('La sesión administrativa ha terminado.');
+          setAuthorized(false, 'Inicia sesión nuevamente con una cuenta autorizada.');
+        }
+      } catch {
+        ownerDashboard?.destroy();
+        setAuthorized(false, 'No se pudo verificar la sesión.');
+      }
+    });
+  } catch (error) {
+    setAuthorized(false, 'No se pudo verificar la identidad de Azure Static Web Apps.');
+    console.warn('Validación administrativa no disponible:', error.message);
+  }
+}
+
+void initializeAdmin();

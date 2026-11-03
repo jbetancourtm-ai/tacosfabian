@@ -22,23 +22,37 @@ const products = [
   { id: 'taco-longaniza', nombre: 'Taco de longaniza', categoria: 'Tacos', precio: 16 },
   { id: 'taco-campechano', nombre: 'Taco campechano', categoria: 'Tacos', precio: 18 },
   { id: 'taco-cochinita', nombre: 'Taco de cochinita pibil', categoria: 'Tacos', precio: 16 },
+  { id: 'taco-carne-dorada', nombre: 'Taco de carne dorada', categoria: 'Tacos', precio: 24 },
+  { id: 'taco-trozo-chico', nombre: 'Taco de trozo chico', categoria: 'Tacos', precio: 80 },
+  { id: 'taco-trozo-grande', nombre: 'Taco de trozo grande', categoria: 'Tacos', precio: 158 },
+  { id: 'taco-no-picado-chico', nombre: 'Taco no muy picado chico', categoria: 'Tacos', precio: 48 },
+  { id: 'taco-no-picado-grande', nombre: 'Taco no muy picado grande', categoria: 'Tacos', precio: 80 },
+  { id: 'taco-suadero-especial', nombre: 'Taco de suadero especial', categoria: 'Tacos', precio: 27 },
+  { id: 'tortilla-semidorada', nombre: 'Tortilla semidorada', categoria: 'Tacos', precio: 18 },
   { id: 'tostada-pastor', nombre: 'Tostada de pastor', categoria: 'Tostadas', precio: 17 },
   { id: 'tostada-suadero', nombre: 'Tostada de suadero', categoria: 'Tostadas', precio: 17 },
   { id: 'tostada-longaniza', nombre: 'Tostada de longaniza', categoria: 'Tostadas', precio: 17 },
   { id: 'tostada-campechano', nombre: 'Tostada campechano', categoria: 'Tostadas', precio: 18 },
   { id: 'tostada-cochinita', nombre: 'Tostada de cochinita pibil', categoria: 'Tostadas', precio: 17 },
+  { id: 'tostada-suadero-dorado', nombre: 'Tostada de suadero dorado', categoria: 'Tostadas', precio: 24 },
+  { id: 'tostada-sola', nombre: 'Tostada sola', categoria: 'Tostadas', precio: 1 },
   { id: 'torta-pastor', nombre: 'Torta de pastor', categoria: 'Tortas', precio: 68 },
   { id: 'torta-suadero', nombre: 'Torta de suadero', categoria: 'Tortas', precio: 68 },
   { id: 'torta-longaniza', nombre: 'Torta de longaniza', categoria: 'Tortas', precio: 68 },
   { id: 'torta-campechano', nombre: 'Torta campechano', categoria: 'Tortas', precio: 75 },
   { id: 'torta-cochinita', nombre: 'Torta de cochinita pibil', categoria: 'Tortas', precio: 68 },
-  { id: 'kilo-suadero', nombre: 'Suadero 1kg', categoria: 'Por kilo', precio: 500 },
+  { id: 'torta-carne-dorada', nombre: 'Torta de carne dorada', categoria: 'Tortas', precio: 85 },
+  { id: 'torta-no-picado', nombre: 'Torta no muy picado', categoria: 'Tortas', precio: 85 },
+  { id: 'torta-trozo-chico', nombre: 'Torta de trozo chico', categoria: 'Tortas', precio: 85 },
+  { id: 'kilo-suadero', nombre: 'Suadero 1kg', categoria: 'Por kilo', precio: 590 },
   { id: 'kilo-pastor', nombre: 'Pastor 1kg', categoria: 'Por kilo', precio: 460 },
   { id: 'kilo-cochinita', nombre: 'Cochinita pibil 1kg', categoria: 'Por kilo', precio: 460 },
-  { id: 'kilo-campechano', nombre: 'Campechano 1kg', categoria: 'Por kilo', precio: 0, pendingPrice: true },
-  { id: 'kilo-longaniza', nombre: 'Longaniza 1kg', categoria: 'Por kilo', precio: 0, pendingPrice: true },
+  { id: 'kilo-campechano', nombre: 'Campechano 1kg', categoria: 'Por kilo', precio: 460 },
+  { id: 'kilo-longaniza', nombre: 'Longaniza 1kg', categoria: 'Por kilo', precio: 460 },
   { id: 'refresco', nombre: 'Refresco', categoria: 'Bebidas', precio: 30 },
-  { id: 'agua', nombre: 'Agua', categoria: 'Bebidas', precio: 30 },
+  { id: 'agua-sabor-medio', nombre: 'Agua de sabor 1/2 litro', categoria: 'Bebidas', precio: 30 },
+  { id: 'agua-sabor-litro', nombre: 'Agua de sabor 1 litro', categoria: 'Bebidas', precio: 45 },
+  { id: 'agua', nombre: 'Agua embotellada 1 litro', categoria: 'Bebidas', precio: 30 },
   { id: 'propina', nombre: 'Propina', categoria: 'Otros', precio: 1 },
   { id: 'otro', nombre: 'Otro concepto manual', categoria: 'Otros', precio: 0, isCustom: true, descripcion: '', customPrice: 0 },
 ];
@@ -64,8 +78,7 @@ function hashPin(pin) {
 }
 
 // Cache PIN (válido durante la sesión)
-const SESSION_PIN_KEY = 'tacos_fabian_caja_session_pin';
-const PIN_HASH = hashPin('1980'); // PIN: 1980
+const SESSION_ROLE_KEY = 'tacos_fabian_caja_session_role';
 const SALES_STORAGE_KEY = 'tacos_fabian_sales_records_v1';
 const SALES_SYNC_CHANNEL = 'tacos-fabian-sales-sync';
 
@@ -139,12 +152,16 @@ const currentDateDisplay = document.getElementById('cajaCurrentDate');
 // ============================================================================
 // Inicialización
 // ============================================================================
-function init() {
-  // Verificar si hay sesión válida
-  const sessionPin = sessionStorage.getItem(SESSION_PIN_KEY);
-  if (sessionPin === PIN_HASH) {
-    authenticateUser();
-  } else {
+async function init() {
+  // La sesión sólo se considera válida si el backend la verifica en el servidor.
+  try {
+    const session = await getAPIService().validateCajaSession();
+    if (session && session.valid && session.role === 'caja') {
+      authenticateUser();
+    } else {
+      showAccessGate();
+    }
+  } catch (error) {
     showAccessGate();
   }
 
@@ -190,18 +207,26 @@ function authenticateUser() {
 function setupEventListeners() {
   // Acceso a caja - Validación de PIN
   if (accessForm) {
-    accessForm.addEventListener('submit', (e) => {
+    accessForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const pin = pinInput.value.trim();
-      const pinHash = hashPin(pin);
 
-      if (pinHash === PIN_HASH) {
-        sessionStorage.setItem(SESSION_PIN_KEY, PIN_HASH);
+      try {
+        const result = await getAPIService().validateCajaPin(pin);
+        if (result && result.valid) {
+          sessionStorage.setItem(SESSION_ROLE_KEY, result.role || 'caja');
+          pinInput.value = '';
+          accessStatus.style.display = 'none';
+          authenticateUser();
+          return;
+        }
+
+        accessStatus.textContent = result?.error || 'PIN incorrecto. Intenta de nuevo.';
+        accessStatus.style.display = 'block';
         pinInput.value = '';
-        accessStatus.style.display = 'none';
-        authenticateUser();
-      } else {
-        accessStatus.textContent = 'PIN incorrecto. Intenta de nuevo.';
+        pinInput.focus();
+      } catch (error) {
+        accessStatus.textContent = error?.message || 'No se pudo validar el PIN.';
         accessStatus.style.display = 'block';
         pinInput.value = '';
         pinInput.focus();

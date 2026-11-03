@@ -1,10 +1,10 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es-MX">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin | Tacos Fabian</title>
-    <meta name="description" content="Panel administrativo de resenas de Tacos Fabian" />
+    <meta name="description" content="Panel administrativo de ventas y reseñas de Tacos Fabian" />
     <link rel="icon" type="image/svg+xml" href="/logo-tacos-fabian.svg" />
     <link rel="shortcut icon" href="/logo-tacos-fabian.svg" />
     <link rel="stylesheet" href="/src/styles.css" />
@@ -44,21 +44,10 @@
         <section id="adminAccessGate" class="card admin-access-card" aria-labelledby="adminAccessTitle">
           <div>
             <p class="section-kicker">Acceso seguro</p>
-            <h2 id="adminAccessTitle">Valida tu clave del panel</h2>
-            <p class="muted">Esta capa extra protege ventas e historial. La clave se guarda solo en este navegador.</p>
+            <h2 id="adminAccessTitle">Verificando identidad del administrador</h2>
+            <p id="adminAccessStatus" class="muted" role="status" aria-live="polite">Consultando permisos en Azure Static Web Apps...</p>
+            <p><a class="btn btn-primary" href="/.auth/login/github?post_login_redirect_uri=/admin">Iniciar sesión con GitHub</a></p>
           </div>
-
-          <form id="adminAccessForm" class="admin-access-form">
-            <label class="order-modal__field">
-              <span>Clave de administrador</span>
-              <input id="adminAccessCode" name="adminAccessCode" type="password" autocomplete="current-password" maxlength="64" required />
-            </label>
-            <div class="admin-access-actions">
-              <button class="btn btn-primary" type="submit">Entrar al panel</button>
-              <button id="adminResetSession" class="btn btn-secondary" type="button">Cerrar acceso local</button>
-            </div>
-            <p id="adminAccessStatus" class="muted" aria-live="polite">Usa tu clave para ver ventas y pedidos.</p>
-          </form>
         </section>
 
         <section id="adminDashboard" class="admin-dashboard" hidden aria-hidden="true">
@@ -68,12 +57,12 @@
             <article class="card admin-kpi">
               <span class="admin-kpi__label">Pedidos</span>
               <strong id="salesTotalOrders" class="admin-kpi__value">0</strong>
-              <small class="admin-kpi__hint">Historico guardado</small>
+              <small class="admin-kpi__hint">Ventas de la fecha seleccionada</small>
             </article>
             <article class="card admin-kpi">
               <span class="admin-kpi__label">Total vendido</span>
               <strong id="salesRevenue" class="admin-kpi__value">$0 MXN</strong>
-              <small class="admin-kpi__hint">Acumulado registrado</small>
+              <small class="admin-kpi__hint">Total de la fecha seleccionada</small>
             </article>
             <article class="card admin-kpi">
               <span class="admin-kpi__label">Pedidos activos</span>
@@ -107,7 +96,7 @@
                   <p class="section-kicker">Ingresos</p>
                   <h2 id="salesTableTitle">Tabla de ventas</h2>
                 </div>
-                <button id="adminClearSales" class="btn btn-secondary" type="button">Limpiar historial local</button>
+                <button id="adminRefreshSales" class="btn btn-secondary" type="button">Actualizar ventas</button>
               </div>
 
               <div class="table-wrap" role="region" aria-label="Tabla de ventas" tabindex="0">

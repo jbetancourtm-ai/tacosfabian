@@ -1,43 +1,90 @@
 /**
  * Azure Function: Validar PIN de caja
  * POST /api/auth/validate-pin
- * Body: { pin: string, type: 'caja' | 'admin' }
+ * Body: { pin: string, type: 'caja' }. Admin usa identidad SWA.
  * Response: { valid: boolean, message: string }
  */
 
-const CAJA_PIN = process.env.CAJA_PIN || '1234'; // Cambiar en AppSettings
-const ADMIN_PIN = process.env.ADMIN_PIN || '9999'; // Cambiar en AppSettings
+import {
+  checkAndRecordLoginAttempt,
+  issueAuthSession,
+  resetLoginAttempts,
+  getSessionCookieName,
+  getSessionCookie,
+  verifySessionToken,
+} from '../lib/auth.js';
+
+const CAJA_PIN = process.env.CAJA_PIN || '';
+// La administración utiliza exclusivamente la identidad y el rol de SWA.
 
 export default async function (context, req) {
   try {
-    const { pin, type = 'caja' } = req.body;
+    const action = (context.bindingData && context.bindingData.action) || 'validate-pin';
 
-    // Validaciones básicas
+    if (req.method === 'GET' && action === 'session') {
+      const token = getSessionCookie(req);
+      const session = token ? verifySessionToken(token) : null;
+
+      if (!session || !session.role) {
+        return unauthorized(context, 'Sesión no válida');
+      }
+
+      return success(context, {
+        valid: true,
+        role: session.role,
+        message: 'Sesión válida',
+      });
+    }
+
+    const { pin, type = 'caja' } = req.body || {};
+    const roleType = String(type || '').toLowerCase();
+
+    if (roleType !== 'caja') {
+      return invalidRequest(context, 'Tipo de acceso inválido');
+    }
+
+    const loginAttempt = checkAndRecordLoginAttempt(req);
+    if (!loginAttempt.allowed) {
+      return tooManyAttempts(context, 'Demasiados intentos. Intenta más tarde.');
+    }
+
     if (!pin || typeof pin !== 'string') {
       return invalidRequest(context, 'PIN inválido');
     }
 
-    // Validar PIN según tipo
-    let isValid = false;
-    let message = 'PIN incorrecto';
-
-    if (type === 'caja' && pin === CAJA_PIN) {
-      isValid = true;
-      message = 'Autenticación de caja exitosa';
-    } else if (type === 'admin' && pin === ADMIN_PIN) {
-      isValid = true;
-      message = 'Autenticación de admin exitosa';
+    if (!CAJA_PIN) {
+      return serverError(context, 'El PIN de caja no está configurado en el servidor.');
     }
 
-    context.res = {
+    const isValid = pin === CAJA_PIN;
+
+    if (!isValid) {
+      return unauthorized(context, 'PIN incorrecto');
+    }
+
+    resetLoginAttempts(req);
+    const session = issueAuthSession({ role: roleType, user: roleType });
+
+    const response = {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': session.cookie,
+      },
       body: {
-        valid: isValid,
-        message,
+        valid: true,
+        role: roleType,
+        message: `Autenticación de ${roleType} exitosa`,
         timestamp: new Date().toISOString(),
+        session: {
+          name: getSessionCookieName(),
+          valid: true,
+        },
       },
     };
+
+    context.res = response;
+    return response;
   } catch (error) {
     context.log.error('Error en validación de PIN:', error);
     return serverError(context, 'Error al procesar solicitud');
@@ -45,17 +92,51 @@ export default async function (context, req) {
 }
 
 function invalidRequest(context, message) {
-  context.res = {
+  const response = {
     status: 400,
     headers: { 'Content-Type': 'application/json' },
     body: { error: message },
   };
+  context.res = response;
+  return response;
+}
+
+function success(context, body) {
+  const response = {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  };
+  context.res = response;
+  return response;
+}
+
+function unauthorized(context, message) {
+  const response = {
+    status: 401,
+    headers: { 'Content-Type': 'application/json' },
+    body: { error: message },
+  };
+  context.res = response;
+  return response;
+}
+
+function tooManyAttempts(context, message) {
+  const response = {
+    status: 429,
+    headers: { 'Content-Type': 'application/json' },
+    body: { error: message },
+  };
+  context.res = response;
+  return response;
 }
 
 function serverError(context, message) {
-  context.res = {
+  const response = {
     status: 500,
     headers: { 'Content-Type': 'application/json' },
     body: { error: message },
   };
+  context.res = response;
+  return response;
 }

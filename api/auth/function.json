@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["POST"],
-      "route": "auth/validate-pin"
+      "methods": ["POST", "GET"],
+      "route": "auth/{action}"
     },
     {
       "type": "http",

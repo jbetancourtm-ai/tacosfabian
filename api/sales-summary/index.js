@@ -6,35 +6,42 @@
  */
 
 import { TableClient, AzureNamedKeyCredential } from '@azure/data-tables';
+import { requireRole } from '../lib/auth.js';
 
 const TABLE_NAME = process.env.MOVEMENTS_TABLE_NAME || 'SalesMovements';
+const STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
 const STORAGE_ACCOUNT = process.env.AZURE_STORAGE_ACCOUNT_NAME || 'tacosfabianstg';
 const STORAGE_KEY = process.env.AZURE_STORAGE_ACCOUNT_KEY || '';
 
 let tableClient = null;
 
 function getTableClient() {
-  if (!tableClient && STORAGE_ACCOUNT && STORAGE_KEY) {
-    try {
-      const credential = new AzureNamedKeyCredential(STORAGE_ACCOUNT, STORAGE_KEY);
-      tableClient = new TableClient(
-        `https://${STORAGE_ACCOUNT}.table.core.windows.net`,
-        TABLE_NAME,
-        credential
-      );
-    } catch (error) {
-      console.warn('No se pudo conectar a Table Storage');
-    }
-  }
-  return tableClient;
-}
+  if (tableClient) return tableClient;
 
-// Mock en memoria
-const mockMovements = [];
+  if (STORAGE_CONNECTION_STRING) {
+    tableClient = TableClient.fromConnectionString(STORAGE_CONNECTION_STRING, TABLE_NAME);
+    return tableClient;
+  }
+
+  if (STORAGE_ACCOUNT && STORAGE_KEY) {
+    tableClient = new TableClient(
+      `https://${STORAGE_ACCOUNT}.table.core.windows.net`,
+      TABLE_NAME,
+      new AzureNamedKeyCredential(STORAGE_ACCOUNT, STORAGE_KEY)
+    );
+    return tableClient;
+  }
+
+  throw new Error('Almacenamiento de ventas no configurado.');
+}
 
 export default async function (context, req) {
   try {
     const { operation } = context.bindingData;
+
+    if (!requireRole(req, ['admin'])) {
+      return unauthorized(context, 'No autorizado para consultar resumen de ventas.');
+    }
 
     if (operation === 'daily') {
       return await handleDailySummary(context, req);
@@ -132,33 +139,19 @@ async function handleKPI(context, req) {
 async function getMovementsByDate(context, date) {
   const partitionKey = sanitizePartitionKey(date);
 
-  try {
-    const client = getTableClient();
-    if (client) {
-      const entities = [];
-      const iterator = client.listEntities({
-        queryOptions: {
-          filter: `PartitionKey eq '${partitionKey}'`,
-        },
-      });
+  const client = getTableClient();
+  const entities = [];
+  const iterator = client.listEntities({
+    queryOptions: {
+      filter: `PartitionKey eq '${partitionKey}'`,
+    },
+  });
 
-      for await (const entity of iterator) {
-        if (entity.estado !== 'cancelado') {
-          entities.push(entity);
-        }
-      }
-
-      return entities;
-    }
-  } catch (error) {
-    context.log.warn('Error con Table Storage, usando mock');
+  for await (const entity of iterator) {
+    if (entity.estado !== 'cancelado') entities.push(entity);
   }
 
-  // Fallback a mock
-  return mockMovements.filter((m) => {
-    const mDate = new Date(m.fecha_hora).toISOString().split('T')[0];
-    return mDate === date && m.estado !== 'cancelado';
-  });
+  return entities;
 }
 
 function calculateSummary(movements) {
@@ -227,6 +220,7 @@ function success(context, data) {
     headers: { 'Content-Type': 'application/json' },
     body: data,
   };
+  return context.res;
 }
 
 function notFound(context) {
@@ -235,6 +229,7 @@ function notFound(context) {
     headers: { 'Content-Type': 'application/json' },
     body: { error: 'Endpoint no encontrado' },
   };
+  return context.res;
 }
 
 function serverError(context, message) {
@@ -243,4 +238,14 @@ function serverError(context, message) {
     headers: { 'Content-Type': 'application/json' },
     body: { error: message },
   };
+  return context.res;
+}
+
+function unauthorized(context, message) {
+  context.res = {
+    status: 401,
+    headers: { 'Content-Type': 'application/json' },
+    body: { error: message },
+  };
+  return context.res;
 }
