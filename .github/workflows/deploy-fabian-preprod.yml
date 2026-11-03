@@ -1,0 +1,41 @@
+name: Deploy Fabian Preprod
+
+on:
+  push:
+    branches:
+      - preprod-admin-seguro-20261103
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: preprod-fabian
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Install Azure Static Web Apps CLI
+        run: npm install -g @azure/static-web-apps-cli
+
+      - name: Deploy preproduction app
+        env:
+          SWA_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_FABIAN }}
+        run: |
+          npx @azure/static-web-apps-cli deploy ./dist \
+            --api-location ./api \
+            --swa-config-location . \
+            --deployment-token "$SWA_DEPLOYMENT_TOKEN" \
+            --env production
