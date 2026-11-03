@@ -12325,6 +12325,12 @@ body {
   gap: 1rem;
 }
 
+/* Respetar el atributo hidden de la compuerta y del panel administrativo. */
+.admin-access-card[hidden],
+.admin-dashboard[hidden] {
+  display: none !important;
+}
+
 .admin-access-actions,
 .admin-panel-card__head {
   display: flex;
