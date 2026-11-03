@@ -59,4 +59,5 @@ jobs:
 
       - name: Show preproduction URL
         if: success()
-        run: echo "Preproduction deployment URL: ${{ steps.deploy.outputs.static_web_app_url }}"
+        run: |
+          echo "Preproduction deployment URL: ${{ steps.deploy.outputs.static_web_app_url }}"
