@@ -6,19 +6,28 @@ on:
       - preprod-admin-seguro-20261103
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: fabian-preprod
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment: preprod-fabian
-
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: false
 
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
           cache: npm
 
       - name: Install dependencies
@@ -27,15 +36,27 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-      - name: Install Azure Static Web Apps CLI
-        run: npm install -g @azure/static-web-apps-cli
-
-      - name: Deploy preproduction app
+      - name: Verify preproduction deployment secret
         env:
-          SWA_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_FABIAN }}
+          FABIAN_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_FABIAN }}
         run: |
-          npx @azure/static-web-apps-cli deploy ./dist \
-            --api-location ./api \
-            --swa-config-location . \
-            --deployment-token "$SWA_DEPLOYMENT_TOKEN" \
-            --env production
+          if [ -z "$FABIAN_TOKEN" ]; then
+            echo '::error::Missing GitHub Actions secret AZURE_STATIC_WEB_APPS_API_TOKEN_FABIAN'
+            exit 1
+          fi
+
+      - name: Deploy exclusively to Azure SWA fabian
+        id: deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_FABIAN }}
+          action: upload
+          app_location: dist
+          api_location: api
+          output_location: ''
+          skip_app_build: true
+          production_branch: preprod-admin-seguro-20261103
+
+      - name: Show preproduction URL
+        if: success()
+        run: echo "Preproduction deployment URL: ${{ steps.deploy.outputs.static_web_app_url }}"
