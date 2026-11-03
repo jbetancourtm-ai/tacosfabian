@@ -1,20 +1,23 @@
 {
+  "platform": {
+    "apiRuntime": "node:22"
+  },
   "routes": [
     {
       "route": "/api/auth/*",
-      "allowedRoles": []
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/api/reviews/*",
-      "allowedRoles": []
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/api/movements/*",
-      "allowedRoles": []
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/api/sales-summary/*",
-      "allowedRoles": []
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/caja",
