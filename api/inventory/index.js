@@ -1,4 +1,5 @@
 import { TableClient } from '@azure/data-tables';
+import { randomUUID } from 'node:crypto';
 import { requireRole } from '../lib/auth.js';
 import { INVENTORY_CATALOG } from './catalog.js';
 
@@ -13,12 +14,13 @@ function respond(context, status, body) {
 
 export default async function inventory(context, req) {
   if (!requireRole(req, ['admin'])) return respond(context, 403, { error: 'Acceso administrativo requerido.' });
-  if (req.method !== 'GET' || context.bindingData.operation !== 'catalog') {
+  const operation = context.bindingData.operation;
+  if (req.method === 'POST' && operation === 'count') return createInitialCount(context, req);
+  if (req.method !== 'GET' || operation !== 'catalog') {
     return respond(context, 405, { error: 'Operación no disponible.' });
   }
 
-  // En fase 1 no se crean tablas ni registros automáticamente.
-  // Un conteo debe activarse expresamente por el propietario.
+  // Consultar nunca crea registros. Solo el conteo explícito del dueño puede inicializar stock.
   let saved = new Map();
   const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
   if (connectionString) {
@@ -52,7 +54,63 @@ export default async function inventory(context, req) {
   return respond(context, 200, {
     phase: 'catalog_only',
     autoDeductionEnabled: false,
-    stockEntryEnabled: false,
+    stockEntryEnabled: true,
     items,
   });
+}
+
+
+// Primer conteo: operación administrativa explícita, no realiza descuentos.
+// Registra el saldo inicial y la evidencia en un batch atómico de Azure Tables.
+// Si el producto ya está inicializado, la operación no lo sobrescribe.
+async function createInitialCount(context, req) {
+  const input = req.body && typeof req.body === 'object' ? req.body : {};
+  const sku = String(input.sku || '').trim();
+  const quantity = Number(input.quantity);
+  const product = INVENTORY_CATALOG.find(item => item.sku === sku);
+  if (!product || !Number.isSafeInteger(quantity) || quantity < 0 || quantity > 1000000) {
+    return respond(context, 400, { error: 'Código o cantidad inválida. Solo se permiten unidades enteras no negativas.' });
+  }
+
+  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
+  if (!connectionString) return respond(context, 503, { error: 'Almacenamiento no configurado.' });
+  const client = TableClient.fromConnectionString(connectionString, TABLE_NAME);
+
+  try {
+    try {
+      await client.createTable();
+    } catch (error) {
+      if (error?.statusCode !== 409 && error?.code !== 'TableAlreadyExists' && error?.code !== 'ResourceAlreadyExists') throw error;
+    }
+
+    const now = new Date().toISOString();
+    const eventId = randomUUID();
+    const record = {
+      partitionKey: 'inventory',
+      rowKey: product.sku,
+      quantity,
+      initialized: true,
+      updatedAt: now,
+      lastEventId: eventId,
+    };
+    const audit = {
+      partitionKey: 'inventory',
+      rowKey: 'event-' + eventId,
+      eventType: 'INITIAL_COUNT',
+      sku,
+      quantityDelta: quantity,
+      previousQuantity: -1, // -1 es marcador interno: no había conteo anterior.
+      resultingQuantity: quantity,
+      createdAt: now,
+      actorRole: 'admin',
+    };
+    await client.submitTransaction([['create', record], ['create', audit]]);
+    return respond(context, 201, { sku, quantity, initialized: true, message: 'Conteo inicial guardado y auditado.' });
+  } catch (error) {
+    if (error?.statusCode === 409 || error?.code === 'EntityAlreadyExists' || error?.code === 'ResourceExists') {
+      return respond(context, 409, { error: 'Este artículo ya tiene un conteo inicial. No se modificó.' });
+    }
+    context.log.error('Fallo al guardar inventario inicial', error);
+    return respond(context, 503, { error: 'No fue posible guardar el conteo inicial.' });
+  }
 }
