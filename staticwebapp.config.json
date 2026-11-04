@@ -28,12 +28,31 @@
       ]
     },
     {
+      "route": "/api/inventory/*",
+      "allowedRoles": [
+        "admin"
+      ]
+    },
+    {
       "route": "/caja",
       "rewrite": "/caja.html"
     },
     {
       "route": "/caja/*",
       "rewrite": "/caja.html"
+    },
+    {
+      "route": "/inventario",
+      "rewrite": "/inventario.html",
+      "allowedRoles": [
+        "admin"
+      ]
+    },
+    {
+      "route": "/inventario.html",
+      "allowedRoles": [
+        "admin"
+      ]
     },
     {
       "route": "/admin",
@@ -72,7 +91,9 @@
       "/admin/*",
       "/admin.html",
       "/favicon.ico",
-      "/assets/*"
+      "/assets/*",
+      "/inventario",
+      "/inventario.html"
     ]
   },
   "globalHeaders": {
