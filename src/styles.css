@@ -12568,7 +12568,7 @@ body {
 /* Reservar una columna lateral real para el ticket fijo de escritorio. */
 @media (min-width: 960px) {
   .menu-showcase-section > .container {
-    padding-right: clamp(22rem, 28vw, 25rem);
+    padding-right: clamp(26rem, 30vw, 28rem);
   }
 
   .menu-showcase-section .menu-grid.menu-grid,
