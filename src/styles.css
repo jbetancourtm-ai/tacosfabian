@@ -12494,3 +12494,128 @@ body {
   white-space: nowrap;
   box-shadow: 0 3px 8px rgba(63, 13, 13, 0.13);
 }
+
+
+/* Refinamiento visual del menú de la landing (noviembre 2026).
+   Afecta solamente al catálogo público; el carrito y sus eventos no cambian. */
+.menu-showcase-section .menu-grid.menu-grid {
+  align-items: start;
+  gap: 1.4rem;
+}
+
+.menu-showcase-section .menu-item {
+  min-width: 0;
+  padding: 1.45rem;
+  border-radius: 24px;
+  border-color: #e8dfd6;
+  background: #fffdfa;
+  box-shadow: 0 12px 32px rgba(48, 32, 20, 0.075);
+}
+
+.menu-showcase-section .menu-item-media {
+  width: 100%;
+  height: clamp(180px, 19vw, 230px);
+  min-height: 0;
+  aspect-ratio: auto;
+  overflow: hidden;
+  border-radius: 18px;
+  margin-bottom: 1.1rem;
+}
+
+.menu-showcase-section .menu-item-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-showcase-section .menu-item h3 {
+  font-size: clamp(1.4rem, 1.7vw, 1.8rem);
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+}
+
+.menu-showcase-section .menu-item-note {
+  font-size: 0.94rem;
+  line-height: 1.65;
+  margin-bottom: 0.8rem;
+}
+
+.menu-showcase-section .menu-item .price-list {
+  margin-top: 1rem;
+  gap: 0.25rem;
+}
+
+.menu-showcase-section .menu-item .price-list li {
+  padding: 0.75rem 0 0.5rem;
+  row-gap: 0.6rem;
+}
+
+.menu-showcase-section .menu-item .price-list li span {
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.menu-showcase-section .menu-item .price-list li.menu-order-enhanced .menu-order-line {
+  padding-top: 0.4rem;
+  margin-top: 0;
+  min-height: 2.8rem;
+}
+
+.menu-showcase-section .menu-item .menu-order-control {
+  min-width: 7.2rem;
+}
+
+/* Reservar una columna lateral real para el ticket fijo de escritorio. */
+@media (min-width: 960px) {
+  .menu-showcase-section > .container {
+    padding-right: clamp(26rem, 30vw, 28rem);
+  }
+
+  .menu-showcase-section .menu-grid.menu-grid,
+  .menu-showcase-section .menu-grid.two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .menu-showcase-section .menu-grid.menu-grid,
+  .menu-showcase-section .menu-grid.two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1850px) {
+  .menu-showcase-section .menu-grid.menu-grid,
+  .menu-showcase-section .menu-grid.two-col {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 959px) {
+  .menu-showcase-section .menu-grid.menu-grid,
+  .menu-showcase-section .menu-grid.two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.15rem;
+  }
+
+  .menu-showcase-section .menu-item {
+    padding: 1.15rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .menu-showcase-section .menu-grid.menu-grid,
+  .menu-showcase-section .menu-grid.two-col {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .menu-showcase-section .menu-item {
+    padding: 1.1rem;
+  }
+
+  .menu-showcase-section .menu-item-media {
+    height: 185px;
+  }
+}
