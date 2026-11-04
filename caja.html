@@ -2371,6 +2371,35 @@
         .category-filters .filter-pill { flex: 0 0 auto; }
       }
 
+      /* Acciones del ticket: jerarquía sencilla sin alterar sus listeners. */
+      @media screen {
+        .print-actions-card .print-secondary-actions {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.5rem;
+        }
+        .print-actions-card .print-secondary-actions .btn {
+          min-width: 0;
+          min-height: 44px;
+          padding: 0.65rem 0.4rem;
+          font-size: 0.79rem;
+          line-height: 1.25;
+          white-space: normal;
+        }
+        .print-actions-card #cajaPrintCustomer {
+          background: #8b3539;
+          border-color: #8b3539;
+          color: #fff;
+          font-weight: 600;
+          box-shadow: none;
+        }
+        .print-actions-card #cajaPrintBusiness { font-weight: 500; }
+        .print-actions-card #cajaReprintLast { font-size: 0.82rem; }
+        .print-actions-card #cajaStartNewSale {
+          margin-top: 0.2rem;
+          font-size: 0.82rem;
+        }
+      }
+
     </style>
   </head>
   <body class="caja-view">
@@ -2527,11 +2556,11 @@
           </div>
           <p class="print-hint">Puedes imprimir el comprobante de esta venta</p>
           <div class="print-actions">
-            <button type="button" id="cajaPrintCustomer" class="btn btn-primary">Imprimir ticket</button>
             <div class="print-secondary-actions">
+              <button type="button" id="cajaPrintCustomer" class="btn btn-primary">Ticket cliente</button>
               <button type="button" id="cajaPrintBusiness" class="btn btn-secondary">Copia negocio</button>
-              <button type="button" id="cajaReprintLast" class="btn btn-secondary">Reimprimir</button>
             </div>
+            <button type="button" id="cajaReprintLast" class="btn btn-secondary">Reimprimir</button>
             <button type="button" id="cajaStartNewSale" class="btn btn-secondary">Nueva venta</button>
           </div>
         </section>
