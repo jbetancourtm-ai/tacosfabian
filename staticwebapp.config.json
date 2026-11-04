@@ -60,9 +60,6 @@
     "401": {
       "statusCode": 302,
       "redirect": "/.auth/login/github?post_login_redirect_uri=/admin"
-    },
-    "403": {
-      "rewrite": "/403.html"
     }
   },
   "navigationFallback": {
