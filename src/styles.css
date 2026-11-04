@@ -12464,3 +12464,33 @@ body {
     padding: 1rem;
   }
 }
+
+
+/* Precio legible sobre cualquier tema: solo menú público, no Caja ni Admin. */
+.menu-showcase-section .menu-item .menu-item-price,
+.menu-showcase-section .menu-item--kilo .menu-item-price {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.8rem;
+  border-radius: 999px;
+  background: #7f1d1d;
+  color: #ffffff;
+  border: 1px solid #7f1d1d;
+  box-shadow: 0 4px 12px rgba(63, 13, 13, 0.16);
+  font-size: 1.05rem;
+  font-weight: 800;
+  opacity: 1;
+}
+
+.menu-showcase-section .menu-item .price-list li strong {
+  color: #ffffff;
+  background: #7f1d1d;
+  border: 1px solid #7f1d1d;
+  border-radius: 10px;
+  padding: 0.25rem 0.6rem;
+  font-size: 1rem;
+  font-weight: 800;
+  opacity: 1;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(63, 13, 13, 0.13);
+}
