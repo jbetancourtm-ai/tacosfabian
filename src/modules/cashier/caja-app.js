@@ -957,7 +957,9 @@ function buildTicketCopy(sale, copyType) {
   return `
     <article class="print-ticket__copy-block">
       <div class="print-ticket__center">
+        <img class="print-ticket__logo" src="/logo-tacos-fabian.svg" alt="Logotipo de Tacos Fabian" />
         <div class="print-ticket__brand">Tacos Fabian</div>
+        <div class="print-ticket__slogan">Los tacos que no hacen daño</div>
         <div class="print-ticket__subtitle">Ticket de venta</div>
         ${copyLabel}
       </div>
@@ -984,7 +986,7 @@ function buildTicketCopy(sale, copyType) {
       <div class="print-ticket__row"><span>Recibido</span><span>${receivedLabel}</span></div>
       <div class="print-ticket__row"><span>Cambio</span><span>${changeLabel}</span></div>
       <div class="print-ticket__rule"></div>
-      <div class="print-ticket__center">Gracias por su compra</div>
+      <div class="print-ticket__center print-ticket__thanks">Gracias por su preferencia, los esperamos pronto.</div>
       <div class="print-ticket__center print-ticket__note">Conserve su ticket</div>
     </article>
   `;
