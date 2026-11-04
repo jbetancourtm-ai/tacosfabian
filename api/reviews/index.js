@@ -66,7 +66,7 @@ function isHiddenReview(item) {
   const name = normalizedReviewText(item.name);
   const comment = normalizedReviewText(item.comment);
   return (
-    (name === "ralalerotralala" &&
+    ((name === "ralalerotralala" || name === "tralalerotralala") &&
       comment.includes("sus tacos saben mal y tienen poca higiene")) ||
     (name === "logan pichardo" &&
       comment.includes("me atendieron con mala gana") &&
