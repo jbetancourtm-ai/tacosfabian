@@ -67,9 +67,11 @@ function isHiddenReview(item) {
   const comment = normalizedReviewText(item.comment);
   return (
     (name === "ralalerotralala" &&
-      comment === "sus tacos saben mal y tienen poca higiene") ||
+      comment.includes("sus tacos saben mal y tienen poca higiene")) ||
     (name === "logan pichardo" &&
-      comment === "me atendieron con mala gana y me atendio un nino gordo , su olor dejaba mucho que desear , los tacos no estaban mal pero no eran los mejores")
+      comment.includes("me atendieron con mala gana") &&
+      comment.includes("su olor dejaba mucho que desear") &&
+      comment.includes("los tacos no estaban mal"))
   );
 }
 
