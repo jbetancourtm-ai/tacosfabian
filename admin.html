@@ -46,7 +46,8 @@
             <p class="section-kicker">Acceso seguro</p>
             <h2 id="adminAccessTitle">Verificando identidad del administrador</h2>
             <p id="adminAccessStatus" class="muted" role="status" aria-live="polite">Consultando permisos en Azure Static Web Apps...</p>
-            <p><a class="btn btn-primary" href="/.auth/login/github?post_login_redirect_uri=/admin">Iniciar sesión con GitHub</a></p>
+            <p id="adminLoginAction"><a class="btn btn-primary" href="/.auth/login/github?post_login_redirect_uri=/admin">Iniciar sesión con GitHub</a></p>
+            <p id="adminSwitchAccountAction" hidden><a class="btn btn-secondary" href="/.auth/logout?post_logout_redirect_uri=/admin">Cerrar sesión y cambiar de cuenta</a></p>
           </div>
         </section>
 
