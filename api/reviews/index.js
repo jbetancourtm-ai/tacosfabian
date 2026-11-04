@@ -50,6 +50,29 @@ function buildRowKey() {
   return `${new Date().toISOString()}_${crypto.randomUUID()}`;
 }
 
+// Moderación puntual solicitada por el propietario: ocultar únicamente dos
+// reseñas identificadas por la combinación de autor y comentario.
+// No modifica ni elimina entidades de Azure Table Storage.
+function normalizedReviewText(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLocaleLowerCase("es");
+}
+
+function isHiddenReview(item) {
+  const name = normalizedReviewText(item.name);
+  const comment = normalizedReviewText(item.comment);
+  return (
+    (name === "ralalerotralala" &&
+      comment === "sus tacos saben mal y tienen poca higiene") ||
+    (name === "logan pichardo" &&
+      comment === "me atendieron con mala gana y me atendio un nino gordo , su olor dejaba mucho que desear , los tacos no estaban mal pero no eran los mejores")
+  );
+}
+
 async function listReviews(client) {
   const entities = [];
   const iterator = client.listEntities({
@@ -70,8 +93,9 @@ async function listReviews(client) {
     if (entities.length >= MAX_ITEMS) break;
   }
 
-  entities.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
-  return entities;
+  const publishedReviews = entities.filter((item) => !isHiddenReview(item));
+  publishedReviews.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+  return publishedReviews;
 }
 
 async function createReview(client, payload) {
