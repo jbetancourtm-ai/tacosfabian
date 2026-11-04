@@ -2135,6 +2135,265 @@
           right: calc(390px + 1.5rem);
         }
       }
+
+
+      /* Caja Premium: visual solamente. Sin cambios a PIN, JS, tickets o ventas. */
+      @media screen {
+        body.caja-view {
+          --caja-border: #e9dfd5;
+          --caja-neutral: #f7f5f2;
+          --caja-primary: #96272c;
+          background: #f6f5f3;
+        }
+
+        .caja-header {
+          padding: 0.65rem 1.15rem;
+          background: #fffefa;
+          border-bottom-color: #ebe4dd;
+          box-shadow: 0 3px 18px rgba(48, 30, 20, 0.045);
+        }
+
+        .caja-main {
+          gap: 1rem;
+        }
+
+        .caja-form {
+          padding: 1.15rem 1.3rem;
+          border-radius: 20px;
+          background: #fffefa;
+          box-shadow: 0 8px 28px rgba(49, 31, 21, 0.045);
+        }
+
+        .caja-form h2 {
+          font-size: 1.2rem;
+          letter-spacing: -0.025em;
+          margin-bottom: 0.25rem;
+        }
+
+        .caja-form .section-description {
+          margin-bottom: 0.75rem;
+          font-size: 0.79rem;
+        }
+
+        .caja-form .form-row {
+          gap: 0.65rem;
+        }
+
+        .caja-form .form-group label {
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: #584b43;
+        }
+
+        .caja-form select,
+        .caja-form .folio-display {
+          border-radius: 12px;
+          border-color: #e6ded7;
+          background: #fff;
+        }
+
+        .caja-filters {
+          gap: 0.75rem;
+          margin: 0.8rem 0 1rem;
+        }
+
+        .search-input {
+          min-height: 48px;
+          border-radius: 14px;
+          padding: 0.7rem 1rem;
+          border-color: #e2d8d0;
+          background: #fff;
+        }
+
+        .category-filters {
+          gap: 0.48rem;
+          padding: 0.25rem 0 0.35rem;
+          align-items: center;
+        }
+
+        .filter-pill {
+          min-height: 40px;
+          padding: 0.52rem 0.92rem;
+          border-radius: 12px;
+          border-color: #e7ded5;
+          background: #fff;
+          color: #4c403c;
+          font-weight: 600;
+          box-shadow: 0 2px 6px rgba(35, 25, 20, 0.025);
+        }
+
+        .filter-pill.active {
+          color: #fff;
+          border-color: #96272c;
+          background: #96272c;
+          box-shadow: 0 4px 12px rgba(150, 39, 44, 0.18);
+        }
+
+        .filter-pill:focus-visible,
+        .qty-btn:focus-visible {
+          outline: 3px solid rgba(150, 39, 44, 0.3);
+          outline-offset: 2px;
+        }
+
+        .catalog-grid {
+          gap: 0.9rem;
+          align-content: start;
+        }
+
+        .product-card {
+          min-width: 0;
+          min-height: 192px;
+          padding: 1rem;
+          border-radius: 16px;
+          border-color: #e6dcd2;
+          background: linear-gradient(180deg, #fff 0%, #fffdfa 100%);
+          box-shadow: 0 4px 14px rgba(54, 32, 21, 0.035);
+          transition: border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .product-card:hover {
+          transform: none;
+          border-color: #ce9ca0;
+          box-shadow: 0 7px 20px rgba(54, 32, 21, 0.075);
+        }
+
+        .product-tag {
+          align-self: flex-start;
+          width: auto;
+          max-width: 100%;
+          font-size: 0.68rem;
+          font-weight: 700;
+          margin-bottom: 0.55rem;
+          padding: 0.3rem 0.55rem;
+          border-radius: 9px;
+        }
+
+        .product-name {
+          font-size: 0.94rem;
+          line-height: 1.38;
+          font-weight: 750;
+          overflow-wrap: anywhere;
+          margin-bottom: 0.4rem;
+        }
+
+        .product-price {
+          font-size: 1.05rem;
+          line-height: 1.3;
+          font-weight: 800;
+          color: #8c2027;
+          margin-bottom: 0.7rem;
+        }
+
+        .product-controls {
+          gap: 0.65rem;
+          grid-template-columns: minmax(0, 1fr) 2rem minmax(0, 1fr);
+          padding-top: 0.55rem;
+          border-top: 1px solid #f0eae4;
+        }
+
+        .product-controls .qty-btn {
+          min-height: 44px;
+          border-radius: 12px;
+          border: 1px solid #e9dfd5;
+          background: #f7f4f0;
+          color: #4d4038;
+        }
+
+        .product-controls .qty-btn[data-action="increment"] {
+          background: #96272c;
+          color: white;
+          border-color: #96272c;
+        }
+
+        .product-controls .qty-btn[data-action="increment"]:hover:not(:disabled) {
+          background: #7b1d23;
+        }
+
+        .product-quantity {
+          font-size: 1.08rem;
+          font-weight: 800;
+          font-variant-numeric: tabular-nums;
+        }
+
+        .product-subtotal {
+          font-variant-numeric: tabular-nums;
+          font-size: 0.8rem;
+        }
+
+        .summary-card,
+        .caja-mobile-checkout {
+          border-color: #e7ddd4;
+          border-radius: 18px;
+          box-shadow: 0 9px 26px rgba(49, 31, 21, 0.075);
+        }
+
+        .ticket-total-row strong,
+        .mobile-checkout-summary strong {
+          font-variant-numeric: tabular-nums;
+        }
+      }
+
+      @media screen and (min-width: 1025px) {
+        .caja-form {
+          padding: 1.2rem 1.35rem;
+        }
+
+        .catalog-grid {
+          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        }
+
+        .caja-summary,
+        .caja-mobile-checkout {
+          width: 370px;
+        }
+      }
+
+      @media screen and (min-width: 640px) and (max-width: 1024px) {
+        .catalog-grid {
+          grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+        }
+      }
+
+      @media screen and (max-width: 639px) {
+        .caja-form {
+          padding: 0.9rem;
+          border-radius: 16px;
+        }
+
+        .catalog-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.65rem;
+        }
+
+        .product-card {
+          padding: 0.75rem;
+          min-height: 174px;
+        }
+
+        .product-controls {
+          gap: 0.25rem;
+          grid-template-columns: minmax(0, 1fr) 1.5rem minmax(0, 1fr);
+        }
+
+        .product-controls .qty-btn {
+          min-height: 44px;
+          padding: 0.25rem;
+        }
+
+        .category-filters {
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          overscroll-behavior-x: contain;
+          scrollbar-width: thin;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .category-filters .filter-pill {
+          flex: 0 0 auto;
+          white-space: nowrap;
+        }
+      }
+
     </style>
   </head>
   <body class="caja-view">
