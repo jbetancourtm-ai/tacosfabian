@@ -10,6 +10,8 @@ import CajaAdminDashboard from './modules/admin/caja-dashboard.js';
 const api = getAPIService();
 const gate = document.querySelector('#adminAccessGate');
 const gateStatus = document.querySelector('#adminAccessStatus');
+const loginAction = document.querySelector('#adminLoginAction');
+const switchAccountAction = document.querySelector('#adminSwitchAccountAction');
 const dashboard = document.querySelector('#adminDashboard');
 const adminStatus = document.querySelector('#adminStatus');
 const table = document.querySelector('#salesTableBody');
@@ -25,8 +27,10 @@ const todayLocal = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-function setAuthorized(authorized, message = '') {
+function setAuthorized(authorized, message = '', authenticated = false) {
   adminAuthorized = authorized;
+  if (loginAction) loginAction.hidden = authorized || authenticated;
+  if (switchAccountAction) switchAccountAction.hidden = authorized || !authenticated;
   if (gate) gate.hidden = authorized;
   if (dashboard) {
     dashboard.hidden = !authorized;
@@ -40,7 +44,9 @@ async function verifyAdminIdentity() {
   if (!response.ok) throw new Error('No se pudo validar la sesión de Azure.');
   const payload = await response.json();
   const principal = payload?.clientPrincipal;
-  return Boolean(principal?.userId && Array.isArray(principal.userRoles) && principal.userRoles.includes('admin'));
+  const authenticated = Boolean(principal?.userId);
+  const isAdmin = authenticated && Array.isArray(principal.userRoles) && principal.userRoles.includes('admin');
+  return { authenticated, isAdmin };
 }
 
 function normalizeSale(sale) {
@@ -139,9 +145,11 @@ async function loadReviews() {
 async function initializeAdmin() {
   setAuthorized(false, 'Verificando sesión y rol admin...');
   try {
-    const isAdmin = await verifyAdminIdentity();
+    const { authenticated, isAdmin } = await verifyAdminIdentity();
     if (!isAdmin) {
-      setAuthorized(false, 'Acceso denegado: tu cuenta no tiene el rol admin autorizado.');
+      setAuthorized(false, authenticated
+        ? 'Sesión de GitHub activa, pero sin rol admin. Cierra sesión y entra con una cuenta autorizada.'
+        : 'No has iniciado sesión. Accede con la cuenta GitHub autorizada.', authenticated);
       return;
     }
     setAuthorized(true);
@@ -155,10 +163,13 @@ async function initializeAdmin() {
     // Revalidar identidad al regresar a la pestaña antes de mostrar nuevas consultas.
     window.addEventListener('pageshow', async () => {
       try {
-        if (!await verifyAdminIdentity()) {
+        const { authenticated, isAdmin } = await verifyAdminIdentity();
+        if (!isAdmin) {
           ownerDashboard?.destroy();
-          resetSalesDisplay('La sesión administrativa ha terminado.');
-          setAuthorized(false, 'Inicia sesión nuevamente con una cuenta autorizada.');
+          resetSalesDisplay('La sesión administrativa ha terminado o perdió sus permisos.');
+          setAuthorized(false, authenticated
+            ? 'La sesión actual no tiene el rol admin. Cierra sesión y cambia de cuenta.'
+            : 'La sesión terminó. Inicia sesión con una cuenta autorizada.', authenticated);
         }
       } catch {
         ownerDashboard?.destroy();
