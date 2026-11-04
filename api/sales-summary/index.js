@@ -7,6 +7,7 @@
 
 import { TableClient, AzureNamedKeyCredential } from '@azure/data-tables';
 import { requireRole } from '../lib/auth.js';
+import { businessDateFromTimestamp, listBusinessDayMovements } from '../lib/business-day.js';
 
 const TABLE_NAME = process.env.MOVEMENTS_TABLE_NAME || 'SalesMovements';
 const STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
@@ -60,7 +61,7 @@ export default async function (context, req) {
 
 async function handleDailySummary(context, req) {
   try {
-    const date = req.query.date || new Date().toISOString().split('T')[0];
+    const date = req.query.date || businessDateFromTimestamp(new Date());
     const movements = await getMovementsByDate(context, date);
 
     const summary = calculateSummary(movements);
@@ -78,15 +79,15 @@ async function handleDailySummary(context, req) {
 
 async function handleRangeSummary(context, req) {
   try {
-    const startDate = req.query.start || new Date().toISOString().split('T')[0];
-    const endDate = req.query.end || new Date().toISOString().split('T')[0];
+    const startDate = req.query.start || businessDateFromTimestamp(new Date());
+    const endDate = req.query.end || businessDateFromTimestamp(new Date());
 
     const start = new Date(startDate);
     const end = new Date(endDate);
     const movements = [];
 
     // Iterar por cada día en el rango
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
       const dateStr = d.toISOString().split('T')[0];
       const dayMovements = await getMovementsByDate(context, dateStr);
       movements.push(...dayMovements);
@@ -108,7 +109,7 @@ async function handleRangeSummary(context, req) {
 
 async function handleKPI(context, req) {
   try {
-    const date = req.query.date || new Date().toISOString().split('T')[0];
+    const date = req.query.date || businessDateFromTimestamp(new Date());
     const movements = await getMovementsByDate(context, date);
 
     const summary = calculateSummary(movements);
@@ -137,21 +138,7 @@ async function handleKPI(context, req) {
 // Utilidades de Datos
 // ============================================================================
 async function getMovementsByDate(context, date) {
-  const partitionKey = sanitizePartitionKey(date);
-
-  const client = getTableClient();
-  const entities = [];
-  const iterator = client.listEntities({
-    queryOptions: {
-      filter: `PartitionKey eq '${partitionKey}'`,
-    },
-  });
-
-  for await (const entity of iterator) {
-    if (entity.estado !== 'cancelado') entities.push(entity);
-  }
-
-  return entities;
+  return listBusinessDayMovements(getTableClient(), date);
 }
 
 function calculateSummary(movements) {

@@ -14,6 +14,7 @@ const state = {
   shiftTotal: 0,
   ticketItems: {},
   lastSale: null,
+  draftFolio: null,
 };
 
 const products = [
@@ -409,18 +410,40 @@ function getTicketItems() {
     });
 }
 
+// La jornada se presenta con la fecha calendario de Texcoco, sin depender
+// de la zona horaria configurada en la computadora o el telefono.
+const BUSINESS_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit',
+});
+
+function getBusinessDate(timestamp = new Date()) {
+  const value = timestamp instanceof Date ? timestamp : new Date(timestamp);
+  if (Number.isNaN(value.getTime())) return null;
+  const parts = Object.fromEntries(
+    BUSINESS_DATE_FORMATTER.formatToParts(value)
+      .filter((part) => ['year', 'month', 'day'].includes(part.type))
+      .map((part) => [part.type, part.value])
+  );
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
 function getCurrentDateStamp() {
-  return new Date().toISOString().split('T')[0].replace(/-/g, '');
+  return getBusinessDate().replaceAll('-', '');
 }
 
 function getNextFolioForToday() {
-  const today = new Date().toISOString().split('T')[0];
-  const dailyMovements = loadMovementsLocally().filter((movement) => {
-    const movementDate = new Date(movement.fecha_hora).toISOString().split('T')[0];
-    return movementDate === today;
-  });
+  const today = getBusinessDate();
+  // El folio es estable mientras se arma el ticket y unico entre dispositivos.
+  if (state.draftFolio?.startsWith(`TF-${today.replaceAll('-', '')}-`)) {
+    return state.draftFolio;
+  }
+  const dailyMovements = loadMovementsLocally()
+    .filter((movement) => getBusinessDate(movement.fecha_hora) === today);
   const sequence = dailyMovements.length + 1;
-  return `TF-${today.replace(/-/g, '')}-${String(sequence).padStart(4, '0')}`;
+  const uniqueSuffix = (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`)
+    .replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase();
+  state.draftFolio = `TF-${today.replaceAll('-', '')}-${String(sequence).padStart(4, '0')}-${uniqueSuffix}`;
+  return state.draftFolio;
 }
 
 function updateTicketSummary() {
@@ -583,6 +606,7 @@ function toggleMobileDetails() {
 function clearTicket() {
   // Limpiar estado del ticket
   state.ticketItems = {};
+  state.draftFolio = null;
   
   // Limpiar producto "Otro" si existe
   const otherProduct = products.find((item) => item.id === 'otro');
@@ -970,7 +994,7 @@ function buildTicketCopy(sale, copyType) {
 // Corte de caja
 // ============================================================================
 function getCashCutSummary(date = new Date()) {
-  const targetDate = new Date(date).toISOString().split('T')[0];
+  const targetDate = getBusinessDate(date);
   const movements = getDailyMovements(targetDate).sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
   const byPayment = movements.reduce((summary, movement) => {
     const method = movement.metodo_pago || 'otro';
@@ -1147,20 +1171,20 @@ function loadMovementsLocally() {
 
 function getMovementsByShift(shift, date = null) {
   const allMovements = loadMovementsLocally();
-  const targetDate = date ? new Date(date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  const targetDate = date ? (/^\d{4}-\d{2}-\d{2}$/.test(date) ? date : getBusinessDate(date)) : getBusinessDate();
 
   return allMovements.filter((m) => {
-    const mDate = new Date(m.fecha_hora).toISOString().split('T')[0];
+    const mDate = getBusinessDate(m.fecha_hora);
     return m.turno === shift && mDate === targetDate && m.estado !== 'cancelado';
   });
 }
 
 function getDailyMovements(date = null) {
   const allMovements = loadMovementsLocally();
-  const targetDate = date ? new Date(date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  const targetDate = date ? (/^\d{4}-\d{2}-\d{2}$/.test(date) ? date : getBusinessDate(date)) : getBusinessDate();
 
   return allMovements.filter((m) => {
-    const mDate = new Date(m.fecha_hora).toISOString().split('T')[0];
+    const mDate = getBusinessDate(m.fecha_hora);
     return mDate === targetDate && m.estado !== 'cancelado';
   });
 }

@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/ensure-swa-config.mjs",
+    "build": "npm run test:business-day && vite build && node scripts/ensure-swa-config.mjs",
     "preview": "vite preview",
-    "start:swa": "swa start http://localhost:5173 --run \"npm run dev\" --api-location api"
+    "start:swa": "swa start http://localhost:5173 --run \"npm run dev\" --api-location api",
+    "test:business-day": "node --check api/lib/business-day.js && node --check api/movements/index.js && node --check api/sales-summary/index.js && node --check src/modules/cashier/caja-app.js && node scripts/test-business-day.mjs"
   },
   "devDependencies": {
     "vite": "^5.4.0"

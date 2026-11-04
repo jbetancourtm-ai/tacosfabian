@@ -8,6 +8,7 @@
 import { TableClient, AzureNamedKeyCredential } from '@azure/data-tables';
 import { createHash } from 'node:crypto';
 import { getCallerRole, requireRole } from '../lib/auth.js';
+import { businessDateFromTimestamp, listBusinessDayMovements } from '../lib/business-day.js';
 
 const TABLE_NAME = process.env.MOVEMENTS_TABLE_NAME || 'SalesMovements';
 const STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING || '';
@@ -156,6 +157,7 @@ async function handleCreateMovement(context, req) {
         payload_hash: payloadHash,
         ...toTableEntity(movement),
         fecha_creacion: new Date().toISOString(),
+        fecha_operacion: businessDateFromTimestamp(movement.fecha_hora),
       };
 
       try {
@@ -251,77 +253,25 @@ function toTableEntity(movement) {
 
 async function handleGetDaily(context, req) {
   try {
-    const date = req.query.date || new Date().toISOString().split('T')[0];
-    const partitionKey = sanitizePartitionKey(date);
-
-    try {
-      const client = getTableClient();
-      const entities = [];
-      const iterator = client.listEntities({
-        queryOptions: {
-          filter: `PartitionKey eq '${partitionKey}'`,
-        },
-      });
-
-      for await (const entity of iterator) {
-        if (entity.estado !== 'cancelado') {
-          entities.push(entity);
-        }
-      }
-
-      return success(context, {
-        date,
-        count: entities.length,
-        movements: entities,
-      });
-    } catch (dbError) {
-      context.log.error('Error con Table Storage al consultar movimientos diarios:', dbError);
-      return serverError(context, `Error de consulta en Table Storage: ${dbError?.message || 'desconocido'}`);
-    }
+    const date = req.query.date || businessDateFromTimestamp(new Date());
+    const entities = await listBusinessDayMovements(getTableClient(), date);
+    return success(context, { date, count: entities.length, movements: entities });
   } catch (error) {
-    context.log.error('Error obteniendo movimientos diarios:', error);
-    return serverError(context, 'Error al obtener movimientos');
+    context.log.error('Error consultando ventas del dia comercial:', error);
+    return serverError(context, 'No se pudieron consultar las ventas.');
   }
 }
 
 async function handleGetShift(context, req) {
   try {
     const shift = req.query.shift;
-    const date = req.query.date || new Date().toISOString().split('T')[0];
-
-    if (!shift) {
-      return badRequest(context, 'Falta parámetro shift');
-    }
-
-    try {
-      const client = getTableClient();
-      const entities = [];
-      const partitionKey = sanitizePartitionKey(date);
-      const iterator = client.listEntities({
-        queryOptions: {
-          filter: `PartitionKey eq '${partitionKey}' and turno eq '${shift}'`,
-        },
-      });
-
-      for await (const entity of iterator) {
-        if (entity.estado !== 'cancelado') {
-          entities.push(entity);
-        }
-      }
-
-      return success(context, {
-        shift,
-        date,
-        count: entities.length,
-        movements: entities,
-      });
-    } catch (dbError) {
-      context.log.error('Error con Table Storage al consultar movimientos por turno:', dbError);
-      return serverError(context, `Error de consulta en Table Storage: ${dbError?.message || 'desconocido'}`);
-    }
+    if (!shift) return badRequest(context, 'Falta parametro shift');
+    const date = req.query.date || businessDateFromTimestamp(new Date());
+    const entities = await listBusinessDayMovements(getTableClient(), date, { shift });
+    return success(context, { shift, date, count: entities.length, movements: entities });
   } catch (error) {
-    context.log.error('Error obteniendo movimientos por turno:', error);
-    return serverError(context, 'Error al obtener movimientos');
+    context.log.error('Error consultando ventas por turno:', error);
+    return serverError(context, 'No se pudieron consultar las ventas por turno.');
   }
 }
 
