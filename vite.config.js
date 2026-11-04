@@ -10,6 +10,7 @@ export default defineConfig({
         main: resolve(__dirname, "index.html"),
         admin: resolve(__dirname, "admin.html"),
         caja: resolve(__dirname, "caja.html"),
+        inventario: resolve(__dirname, "inventario.html"),
       },
     },
   },
