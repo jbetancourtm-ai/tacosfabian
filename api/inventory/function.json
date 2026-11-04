@@ -1,6 +1,6 @@
 {
   "bindings": [
-    { "authLevel": "anonymous", "type": "httpTrigger", "direction": "in", "name": "req", "methods": ["get"], "route": "inventory/{operation}" },
+    { "authLevel": "anonymous", "type": "httpTrigger", "direction": "in", "name": "req", "methods": ["get", "post"], "route": "inventory/{operation}" },
     { "type": "http", "direction": "out", "name": "$return" }
   ]
 }
