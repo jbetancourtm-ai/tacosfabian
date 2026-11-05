@@ -2427,6 +2427,36 @@
         }
       }
 
+      /* Vista horizontal de móvil/tableta: aprovechar todo el ancho disponible.
+         La reserva lateral de 360px es solo para escritorios con ticket lateral.
+         Mantener intactos los flujos de Caja, impresión, PIN y Corte de caja. */
+      @media screen and (orientation: landscape) and (max-width: 1024px),
+             screen and (orientation: landscape) and (max-height: 650px) and (pointer: coarse) {
+        .caja-main {
+          display: block;
+          width: 100%;
+          min-width: 0;
+          height: auto;
+          padding: 0.75rem;
+        }
+
+        .caja-form {
+          width: 100%;
+          max-width: none;
+          min-width: 0;
+          height: auto;
+          box-sizing: border-box;
+        }
+
+        .catalog-grid {
+          grid-template-columns: repeat(auto-fit, minmax(min(175px, 100%), 1fr));
+        }
+
+        .caja-cut-trigger {
+          right: 0.85rem;
+        }
+      }
+
     </style>
   </head>
   <body class="caja-view">
