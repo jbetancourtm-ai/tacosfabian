@@ -206,3 +206,94 @@ body[data-home-theme="premium-noir"] .hero-premium-copy__links a:focus-visible {
     transition: none;
   }
 }
+
+/* Navegación pública minimalista: una sola ruta visible por acción.
+   Los anchors y listeners HTML/JS originales se conservan. */
+body[data-home-theme="premium-noir"] .site-header .quick-category-nav,
+body[data-home-theme="premium-noir"] .site-header #heroMenuDestacadoBtn,
+body[data-home-theme="premium-noir"] .site-header .hero-actions--header > a[href="#ubicacion"] {
+  display: none !important;
+}
+
+body[data-home-theme="premium-noir"] .site-header .hero-actions--header {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  gap: 0.55rem;
+}
+
+body[data-home-theme="premium-noir"] .site-header .hero-actions--header > .btn {
+  box-shadow: none;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  flex: 0 0 auto;
+}
+
+body[data-home-theme="premium-noir"] .site-header .header-inner {
+  align-items: center;
+}
+
+body[data-home-theme="premium-noir"] .site-header .header-cta-group {
+  align-items: center;
+  gap: 0;
+}
+
+@media (min-width: 1100px) {
+  body[data-home-theme="premium-noir"] .site-header {
+    width: min(1280px, calc(100vw - 2rem));
+  }
+
+  body[data-home-theme="premium-noir"] .site-header .header-inner {
+    grid-template-columns: minmax(215px, auto) minmax(0, 1fr) auto;
+    min-height: 76px;
+    padding: 0.7rem 1.25rem;
+    gap: clamp(0.85rem, 2vw, 1.8rem);
+  }
+
+  body[data-home-theme="premium-noir"] .site-header .header-cta-group {
+    width: auto;
+    min-width: 0;
+    justify-self: end;
+  }
+
+  body[data-home-theme="premium-noir"] .site-header .hero-actions--header {
+    display: flex;
+    width: auto;
+    max-width: none;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    overflow: visible;
+  }
+
+  body[data-home-theme="premium-noir"] .site-header .hero-actions--header > .btn {
+    min-width: 0;
+    width: auto;
+  }
+
+  /* Despegar el panel del pedido del encabezado, sin alterar el carrito. */
+  body[data-home-theme="premium-noir"] .menu-order-shell.is-desktop {
+    top: 7.6rem;
+    max-height: calc(100dvh - 8.4rem);
+  }
+}
+
+@media (max-width: 1099px) {
+  body[data-home-theme="premium-noir"] .site-header .header-cta-group {
+    min-width: 0;
+  }
+
+  body[data-home-theme="premium-noir"] .site-header .hero-actions--header {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-home-theme="premium-noir"] .site-header .hero-actions--header > .btn {
+    transition: none;
+  }
+}
