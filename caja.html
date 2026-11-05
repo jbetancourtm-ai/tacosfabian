@@ -2400,6 +2400,33 @@
         }
       }
 
+      /* Barra de categorías responsive: una sola línea en cualquier orientación.
+         Desplazamiento horizontal táctil, sin alterar el diseño ni los eventos. */
+      @media screen {
+        .caja-form .caja-filters,
+        .caja-form .category-filters {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .caja-form .category-filters {
+          display: flex;
+          flex-wrap: nowrap;
+          width: 100%;
+          overflow-x: auto;
+          overflow-y: hidden;
+          overscroll-behavior-x: contain;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
+          touch-action: pan-x pan-y;
+        }
+
+        .caja-form .category-filters > .filter-pill {
+          flex: 0 0 auto;
+          white-space: nowrap;
+        }
+      }
+
     </style>
   </head>
   <body class="caja-view">
