@@ -297,3 +297,83 @@ body[data-home-theme="premium-noir"] .site-header .header-cta-group {
     transition: none;
   }
 }
+
+/* App dock: mantener Instalar y Salir dentro del mismo grupo.
+   Resuelve la posición fija heredada de Salir y evita tapar redes sociales.
+   Solo layout: se conservan IDs, listeners y control de visibilidad. */
+body[data-home-theme="premium-noir"] .fixed-app-actions {
+  position: fixed;
+  left: max(0.75rem, env(safe-area-inset-left));
+  bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  right: auto;
+  top: auto;
+  width: min(164px, calc(100vw - 1.5rem));
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  z-index: 350;
+}
+
+body[data-home-theme="premium-noir"] .fixed-app-actions > .btn {
+  position: relative !important;
+  inset: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  box-sizing: border-box;
+  white-space: normal;
+  box-shadow: 0 4px 14px rgba(31, 25, 22, 0.08);
+}
+
+body[data-home-theme="premium-noir"] .fixed-app-actions > .btn[hidden] {
+  display: none !important;
+}
+
+body[data-home-theme="premium-noir"] .fixed-app-actions > .btn .btn-exit-app__text,
+body[data-home-theme="premium-noir"] .fixed-app-actions > .btn .btn-install-app__text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+body[data-home-theme="premium-noir"] .fixed-app-actions:not(:has(> .btn:not([hidden]))) {
+  display: none;
+}
+
+/* Una acción necesita una altura; dos se acomodan una sobre otra.
+   La barra de redes siempre queda por encima del grupo, sin solaparse. */
+body[data-home-theme="premium-noir"] .social-floating-links {
+  left: max(0.75rem, env(safe-area-inset-left));
+  bottom: calc(4.8rem + env(safe-area-inset-bottom));
+}
+
+body[data-home-theme="premium-noir"]:has(.fixed-app-actions > #installAppBtn:not([hidden])):has(.fixed-app-actions > #exitAppBtn:not([hidden])) .social-floating-links {
+  bottom: calc(8.1rem + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 480px) {
+  body[data-home-theme="premium-noir"] .fixed-app-actions {
+    width: min(148px, calc(100vw - 1.5rem));
+    left: max(0.6rem, env(safe-area-inset-left));
+    bottom: calc(0.6rem + env(safe-area-inset-bottom));
+  }
+
+  body[data-home-theme="premium-noir"] .social-floating-links {
+    left: max(0.6rem, env(safe-area-inset-left));
+  }
+}
